@@ -2,13 +2,8 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const app = require("./app");
 
-
-
-
 const connection = mongoose.connect(process.env.SO_YUMMY, {
   dbName: "so_yummy",
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
 });
 
 const PORT = process.env.PORT || 3000;
@@ -21,6 +16,8 @@ connection
     });
   })
   .catch((err) => {
-    console.error(`Error while establishing connection: [${err}]`);
+    console.error("Error while establishing connection:", err);
     process.exit(1);
   });
+
+  
