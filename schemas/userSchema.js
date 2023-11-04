@@ -17,5 +17,17 @@ const registerSchema = Joi.object({
     "any.required": "Password is required",
   }),
 });
+const signinSchema = Joi.object({
+  email: Joi.string().email().trim().required().messages({
+    "string.base": "E-mail must be a string",
+    "string.email": "Enter a valid email address",
+    "any.required": "Email is required",
+  }),
+  password: Joi.string().min(6).trim().required().messages({
+    "string.base": "Password must be a string",
+    "string.min": "Password must be at least 6 characters long",
+    "any.required": "Password is required",
+  }),
+});
 
-module.exports = { registerSchema };
+module.exports = { registerSchema, signinSchema };
