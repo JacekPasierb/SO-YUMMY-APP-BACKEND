@@ -12,7 +12,7 @@ const userRouter = require("./routes/api/user");
 const { handle404, handle500 } = require("./utils/handleErrors");
 
 app.use("/api/users", userRouter);
-
+app.get("/", (req, res) => res.json({ version: "1.0" }));
 app.use((req, res) => {
   handle404(res, "Not Found");
 });
