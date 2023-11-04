@@ -8,9 +8,14 @@ const send = (email, verificationToken) => {
   const msg = {
     to: email, // Change to your recipient
     from: "jack_byk@o2.pl", // Change to your verified sender
-    subject: "E-mail verification Contacts",
+    subject: "SO YUMMY APP email verification",
     text: "and easy to do anywhere, even with Node.js",
-    html: `<p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="http://localhost:${process.env.PORT}/api/users/verify/${verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>`,
+    html: `
+       <div style="text-align: center;">
+       <h1>SO YUMMY APP</h1>
+       <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="http://localhost:${process.env.PORT}/api/users/verify/${verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
+       </div>
+       `,
   };
 
   sgMail

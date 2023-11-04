@@ -1,8 +1,17 @@
 const bcrypt = require("bcrypt");
 const { nanoid } = require("nanoid");
 const { registerSchema } = require("../schemas/userSchema");
-const { getUserByEmail, addUser, findUser } = require("../services/user/userServices");
-const { handle409, handle201, handle404, handle200 } = require("../utils/handleErrors");
+const {
+  getUserByEmail,
+  addUser,
+  findUser,
+} = require("../services/user/userServices");
+const {
+  handle409,
+  handle201,
+  handle404,
+  handle200,
+} = require("../utils/handleErrors");
 const { send } = require("../utils/sendGrid");
 
 const register = async (req, res, next) => {
@@ -46,19 +55,19 @@ const register = async (req, res, next) => {
 
 const verifyEmail = async (req, res) => {
   try {
-      const { verificationToken } = req.params;
-      console.log(verificationToken);
-      const user = await findUser({ verificationToken } );
-console.log("uuuu",user);
+    const { verificationToken } = req.params;
+
+    const user = await findUser({ verificationToken });
+
     if (!user) {
       return handle404(res);
     }
     user.set("verify", true);
-      user.verificationToken = null;
-      console.log("end",user);
-      await user.save();
-      console.log("działa");
-    return handle200(res, "Success")
+    user.verificationToken = null;
+
+    await user.save();
+
+    return handle200(res, "Success");
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });

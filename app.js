@@ -8,23 +8,17 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-const userRouter = require('./routes/api/user');
+const userRouter = require("./routes/api/user");
+const { handle404, handle500 } = require("./utils/handleErrors");
 
 app.use("/api/users", userRouter);
 
 app.use((req, res) => {
-   return res.status(404).json({
-     status: "Not Found",
-     code: "404",
-     message: `${message}`,
-     data,
-   });
+  handle404(res, "Not Found");
 });
 app.use((err, req, res, next) => {
   console.log("err:", err);
- return res.status(500).json({
-   message: message,
- });
+  handle500(res, err.message);
 });
 
 module.exports = app;
