@@ -33,7 +33,7 @@ const register = async (req, res, next) => {
     }
     const checkEmail = await getUserByEmail({ email });
     if (checkEmail) {
-      return handle409(res, "Email is already in use TEST");
+      return handle409(res, "Email is already in use");
     }
 
     const hashPassword = await bcrypt.hash(password, 12);

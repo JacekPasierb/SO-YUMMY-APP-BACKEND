@@ -27,6 +27,14 @@ const send = (email, verificationToken) => {
       console.error(error);
     });
 };
+try {
+  const sended = await sgMail.send(msg);
+  console.log("sended: ", sended);
+  return { success: true };
+} catch (error) {
+  console.error(error);
+  return { succes: false };
+}
 
 module.exports = {
   send,
