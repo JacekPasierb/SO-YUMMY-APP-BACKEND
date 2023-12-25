@@ -5,7 +5,13 @@ const app = express();
 const logger = require("morgan");
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // lub '*' jeśli chcesz zezwolić na wszystkie źródła
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 const userRouter = require("./routes/api/user");
