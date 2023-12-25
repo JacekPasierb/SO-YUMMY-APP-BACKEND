@@ -18,15 +18,15 @@ const send = (email, verificationToken) => {
        `,
   };
 
-  sgMail
-    .send(msg)
-    .then(() => {
-      console.log("Email sent");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+//   sgMail
+//     .send(msg)
+//     .then(() => {
+//       console.log("Email sent");
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+// };
 try {
   const sended = await sgMail.send(msg);
   console.log("sended: ", sended);
