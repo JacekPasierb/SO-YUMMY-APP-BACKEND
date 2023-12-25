@@ -17,6 +17,7 @@ const send = async (email, verificationToken) => {
   };
 
   try {
+    console.log("hej");
     const wyslane = await sgMail.send(msg);
     console.log("E-mail wysłany");
     return { sukces: true };
