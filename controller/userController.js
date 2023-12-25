@@ -45,9 +45,9 @@ const register = async (req, res, next) => {
       verificationToken: nanoid(),
       token: null,
     });
-    console.log("przed wyslaniem");
+    
     send(newUser.email, newUser.verificationToken);
-    console.log("po wyslaniu");
+   
     handle201(res, "Registration successful", {
       token: newUser.token,
       email: newUser.email,

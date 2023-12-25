@@ -17,13 +17,11 @@ const send = async (email, verificationToken) => {
   };
 
   try {
-    console.log("hej");
-    const wyslane = await sgMail.send(msg);
-    console.log("E-mail wysłany");
-    return { sukces: true };
+    await sgMail.send(msg);
+    res.status(200).json({ message: "Email sent successfully!" });
   } catch (error) {
     console.error(error);
-    return { sukces: false };
+    res.status(500).json({ message: "Something went wrong." });
   }
 };
 
