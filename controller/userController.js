@@ -45,12 +45,9 @@ const register = async (req, res, next) => {
       verificationToken: nanoid(),
       token: null,
     });
-    
-    
-   const checkSend = await send(newUser.email, newUser.verificationToken);
-   if (!checkSend) {
-     return handle404(res, "Email not sent");
-   }
+
+    send(newUser.email, newUser.verificationToken);
+
     handle201(res, "Registration successful", {
       token: newUser.token,
       email: newUser.email,
