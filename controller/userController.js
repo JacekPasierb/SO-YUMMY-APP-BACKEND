@@ -52,7 +52,7 @@ const register = async (req, res, next) => {
      return res.status(409).json({
        status: "Conflict",
        code: "409",
-       message: `${checkSend}`,
+       message: checkSend,
      });
    }
     handle201(res, "Registration successful", {
