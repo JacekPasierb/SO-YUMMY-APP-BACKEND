@@ -46,8 +46,11 @@ const register = async (req, res, next) => {
       token: null,
     });
     
-    send(newUser.email, newUser.verificationToken);
-   
+    
+   const checkSend = await send(newUser.email, newUser.verificationToken);
+   if (checkSend) {
+     return handle409(res, "Prawda");
+   }
     handle201(res, "Registration successful", {
       token: newUser.token,
       email: newUser.email,
