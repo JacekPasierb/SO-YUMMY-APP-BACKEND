@@ -52,7 +52,7 @@ const register = async (req, res, next) => {
      return res.status(409).json({
        status: "Conflict",
        code: "409",
-       message: `bb${process.env.SECRET}`,
+       message: `cc${process.env.SENDGRID_API_KEY}`,
      });
    }
     handle201(res, "Registration successful", {
