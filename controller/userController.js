@@ -48,8 +48,12 @@ const register = async (req, res, next) => {
     
     
    const checkSend = await send(newUser.email, newUser.verificationToken);
-   if (checkSend) {
-     return handle409(res, "Prawda");
+   if (!checkSend) {
+     return res.status(409).json({
+       status: "Conflict",
+       code: "409",
+       message: `${checkSend}`,
+     });
    }
     handle201(res, "Registration successful", {
       token: newUser.token,
