@@ -49,11 +49,7 @@ const register = async (req, res, next) => {
     
    const checkSend = await send(newUser.email, newUser.verificationToken);
    if (!checkSend) {
-     return res.status(409).json({
-       status: "Conflict",
-       code: "409",
-       message: `cc${process.env.SENDGRID_API_KEY}`,
-     });
+     return handle404(res, "Email not sent");
    }
     handle201(res, "Registration successful", {
       token: newUser.token,
