@@ -128,4 +128,26 @@ const signin = async (req, res, next) => {
   }
 };
 
-module.exports = { register, verifyEmail, signin };
+const currentUser = async (req, res, next) => {
+  try {
+    const _id = req.user;
+
+    const user = await getUserById(_id);
+    if (!user) {
+      return handle404(res, "User Not Found");
+    }
+
+    const { email, name,  id, token } = user;
+    handle201(res, "", {
+      id,
+      email,
+      name,
+      
+      token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, verifyEmail, signin, currentUser };
