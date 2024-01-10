@@ -7,6 +7,7 @@ const {
   getUserByEmail,
   addUser,
   findUser,
+  getUserById,
 } = require("../services/user/userServices");
 const {
   handle409,
@@ -130,20 +131,18 @@ const signin = async (req, res, next) => {
 
 const currentUser = async (req, res, next) => {
   try {
+    
     const _id = req.user;
 
-    const user = await getUserById(_id);
-    if (!user) {
-      return handle404(res, "User Not Found");
-    }
+console.log("lll",_id);
+    // const user = await getUserById(_id);
+    // if (!user) {
+    //   return handle404(res, "User Not Found");
+    // }
 
-    const { email, name,  id, token } = user;
+    // const { email, name,  id, token } = user;
     handle201(res, "", {
-      id,
-      email,
-      name,
-      
-      token,
+      _id,
     });
   } catch (error) {
     next(error);

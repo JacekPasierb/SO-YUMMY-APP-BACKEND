@@ -7,6 +7,13 @@ const getUserByEmail = ({email}) => {
         return false;
     }
 }
+const getUserById = (_id) => {
+  try {
+    return User.findById(_id);
+  } catch (error) {
+    return false;
+  }
+};
 
 const addUser = ({email, password, name,verificationToken, token }) => {
     try {
@@ -30,4 +37,4 @@ const findUser = async (query) => {
   }
 };
 
-module.exports = {getUserByEmail, addUser, findUser}
+module.exports = {getUserByEmail, addUser, findUser, getUserById}
