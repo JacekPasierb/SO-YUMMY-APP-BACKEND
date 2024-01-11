@@ -1,12 +1,12 @@
 const User = require("./userModel");
 
-const getUserByEmail = ({email}) => {
-    try {
-        return User.findOne({email})
-    } catch (error) {
-        return false;
-    }
-}
+const getUserByEmail = ({ email }) => {
+  try {
+    return User.findOne({ email });
+  } catch (error) {
+    return false;
+  }
+};
 const getUserById = (_id) => {
   try {
     return User.findById(_id);
@@ -15,19 +15,19 @@ const getUserById = (_id) => {
   }
 };
 
-const addUser = ({email, password, name,verificationToken, token }) => {
-    try {
-        return User.create({
-            email,
-            password,
-            name,
-            verificationToken,
-            token,
-        })
-    } catch (error) {
-        return false;
-    }
-}
+const addUser = ({ email, password, name, verificationToken, token }) => {
+  try {
+    return User.create({
+      email,
+      password,
+      name,
+      verificationToken,
+      token,
+    });
+  } catch (error) {
+    return false;
+  }
+};
 
 const findUser = async (query) => {
   try {
@@ -37,4 +37,4 @@ const findUser = async (query) => {
   }
 };
 
-module.exports = {getUserByEmail, addUser, findUser, getUserById}
+module.exports = { getUserByEmail, addUser, findUser, getUserById };

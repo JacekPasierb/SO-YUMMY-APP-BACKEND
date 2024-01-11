@@ -19,5 +19,3 @@ connection
     console.error("Error while establishing connection:", err);
     process.exit(1);
   });
-
-  

@@ -120,7 +120,7 @@ const signin = async (req, res, next) => {
       token,
       user: {
         email: user.email,
-        id: user._id,
+    
         name: user.name,
       },
     });
@@ -130,23 +130,25 @@ const signin = async (req, res, next) => {
 };
 
 const currentUser = async (req, res, next) => {
-  try {
-    
-    const _id = req.user;
+   try {
+     const  _id  = req.user;
 
-console.log("lll",_id);
-    // const user = await getUserById(_id);
-    // if (!user) {
-    //   return handle404(res, "User Not Found");
-    // }
+     const user = await getUserById(_id);
+     if (!user) {
+       return handle404(res, "User Not Found");
+     }
 
-    // const { email, name,  id, token } = user;
-    handle201(res, "", {
-      _id,
-    });
-  } catch (error) {
-    next(error);
-  }
+     const { email, name,  id, token } = user;
+     handle201(res, "", {
+       id,
+       email,
+       name,
+       
+       token,
+     });
+   } catch (error) {
+     next(error);
+   }
 };
 
 module.exports = { register, verifyEmail, signin, currentUser };

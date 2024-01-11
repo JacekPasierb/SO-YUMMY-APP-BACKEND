@@ -11,7 +11,6 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-
 const userRouter = require("./routes/api/user");
 const { handle404, handle500 } = require("./utils/handleErrors");
 
