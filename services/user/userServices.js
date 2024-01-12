@@ -37,4 +37,12 @@ const findUser = async (query) => {
   }
 };
 
-module.exports = { getUserByEmail, addUser, findUser, getUserById };
+const updateUser = (id, body) => {
+  try {
+    return User.findByIdAndUpdate(id, body, { new: true });
+  } catch (err) {
+    return false;
+  }
+};
+
+module.exports = { getUserByEmail, addUser, findUser, getUserById, updateUser };

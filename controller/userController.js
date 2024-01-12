@@ -8,6 +8,7 @@ const {
   addUser,
   findUser,
   getUserById,
+  updateUser,
 } = require("../services/user/userServices");
 const {
   handle409,
@@ -151,4 +152,14 @@ const currentUser = async (req, res, next) => {
    }
 };
 
-module.exports = { register, verifyEmail, signin, currentUser };
+const logout = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+    await updateUser(_id, { token: null });
+    handle204(res);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, verifyEmail, signin, currentUser,logout };
