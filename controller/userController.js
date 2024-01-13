@@ -17,6 +17,7 @@ const {
   handle200,
   handle400,
   handle401,
+  handle204,
 } = require("../utils/handleErrors");
 const { send } = require("../utils/sendGrid");
 
@@ -154,6 +155,7 @@ const currentUser = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
+
     const { _id } = req.user;
     await updateUser(_id, { token: null });
     handle204(res);
