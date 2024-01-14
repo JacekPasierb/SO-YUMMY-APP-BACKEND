@@ -61,7 +61,7 @@ const register = async (req, res, next) => {
   }
 };
 
-const updateUser = async (req, res, next) => {
+const update = async (req, res, next) => {
   try {
     const { _id } = req.user;
     const { error } = updateUserSchema.validate(req.body);
@@ -198,4 +198,4 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, verifyEmail, signin, currentUser,logout, updateUser };
+module.exports = { register, verifyEmail, signin, currentUser,logout, update };
