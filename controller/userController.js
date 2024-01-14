@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 const { nanoid } = require("nanoid");
 const jwt = require("jsonwebtoken");
-const { registerSchema, signinSchema } = require("../schemas/userSchema");
+const { registerSchema, signinSchema, updateUserSchema } = require("../schemas/userSchema");
 const {
   getUserByEmail,
   addUser,
@@ -55,6 +55,40 @@ const register = async (req, res, next) => {
       token: newUser.token,
       email: newUser.email,
       name: newUser.name,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUser = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+    const { error } = updateUserSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({
+        status: "Bad Request",
+        code: 400,
+        ResponseBody: {
+          message: `Input data validation error: ${error.message}`,
+        },
+      });
+    }
+
+    const updatedUser = await updateUser(_id, req.body);
+
+    if (!updatedUser) {
+      return handle404(res, "User Not Found");
+    }
+
+    const { email, name, id, token } = updatedUser;
+
+    handle200(res, "User data updated successfully", {
+      id,
+      email,
+      name,
+      token,
     });
   } catch (error) {
     next(error);
@@ -164,4 +198,4 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, verifyEmail, signin, currentUser,logout };
+module.exports = { register, verifyEmail, signin, currentUser,logout, updateUser };

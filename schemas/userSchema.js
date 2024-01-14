@@ -17,6 +17,13 @@ const registerSchema = Joi.object({
     "any.required": "Password is required",
   }),
 });
+const updateUserSchema = Joi.object({
+  name: Joi.string().min(3).trim().required().messages({
+    "string.base": "Name must be a string",
+    "string.min": "Name must be at least 3 characters long",
+    "any.required": "Name is required",
+  }),
+});
 const signinSchema = Joi.object({
   email: Joi.string().email().trim().required().messages({
     "string.base": "E-mail must be a string",
@@ -30,4 +37,4 @@ const signinSchema = Joi.object({
   }),
 });
 
-module.exports = { registerSchema, signinSchema };
+module.exports = { registerSchema, signinSchema, updateUserSchema };

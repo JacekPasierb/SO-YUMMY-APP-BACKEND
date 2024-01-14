@@ -7,6 +7,7 @@ const {
   signin,
   currentUser,
   logout,
+  updateUser,
 } = require("../../controller/userController");
 const auth = require("../../middlewares/auth");
 
@@ -15,5 +16,6 @@ router.get("/verify/:verificationToken", verifyEmail);
 router.post("/signin", signin);
 router.get("/current", auth, currentUser);
 router.get("/logout", auth, logout);
+router.put("/update", auth, updateUser);
 
 module.exports = router;
