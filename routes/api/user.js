@@ -16,6 +16,6 @@ router.get("/verify/:verificationToken", verifyEmail);
 router.post("/signin", signin);
 router.get("/current", auth, currentUser);
 router.get("/logout", auth, logout);
-router.put("/update", auth, updateUser);
+router.post("/update", auth, updateUser);
 
 module.exports = router;
