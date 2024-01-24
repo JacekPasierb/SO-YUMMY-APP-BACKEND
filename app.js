@@ -12,17 +12,21 @@ app.use(cors());
 app.use(express.json());
 
 const userRouter = require("./routes/api/user");
-const { handle404, handle500 } = require("./utils/handleErrors");
+const subscribeRouter = require("./routes/api/subscribe.js");
+
+const handleError = require("./utils/handleErrors");
 
 app.use("/api/users", userRouter);
+app.use("/api/subscribe", subscribeRouter);
+
 app.get("/", (req, res) => res.json({ version: "1.0" }));
 
-app.use((req, res) => {
-  handle404(res, "Not Found");
-});
-app.use((err, req, res, next) => {
-  console.log("err:", err);
-  handle500(res, err.message);
+app.use((error, req, res, next) => {
+  if (handleError) {
+    return res.status(error.status).json({ message: error.message });
+  }
+
+  res.status(500).json({ message: `Internal server error: ${error.message}` });
 });
 
 module.exports = app;

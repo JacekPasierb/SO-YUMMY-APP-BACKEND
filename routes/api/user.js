@@ -11,12 +11,14 @@ const {
   update,
 } = require("../../controller/userController");
 const auth = require("../../middlewares/auth");
+const validateBody = require("../../middlewares/validateBody");
+const { registerSchema, updateUserSchema, signinSchema } = require("../../schemas/userSchema");
 
-router.post("/register", register);
+router.post("/register", validateBody(registerSchema), register);
 router.get("/verify/:verificationToken", verifyEmail);
-router.post("/signin", signin);
+router.post("/signin", validateBody(signinSchema), signin);
 router.get("/current", auth, currentUser);
 router.get("/logout", auth, logout);
-router.put("/update", auth, update);
+router.put("/update", auth, validateBody(updateUserSchema), update);
 
 module.exports = router;
