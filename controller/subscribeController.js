@@ -1,4 +1,5 @@
 const Subscribe = require("../models/subscribe");
+const handleError = require("../utils/handleErrors");
 
 const addSubscribe = async (req, res, next) => {
   const { _id: owner } = req.user;
@@ -8,16 +9,16 @@ const addSubscribe = async (req, res, next) => {
   const emailSub = await Subscribe.findOne({ email });
 
   if (userSub) {
-    throw HttpError(409, `User is already subscribed`);
+    throw handleError(409, `User is already subscribed`);
   }
 
   if (emailSub) {
-    throw HttpError(404, `The email belongs to another user`);
+    throw handleError(404, `The email belongs to another user`);
   }
 
   const result = await Subscribe.create({
     ...req.body,
-    owner,
+    owner, 
   });
 
 //   const emailToSend = {

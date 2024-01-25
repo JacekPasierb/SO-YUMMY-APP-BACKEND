@@ -12,4 +12,4 @@ const handleError = (status, message = errorMessageList[status]) => {
   return error;
 };
 
-module.exports = handleError;
+module.exports = handleError  ;

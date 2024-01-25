@@ -12,7 +12,7 @@ const {
 } = require("../services/user/userServices");
 
 const { send } = require("../utils/sendGrid");
-const handleError = require("../utils/handleErrors");
+const  handleError  = require("../utils/handleErrors");
 
 const register = async (req, res, next) => {
   try {
@@ -20,7 +20,7 @@ const register = async (req, res, next) => {
 
     const checkEmail = await getUserByEmail({ email });
     if (checkEmail) {
-      return handleError(409, "Email is already in use");
+      throw handleError(409, "Email is already in use");
     }
 
     const hashPassword = await bcrypt.hash(password, 12);
@@ -56,7 +56,7 @@ const update = async (req, res, next) => {
     const updatedUser = await updateUser(_id, req.body);
 
     if (!updatedUser) {
-      return handleError(404, "User Not Found");
+      throw handleError(404, "User Not Found");
     }
 
     const { email, name, id, token } = updatedUser;
@@ -83,7 +83,7 @@ const verifyEmail = async (req, res) => {
     const user = await findUser({ verificationToken });
 
     if (!user) {
-      return handleError(404);
+      throw handleError(404);
     }
     user.set("verify", true);
     user.verificationToken = null;
@@ -104,16 +104,16 @@ const signin = async (req, res, next) => {
 
     const user = await getUserByEmail({ email });
     if (!user) {
-      return handleError(400, "Invalid Email or Password");
+     throw handleError(400, "Invalid Email or Password");
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
     console.log("passwordMatch", passwordMatch);
     if (!passwordMatch) {
-      return handleError(400, "Invalid Email or Password");
+      throw handleError(400, "Invalid Email or Password");
     }
 
     if (!user.verify) {
-      return handleError(401, "email is not verifed");
+      throw handleError(401, "email is not verifed");
     }
 
     const payload = {
@@ -147,7 +147,7 @@ const currentUser = async (req, res, next) => {
 
     const user = await getUserById(_id);
     if (!user) {
-      return handleError(404, "User Not Found");
+      throw handleError(404, "User Not Found");
     }
 
     const { email, name, id, token } = user;

@@ -6,7 +6,7 @@ const auth = (req, res, next) => {
 
   passport.authenticate("jwt", { session: false }, (err, user) => {
     if (!user || err || user.token !== authorization.split(" ")[1]) {
-      return handleError(401);
+      throw handleError(401);
     }
 
     req.user = user;
