@@ -12,7 +12,7 @@ const {
 } = require("../services/user/userServices");
 
 const { send } = require("../utils/sendGrid");
-const  handleError  = require("../utils/handleErrors");
+const handleError = require("../utils/handleErrors");
 
 const register = async (req, res, next) => {
   try {
@@ -33,7 +33,18 @@ const register = async (req, res, next) => {
       token: null,
     });
 
-    send(newUser.email, newUser.verificationToken);
+     const emailToSend = {
+       to: newUser.email,
+       subject: "SO YUMMY APP email verification",
+       html: `
+       <div style="text-align: center;">
+       <h1>SO YUMMY APP</h1>
+       <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend.vercel.app/api/users/verify/${newUser.verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
+       </div>
+       `,
+     };
+    
+    send(emailToSend);
 
     return res.status(201).json({
       status: "success",
@@ -104,7 +115,7 @@ const signin = async (req, res, next) => {
 
     const user = await getUserByEmail({ email });
     if (!user) {
-     throw handleError(400, "Invalid Email or Password");
+      throw handleError(400, "Invalid Email or Password");
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
     console.log("passwordMatch", passwordMatch);
