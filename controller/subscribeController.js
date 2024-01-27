@@ -1,4 +1,9 @@
 const Subscribe = require("../models/subscribe");
+const {
+  getSubscribeByOwner,
+  getSubscribeByEmail,
+  createSubscribe,
+} = require("../services/subscribeServices");
 const handleError = require("../utils/handleErrors");
 const { send } = require("../utils/sendGrid");
 
@@ -6,23 +11,20 @@ const addSubscribe = async (req, res, next) => {
   const { _id: owner } = req.user;
   const { email } = req.body;
 
-  const userSub = await Subscribe.findOne({ owner });
-  const emailSub = await Subscribe.findOne({ email });
+  const userSub = await getSubscribeByOwner({ owner });
+  const emailSub = await getSubscribeByEmail({ email });
 
   if (userSub) {
     const error = handleError(409, "User is already subscribed");
-    return next(error); 
+    return next(error);
   }
 
   if (emailSub) {
     const error = handleError(409, "The email belongs to another user");
-    return next(error); 
+    return next(error);
   }
 
-  const result = await Subscribe.create({
-    ...req.body,
-    owner,
-  });
+  const result = await createSubscribe({ body: req.body, owner });
 
   const emailToSend = {
     to: email,
