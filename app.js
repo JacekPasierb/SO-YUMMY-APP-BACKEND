@@ -3,8 +3,9 @@ const cors = require("cors");
 require("dotenv").config();
 require("./config/passport-config");
 
+const swaggerUi = require("swagger-ui-express");
 const app = express();
-
+const swaggerDocument = require('./swagger.json'); 
 const logger = require("morgan");
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
@@ -15,7 +16,7 @@ const userRouter = require("./routes/api/user");
 const subscribeRouter = require("./routes/api/subscribe.js");
 
 const handleError = require("./utils/handleErrors");
-
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api/users", userRouter);
 app.use("/api/subscribe", subscribeRouter);
 
