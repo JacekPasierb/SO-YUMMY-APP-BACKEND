@@ -10,7 +10,7 @@ const { send } = require("../utils/sendGrid");
 const addSubscribe = async (req, res, next) => {
   const { _id: owner } = req.user;
   const { email } = req.body;
-
+  console.log("TEST");
   const userSub = await getSubscribeByOwner({ owner });
   const emailSub = await getSubscribeByEmail({ email });
 
