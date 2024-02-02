@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3000",
+      "url": "http://localhost:3000/",
       "description": "Development server"
     },
     {
@@ -55,7 +55,7 @@
     }
   },
   "paths": {
-    "api/users/register": {
+    "/api/users/register": {
       "post": {
         "tags": ["Auth"],
         "summary": "User registration",
@@ -75,7 +75,7 @@
           },
           "required": true
         },
-        "response": {
+        "responses": {
           "201": {
             "description": " User successfully registered",
             "content": {
@@ -85,22 +85,22 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "description": "response status",
+                      "description": "responses status",
                       "example": "Created"
                     },
                     "code": {
                       "type": "number",
-                      "description": "response code",
+                      "description": "responses code",
                       "example": "201"
                     },
                     "message": {
-                      "type": "string",
-                      "description": "response message",
+                      "type": "string", 
+                      "description": "responses message",
                       "example": "Register Success !"
                     },
                     "data": {
                       "type": "object",
-                      "description": "response data",
+                      "description": "responses data",
                       "example": {
                         "token": "f545dgdfgfd54",
                         "email": "jankowalski@test.net",
