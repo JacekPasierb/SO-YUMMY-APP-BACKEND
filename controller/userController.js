@@ -47,8 +47,9 @@ const register = async (req, res, next) => {
     send(emailToSend);
 
     return res.status(201).json({
-      status: "success",
+      status: "Created",
       code: 201,
+      message:"Register Success !",
       data: {
         token: newUser.token,
         email: newUser.email,

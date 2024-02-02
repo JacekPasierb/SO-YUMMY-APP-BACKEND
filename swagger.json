@@ -20,5 +20,181 @@
       "name": "Auth",
       "description": "Authorization endpoints"
     }
-  ]
+  ],
+  "components": {
+    "schemas": {
+      "registerSchema": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "Jan"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "example": "jankowalski@test.net"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "12345678"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Enter JWT Bearer token"
+      }
+    }
+  },
+  "paths": {
+    "api/users/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User registration",
+        "requestBody": {
+          "description": "Registration's object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/registerSchema"
+              },
+              "example": {
+                "name": "Jan",
+                "email": "jankowalski@test.net",
+                "password": "12345678"
+              }
+            }
+          },
+          "required": true
+        },
+        "response": {
+          "201": {
+            "description": " User successfully registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "response status",
+                      "example": "Created"
+                    },
+                    "code": {
+                      "type": "number",
+                      "description": "response code",
+                      "example": "201"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "response message",
+                      "example": "Register Success !"
+                    },
+                    "data": {
+                      "type": "object",
+                      "description": "response data",
+                      "example": {
+                        "token": "f545dgdfgfd54",
+                        "email": "jankowalski@test.net",
+                        "name": "Jan"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "response status",
+                      "example": "Bad Request"
+                    },
+                    "code": {
+                      "type": "number",
+                      "description": "response code",
+                      "example": "400"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "response message",
+                      "example": "Input data validation error"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "Conflict",
+                      "example": "Conflict"
+                    },
+                    "code": {
+                      "type": "number",
+                      "description": "response code",
+                      "example": "409"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "response message",
+                      "example": "Email is already in use"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "response status",
+                      "example": "Internal server error"
+                    },
+                    "code": {
+                      "type": "number",
+                      "description": "response code",
+                      "example": "500"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "response message",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
