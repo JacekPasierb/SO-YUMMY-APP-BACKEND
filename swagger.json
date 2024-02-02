@@ -11,7 +11,7 @@
       "description": "Development server"
     },
     {
-      "url": "https://so-yummy-app-backend.vercel.app",
+      "url": "https://so-yummy-app-backend.vercel.app/",
       "description": "Production server"
     }
   ],
