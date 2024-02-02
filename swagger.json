@@ -4,5 +4,21 @@
     "title": "SO Yummy App API docs",
     "description": "The API for the So Yummy project",
     "version": "1.0.0"
-  }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    },
+    {
+      "url": "https://so-yummy-app-backend.vercel.app",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authorization endpoints"
+    }
+  ]
 }
