@@ -14,9 +14,10 @@ app.use(express.json());
 
 const userRouter = require("./routes/api/user");
 const subscribeRouter = require("./routes/api/subscribe.js");
-
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 const handleError = require("./utils/handleErrors");
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, { customCssUrl: CSS_URL }));
 app.use("/api/users", userRouter);
 app.use("/api/subscribe", subscribeRouter);
 
