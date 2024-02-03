@@ -94,7 +94,7 @@
                       "example": "201"
                     },
                     "message": {
-                      "type": "string", 
+                      "type": "string",
                       "description": "responses message",
                       "example": "Register Success !"
                     },
@@ -160,6 +160,106 @@
                       "type": "string",
                       "description": "response message",
                       "example": "Email is already in use"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "response status",
+                      "example": "Internal server error"
+                    },
+                    "code": {
+                      "type": "number",
+                      "description": "response code",
+                      "example": "500"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "response message",
+                      "example": "Internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/verify/:verificationToken": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "User verification email",
+        "parameters": [
+          {
+            "in": "path",
+            "required": "true",
+            "name": "verificationToken",
+            "description": "User's verify token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "response": {
+          "200": {
+            "description": "User success verification",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "response status",
+                      "example": "OK"
+                    },
+                    "code": {
+                      "type": "number",
+                      "description": "response code",
+                      "example": "200"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "response message",
+                      "example": "User verification successfull"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "VerificationToken not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "response status",
+                      "example": "Not found"
+                    },
+                    "code": {
+                      "type": "number",
+                      "description": "response code",
+                      "example": "404"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "response message",
+                      "example": "VerificationToken not found"
                     }
                   }
                 }

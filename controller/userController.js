@@ -103,7 +103,7 @@ const verifyEmail = async (req, res) => {
     await user.save();
 
     return res.status(200).json({
-      status: "Success",
+      status: "OK",
     });
   } catch (error) {
     console.error(error);
