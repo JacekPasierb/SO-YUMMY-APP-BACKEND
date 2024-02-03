@@ -43,6 +43,22 @@
             "example": "1234567"
           }
         }
+      },
+      "signinSchema": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "example": "jankowalski@test.net"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "1234567"
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -293,6 +309,30 @@
               }
             }
           }
+        }
+      }
+    },
+    "/api/users/signin": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User signin",
+        "requestBody": {
+          "description": "Signin's object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/signinSchema"
+              },
+              "example": {
+                "email": "jankowalski@test.net",
+                "password": "12345678"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses":{
+          
         }
       }
     }
