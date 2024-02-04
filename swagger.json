@@ -459,14 +459,7 @@
           }
         }
       }
-    },
-    "/api/users/current":{
-      "get":{
-        "tags":["Auth"],
-        "summary":"",
-        "request"
-        "responses"
-      }
     }
+    
   }
 }
