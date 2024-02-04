@@ -116,16 +116,16 @@ const signin = async (req, res, next) => {
 
     const user = await getUserByEmail({ email });
     if (!user) {
-      throw handleError(400, "Invalid Email or Password");
+      throw handleError(401, "Invalid Email or Password");
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
     console.log("passwordMatch", passwordMatch);
     if (!passwordMatch) {
-      throw handleError(400, "Invalid Email or Password");
+      throw handleError(401, "Invalid Email or Password");
     }
 
     if (!user.verify) {
-      throw handleError(401, "email is not verifed");
+      throw handleError(403, "email is not verifed");
     }
 
     const payload = {
@@ -162,7 +162,7 @@ const currentUser = async (req, res, next) => {
       throw handleError(404, "User Not Found");
     }
 
-    const { email, name, id, token } = user;
+    const { email, name, id, token, avatar } = user;
 
     res.status(201).json({
       status: "success",
@@ -172,6 +172,7 @@ const currentUser = async (req, res, next) => {
         email,
         name,
         token,
+        avatar,
       },
     });
   } catch (error) {

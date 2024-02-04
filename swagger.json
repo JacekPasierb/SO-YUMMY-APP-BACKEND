@@ -23,7 +23,24 @@
   ],
   "components": {
     "schemas": {
-      "registerSchema": {
+      "Token": {
+        "type": "string",
+        "description": "JWT token",
+        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MmMxODQyM2NhZmFjMGVkNGYyMDYyZiIsImlhdCI6MTY4MDYyMDc1MCwiZXhwIjoxNjgwNzA3MTUwfQ.vpfUcfAEnlEXa_lpbtmfmk8leV2UAgIimyKr8FUssQM"
+      },
+      "Email": {
+        "type": "string",
+        "description": "User's email",
+        "format": "email",
+        "example": "jankowalski@test.net"
+      },
+      "Name": {
+        "minLength": 3,
+        "type": "string",
+        "description": "User's name",
+        "example": "Jan"
+      },
+      "RegisterCredentials": {
         "type": "object",
         "required": ["name", "email", "password"],
         "properties": {
@@ -44,7 +61,7 @@
           }
         }
       },
-      "signinSchema": {
+      "SigninCredentials": {
         "type": "object",
         "required": ["email", "password"],
         "properties": {
@@ -58,6 +75,192 @@
             "description": "User's password",
             "example": "1234567"
           }
+        }
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "response status",
+            "example": "OK"
+          },
+          "code": {
+            "type": "string",
+            "description": "response code",
+            "example": "200"
+          },
+          "message": {
+            "type": "string",
+            "description": "response message",
+            "example": "Successfull"
+          },
+          "data": {
+            "token": {
+              "$ref": "#/components/schemas/Token"
+            },
+            "user": {
+              "email": {
+                "$ref": "#/components/schemas/Email"
+              },
+              "name": {
+                "$ref": "#/components/schemas/Name"
+              }
+            }
+          }
+        }
+      },
+      "CreatedResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "response status",
+            "example": "Created"
+          },
+          "code": {
+            "type": "string",
+            "description": "response code",
+            "example": "201"
+          },
+          "message": {
+            "type": "string",
+            "description": "responses message",
+            "example": "Register Success !"
+          },
+          "data": {
+            "type": "object",
+            "description": "responses data",
+            "properties": {
+              "token": {
+                "$ref": "#/components/schemas/Token"
+              },
+              "email": {
+                "$ref": "#/components/schemas/Email"
+              },
+              "name": {
+                "$ref": "#/components/schemas/Name"
+              }
+            }
+          }
+        }
+      },
+      "BadRequestError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "response status",
+            "example": "Bad Request"
+          },
+          "code": {
+            "type": "string",
+            "description": "response code",
+            "example": "400"
+          },
+          "message": {
+            "type": "string",
+            "description": "response message",
+            "example": "Input data validation error"
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "response status",
+            "example": "Unauthorized"
+          },
+          "code": {
+            "type": "string",
+            "description": "response code",
+            "example": "401"
+          },
+          "message": {
+            "type": "string",
+            "description": "response message",
+            "example": "Unauthorized"
+          }
+        }
+      },
+      "ForbiddenError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "response status",
+            "example": "Forbidden"
+          },
+          "code": {
+            "type": "string",
+            "description": "response code",
+            "example": "403"
+          },
+          "message": {
+            "type": "string",
+            "description": "response message",
+            "example": "Forbidden"
+          }
+        }
+      },
+      "NotFoundError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "response status",
+            "example": "Not found"
+          },
+          "code": {
+            "type": "string",
+            "description": "response code",
+            "example": "404"
+          },
+          "message": {
+            "type": "string",
+            "description": "response message",
+            "example": "Not found"
+          }
+        }
+      },
+      "ConflictError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Conflict",
+            "example": "Conflict"
+          },
+          "code": {
+            "type": "string",
+            "description": "response code",
+            "example": "409"
+          },
+          "message": {
+            "type": "string",
+            "description": "response message",
+            "example": "Email is already in use"
+          }
+        }
+      },
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "response status",
+          "example": "Internal server error"
+        },
+        "code": {
+          "type": "string",
+          "description": "response code",
+          "example": "500"
+        },
+        "message": {
+          "type": "string",
+          "description": "response message",
+          "example": "Internal server error"
         }
       }
     },
@@ -74,13 +277,14 @@
     "/api/users/register": {
       "post": {
         "tags": ["Auth"],
-        "summary": "User registration",
+        "summary": "Register a new user",
         "requestBody": {
+          "required": true,
           "description": "Registration's object",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/registerSchema"
+                "$ref": "#/components/schemas/RegisterCredentials"
               },
               "example": {
                 "name": "Jan",
@@ -88,69 +292,25 @@
                 "password": "12345678"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
-            "description": " User successfully registered",
+            "description": "Registration successfull",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "responses status",
-                      "example": "Created"
-                    },
-                    "code": {
-                      "type": "number",
-                      "description": "responses code",
-                      "example": "201"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "responses message",
-                      "example": "Register Success !"
-                    },
-                    "data": {
-                      "type": "object",
-                      "description": "responses data",
-                      "example": {
-                        "token": "f545dgdfgfd54",
-                        "email": "jankowalski@test.net",
-                        "name": "Jan"
-                      }
-                    }
-                  }
+                  "$ref": "#/components/schemas/CreatedResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Bad Request",
+            "description": "Invalid request body",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "response status",
-                      "example": "Bad Request"
-                    },
-                    "code": {
-                      "type": "number",
-                      "description": "response code",
-                      "example": "400"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "response message",
-                      "example": "Input data validation error"
-                    }
-                  }
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
@@ -160,24 +320,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "Conflict",
-                      "example": "Conflict"
-                    },
-                    "code": {
-                      "type": "number",
-                      "description": "response code",
-                      "example": "409"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "response message",
-                      "example": "Email is already in use"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ConflictError"
                 }
               }
             }
@@ -187,24 +330,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "response status",
-                      "example": "Internal server error"
-                    },
-                    "code": {
-                      "type": "number",
-                      "description": "response code",
-                      "example": "500"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "response message",
-                      "example": "Internal server error"
-                    }
-                  }
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -233,24 +359,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "response status",
-                      "example": "OK"
-                    },
-                    "code": {
-                      "type": "number",
-                      "description": "response code",
-                      "example": "200"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "response message",
-                      "example": "User verification successfull"
-                    }
-                  }
+                  "$ref": "#/components/schemas/SuccessResponse"
                 }
               }
             }
@@ -260,24 +369,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "response status",
-                      "example": "Not found"
-                    },
-                    "code": {
-                      "type": "number",
-                      "description": "response code",
-                      "example": "404"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "response message",
-                      "example": "VerificationToken not found"
-                    }
-                  }
+                  "$ref": "#/components/schemas/NotFoundError"
                 }
               }
             }
@@ -287,24 +379,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "description": "response status",
-                      "example": "Internal server error"
-                    },
-                    "code": {
-                      "type": "number",
-                      "description": "response code",
-                      "example": "500"
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "response message",
-                      "example": "Internal server error"
-                    }
-                  }
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -321,7 +396,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/signinSchema"
+                "$ref": "#/components/schemas/SigninCredentials"
               },
               "example": {
                 "email": "jankowalski@test.net",
@@ -331,9 +406,66 @@
           },
           "required": true
         },
-        "responses":{
-          
+        "responses": {
+          "200": {
+            "description": "User succesfully signed in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid Email or Password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Email is not verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
         }
+      }
+    },
+    "/api/users/current":{
+      "get":{
+        "tags":["Auth"],
+        "summary":"",
+        "request"
+        "responses"
       }
     }
   }
