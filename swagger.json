@@ -40,6 +40,12 @@
         "description": "User's name",
         "example": "Jan"
       },
+      "Avatar": {
+        "type": "string",
+        "description": "Url to the user's avatar",
+        "format": "uri",
+        "example": "https://res.cloudinary.com/db5awxaxs/image/upload/v1680438156/cld-sample-4.jpg"
+      },
       "RegisterCredentials": {
         "type": "object",
         "required": ["name", "email", "password"],
@@ -105,6 +111,9 @@
               },
               "name": {
                 "$ref": "#/components/schemas/Name"
+              },
+              "avatar": {
+                "$ref": "#/components/schemas/Avatar"
               }
             }
           }
@@ -459,7 +468,35 @@
           }
         }
       }
+    },
+    "/api/users/current": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get user data",
+        "parameters": [
+          {
+            "in": "header",
+            "required": "true",
+            "name": "token",
+            "description": "User's token",
+            "schema": {
+              "$ref": "#/components/schemas/Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
-    
   }
 }
