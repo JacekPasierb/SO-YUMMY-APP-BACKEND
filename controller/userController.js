@@ -63,9 +63,9 @@ const register = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const { _id } = req.user;
+    const { email} = req.user;
 
-    const updatedUser = await updateUser(_id, req.body);
+    const updatedUser = await updateUser(email, req.body);
 
     if (!updatedUser) {
       throw handleError(404, "User Not Found");

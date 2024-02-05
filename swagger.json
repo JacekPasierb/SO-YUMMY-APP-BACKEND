@@ -83,6 +83,9 @@
           }
         }
       },
+      "UpdateUserCredentials": {
+        "type": "object"
+      },
       "SuccessResponse": {
         "type": "object",
         "properties": {
@@ -493,13 +496,50 @@
               }
             }
           },
-          "401":{
-            "description":"Unauthorized",
-            "content":{
-              "application/json":{
-                "schema":{
-                  "$ref":"#/components/schemas/UnauthorizedError"
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
                 }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/update": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Update User data",
+        "parameters": [
+          {
+            "in": "header",
+            "required": "true",
+            "name": "token",
+            "description": "User's token",
+            "schema": {
+              "$ref": "#/components/schemas/Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Updated Info User object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserCredentials"
               }
             }
           }
