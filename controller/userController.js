@@ -71,7 +71,7 @@ const update = async (req, res, next) => {
       throw handleError(404, "User Not Found");
     }
 
-    const { email, name, id, token } = updatedUser;
+    const { email, name, id, token, avatar } = updatedUser;
 
     return res.status(200).json({
       status: "User data updated successfully",
@@ -81,6 +81,7 @@ const update = async (req, res, next) => {
         email,
         name,
         token,
+        avatar,
       },
     });
   } catch (error) {
