@@ -37,9 +37,9 @@ const findUser = async (query) => {
   }
 };
 
-const updateUser = (email, body) => {
+const updateUser = (id, body) => {
   try {
-    return User.findByIdAndUpdate(email, body, { new: true });
+    return User.findByIdAndUpdate(id, body, { new: true });
   } catch (err) {
     return false;
   }
