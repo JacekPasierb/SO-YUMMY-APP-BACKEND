@@ -105,16 +105,14 @@
             "token": {
               "$ref": "#/components/schemas/Token"
             },
-            "user": {
-              "email": {
-                "$ref": "#/components/schemas/Email"
-              },
-              "name": {
-                "$ref": "#/components/schemas/Name"
-              },
-              "avatar": {
-                "$ref": "#/components/schemas/Avatar"
-              }
+            "email": {
+              "$ref": "#/components/schemas/Email"
+            },
+            "name": {
+              "$ref": "#/components/schemas/Name"
+            },
+            "avatar": {
+              "$ref": "#/components/schemas/Avatar"
             }
           }
         }
@@ -491,6 +489,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401":{
+            "description":"Unauthorized",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "$ref":"#/components/schemas/UnauthorizedError"
                 }
               }
             }
