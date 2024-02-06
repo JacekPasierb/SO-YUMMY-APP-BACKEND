@@ -146,6 +146,8 @@ const signin = async (req, res, next) => {
         user: {
           email: user.email,
           name: user.name,
+          avatar: user.avatar,
+          userId: user._id,
         },
       },
     });
