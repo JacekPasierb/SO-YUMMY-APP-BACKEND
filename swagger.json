@@ -46,24 +46,23 @@
         "format": "uri",
         "example": "https://res.cloudinary.com/db5awxaxs/image/upload/v1680438156/cld-sample-4.jpg"
       },
+      "Password": {
+        "type": "string",
+        "description": "User's password",
+        "example": "1234567"
+      },
       "RegisterCredentials": {
         "type": "object",
         "required": ["name", "email", "password"],
         "properties": {
           "name": {
-            "type": "string",
-            "description": "User's name",
-            "example": "Jan"
+            "$ref": "#/components/schemas/Name"
           },
           "email": {
-            "type": "string",
-            "description": "User's email",
-            "example": "jankowalski@test.net"
+            "$ref": "#/components/schemas/Email"
           },
           "password": {
-            "type": "string",
-            "description": "User's password",
-            "example": "1234567"
+            "$ref": "#/components/schemas/Password"
           }
         }
       },
@@ -72,19 +71,23 @@
         "required": ["email", "password"],
         "properties": {
           "email": {
-            "type": "string",
-            "description": "User's email",
-            "example": "jankowalski@test.net"
+            "$ref": "#/components/schemas/Email"
           },
           "password": {
-            "type": "string",
-            "description": "User's password",
-            "example": "1234567"
+            "$ref": "#/components/schemas/Password"
           }
         }
       },
       "UpdateUserCredentials": {
-        "type": "object"
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/Name"
+          },
+          "avatar": {
+            "$ref": "#/components/schemas/Avatar"
+          }
+        }
       },
       "SuccessResponse": {
         "type": "object",
@@ -540,6 +543,90 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateUserCredentials"
+              }
+            }
+          }
+        },
+        "response": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Logout user",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "header",
+            "description": "User's token",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Token"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK, No content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
               }
             }
           }

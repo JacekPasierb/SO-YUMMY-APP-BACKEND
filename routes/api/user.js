@@ -18,7 +18,7 @@ router.post("/register", validateBody(registerSchema), register);
 router.patch("/verify/:verificationToken", verifyEmail);
 router.post("/signin", validateBody(signinSchema), signin);
 router.get("/current", auth, currentUser);
-router.get("/logout", auth, logout);
+router.patch("/logout", auth, logout);
 router.patch("/update", auth, validateBody(updateUserSchema), update);
 
 module.exports = router;
