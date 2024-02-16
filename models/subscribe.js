@@ -1,6 +1,5 @@
 const { Schema, model } = require("mongoose");
 
-
 const emailRegexp = /^\S+@\S+\.\S+$/;
 
 const subscribeSchema = new Schema(
@@ -19,8 +18,6 @@ const subscribeSchema = new Schema(
   },
   { versionKey: false }
 );
-
-
 
 const Subscribe = model("subscribe", subscribeSchema);
 
