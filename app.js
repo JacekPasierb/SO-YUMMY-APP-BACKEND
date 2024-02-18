@@ -18,7 +18,7 @@ app.use(express.json());
 
 const userRouter = require("./routes/api/user");
 const subscribeRouter = require("./routes/api/subscribe.js");
-const recipeRouter = "";
+const recipeRouter = require("./routes/api/recipe.js");
 
 const handleError = require("./utils/handleErrors");
 app.use(

@@ -74,4 +74,4 @@ const recipeSchema = new Schema(
 
 const Recipe = model("recipe", recipeSchema);
 
-module.exports = { Recipe };
+module.exports = Recipe;
