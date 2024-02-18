@@ -3,41 +3,42 @@ const Recipe = require("../models/recipeModel");
 const getRecipesByFourCategories = async (req, res, next) => {
   try {
     const { count = 1 } = req.query;
-    const breakfast = await Recipe.find({
-      category: "Breakfast",
-    }).limit(count);
+    // const breakfast = await Recipe.find({
+    //   category: "Breakfast",
+    // }).limit(count);
 
-    const miscellaneous = await Recipe.find({
-      category: "Miscellaneous",
-    }).limit(count);
-
-    const chicken = await Recipe.find({
-      category: "Chicken",
-    }).limit(count);
-
-    const dessert = await Recipe.aggregate([
-      { $match: { category: "Dessert" } },
-      { 
-        $sort: { "title": 1 } 
-      },
+    const options = [
       {
         $project: {
+          _id: 1,
           title: 1,
           category: 1,
+          preview: 1,
+          thumb: 1,
         },
       },
-      { $limit: 2 }
+      { $limit: count },
+    ];
+
+    const result = await Recipe.aggregate([
+      {
+        $facet: {
+          breakfast: [{ $match: { category: "Breakfast" } }, ...options],
+          miscellaneous: [
+            { $match: { category: "Miscellaneous" } },
+            ...options,
+          ],
+          chicken: [{ $match: { category: "Chicken" } }, ...options],
+          dessert: [{ $match: { category: "Dessert" } }, ...options],
+        },
+      },
     ]);
 
     res.status(200).json({
       status: "success",
       code: 200,
       data: {
-        count,
-        breakfast,
-        miscellaneous,
-        chicken,
-        dessert,
+        ...result[0],
       },
     });
   } catch (error) {
