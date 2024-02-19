@@ -14,12 +14,12 @@ const getRecipesByFourCategories = async (req, res, next) => {
         $project: {
           _id: 1,
           title: 1,
-          category: 1,
+          category: 1, 
           preview: 1,
           thumb: 1,
         },
       },
-      { $limit: count },
+      { $limit: Number(count)},
     ];
 
     const result = await Recipe.aggregate([

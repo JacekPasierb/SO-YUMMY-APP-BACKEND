@@ -11,3 +11,4 @@ router.get("/categories/:category", auth, getRecipesByCategory);
 router.get("/:id", auth, getRecipeById);
 
 module.exports = router;
+ 
