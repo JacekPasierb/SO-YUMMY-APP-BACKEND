@@ -114,4 +114,5 @@ module.exports = {
   getRecipesByFourCategories,
   getCategoriesList,
   getRecipesByCategory,
+  getRecipeById,
 };
