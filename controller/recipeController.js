@@ -52,7 +52,8 @@ const getCategoriesList = async (req, res, next) => {
   try {
     const categories = await Category.find();
     const catArr = categories.map((cat) => cat.title);
-
+    catArr.sort((a, b) => a.localeCompare(b));
+    
     res.status(200).json({
       status: "success",
       code: 200,
