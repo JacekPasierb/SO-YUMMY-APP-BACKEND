@@ -14,12 +14,12 @@ const getRecipesByFourCategories = async (req, res, next) => {
         $project: {
           _id: 1,
           title: 1,
-          category: 1, 
+          category: 1,
           preview: 1,
           thumb: 1,
         },
       },
-      { $limit: Number(count)},
+      { $limit: Number(count) },
     ];
 
     const result = await Recipe.aggregate([
@@ -53,7 +53,7 @@ const getCategoriesList = async (req, res, next) => {
     const categories = await Category.find();
     const catArr = categories.map((cat) => cat.title);
     catArr.sort((a, b) => a.localeCompare(b));
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
@@ -81,12 +81,14 @@ const getRecipesByCategory = async (req, res, next) => {
     if (result.length === 0) {
       return handleError(404, "Not found recipes by such category");
     }
+    const totalRecipe = await Recipe.find({ category: category }).length;
 
     res.status(200).json({
       status: "success",
       code: 200,
       data: {
         result,
+        totalRecipe,
       },
     });
   } catch (error) {
