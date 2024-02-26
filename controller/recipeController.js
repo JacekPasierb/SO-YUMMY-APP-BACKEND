@@ -81,14 +81,14 @@ const getRecipesByCategory = async (req, res, next) => {
     if (result.length === 0) {
       return handleError(404, "Not found recipes by such category");
     }
-    const totalRecipe = await Recipe.find({ category: category }).length;
-
+    const totalRecipe = await Recipe.find({ category: category });
+    const total = totalRecipe.length;
     res.status(200).json({
       status: "success",
       code: 200,
       data: {
         result,
-        totalRecipe,
+        total,
       },
     });
   } catch (error) {
