@@ -78,11 +78,13 @@ const getRecipesByCategory = async (req, res, next) => {
       .skip(skip)
       .limit(limit);
 
+    const totalRecipe = await Recipe.find({ category: category });
+
     if (result.length === 0) {
       return handleError(404, "Not found recipes by such category");
     }
-    const totalRecipe = await Recipe.find({ category: category });
     const total = totalRecipe.length;
+    
     res.status(200).json({
       status: "success",
       code: 200,
