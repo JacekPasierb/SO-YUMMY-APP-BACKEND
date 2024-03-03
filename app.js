@@ -19,6 +19,8 @@ app.use(express.json());
 const userRouter = require("./routes/api/user");
 const subscribeRouter = require("./routes/api/subscribe.js");
 const recipeRouter = require("./routes/api/recipe.js");
+const ingredientsRouter = require("./routes/api/ingredients.js");
+
 
 const handleError = require("./utils/handleErrors");
 app.use(
@@ -29,6 +31,7 @@ app.use(
 app.use("/api/users", userRouter);
 app.use("/api/subscribe", subscribeRouter);
 app.use("/api/recipes", recipeRouter);
+app.use("/api/ingredients", ingredientsRouter);
 
 app.get("/", (req, res) => res.json({ version: "1.0" }));
 
