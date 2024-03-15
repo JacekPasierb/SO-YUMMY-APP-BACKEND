@@ -115,29 +115,12 @@ const getRecipeById = async (req, res, next) => {
   }
 };
 
-const addRecipe = async (req, res, next) => {
-  try {
-    const newRecipe = await Recipe.create({
-      ...req.body,
-      owner: req.user._id,
-    })
 
-    res.status(200).json({
-      status: "success",
-      code: 200,
-      data: {
-        newRecipe,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
 
 module.exports = {
   getRecipesByFourCategories,
   getCategoriesList,
   getRecipesByCategory,
   getRecipeById,
-  addRecipe,
+  
 };
