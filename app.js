@@ -15,6 +15,7 @@ const CSS_URL =
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 const userRouter = require("./routes/api/user");
 const subscribeRouter = require("./routes/api/subscribe.js");
