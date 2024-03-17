@@ -34,7 +34,9 @@ app.use("/api/subscribe", subscribeRouter);
 app.use("/api/recipes", recipeRouter);
 app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/ownRecipes", ownRecipesRouter);
-
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 app.get("/", (req, res) => res.json({ version: "1.0" }));
 
 app.use((error, req, res, next) => {
