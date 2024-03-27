@@ -19,6 +19,7 @@ const getOwnRecipes = async (req, res, next) => {
 
 const addOwnRecipe = async (req, res, next) => {
   try {
+    console.log("tu");
     const newRecipe = await Recipe.create({
       ...req.body,
       owner: req.user._id,
