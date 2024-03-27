@@ -4,6 +4,7 @@ const handleError = require("../utils/handleErrors");
 const getOwnRecipes = async (req, res, next) => {
   try {
     const userId = req?.user?._id;
+    console.log("tese");
     const ownRecipes = await Recipe.find({ owner: userId });
     res.status(200).json({
       status: "success",
