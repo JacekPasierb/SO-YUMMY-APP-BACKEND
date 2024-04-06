@@ -12,7 +12,11 @@ const {
 } = require("../../controller/userController");
 const auth = require("../../middlewares/auth");
 const validateBody = require("../../middlewares/validateBody");
-const { registerSchema, updateUserSchema, signinSchema } = require("../../schemas/userSchema");
+const {
+  registerSchema,
+  updateUserSchema,
+  signinSchema,
+} = require("../../schemas/userSchema");
 
 router.post("/register", validateBody(registerSchema), register);
 router.patch("/verify/:verificationToken", verifyEmail);

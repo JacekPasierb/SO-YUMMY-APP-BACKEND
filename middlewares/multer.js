@@ -1,4 +1,3 @@
-const { log } = require("console");
 const multer = require("multer");
 const path = require("path");
 
@@ -7,7 +6,7 @@ module.exports = multer({
 
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    log("filf",file)
+
     if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
       cb(new Error("file is not sapported"), false);
     }
