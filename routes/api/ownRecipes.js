@@ -10,7 +10,7 @@ const {
 const router = express.Router();
 const upload = require("../../middlewares/multer");
 const saveImage = require("../../controller/cloudinary/saveImg");
-const test = ()=>{
+const test = async (req, res, next)=>{
 
   res.status(201).json({
     status: "success",
