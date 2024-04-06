@@ -10,10 +10,12 @@ const {
 const router = express.Router();
 const upload = require("../../middlewares/multer");
 const saveImage = require("../../controller/cloudinary/saveImg");
-
+const test = ()=>{
+  alert("hello")
+}
 router.get("/", auth, getOwnRecipes);
 router.post("/add", auth, validateBody(recipeSchema), addOwnRecipe);
 router.delete("/remove/:recipeId", auth, deleteOwnRecipe);
 // router.post("/picture", auth, upload.single("file"), saveImage);
-router.post("/picture", auth,  saveImage);
+router.post("/picture",test);
 module.exports = router;
