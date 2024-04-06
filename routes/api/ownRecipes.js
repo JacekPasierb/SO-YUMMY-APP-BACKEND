@@ -11,7 +11,7 @@ const router = express.Router();
 const upload = require("../../middlewares/multer");
 const saveImage = require("../../controller/cloudinary/saveImg");
 const test = async (req, res, next)=>{
-
+console.log("Napewno działa");
   res.status(201).json({
     status: "success",
     code: 200,
