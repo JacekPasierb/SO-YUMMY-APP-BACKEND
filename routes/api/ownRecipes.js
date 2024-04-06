@@ -14,6 +14,6 @@ const saveImage = require("../../controller/cloudinary/saveImg");
 router.get("/", auth, getOwnRecipes);
 router.post("/add", auth, validateBody(recipeSchema), addOwnRecipe);
 router.delete("/remove/:recipeId", auth, deleteOwnRecipe);
-router.post("/picture", auth, upload.single("file"), saveImage);
-
+// router.post("/picture", auth, upload.single("file"), saveImage);
+router.post("/picture", auth,  saveImage);
 module.exports = router;
