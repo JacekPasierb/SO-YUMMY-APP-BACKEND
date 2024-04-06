@@ -4,7 +4,7 @@ const saveImages = async (req, res) => {
     
   // const result = await cloudinary.uploader.upload(req.file.path);
   // res.json(result);
-  res.status(200).json({
+  res.json({
     status: "success",
     code: 200,
     message: "Recipe pic",
