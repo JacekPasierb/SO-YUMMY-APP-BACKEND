@@ -9,7 +9,8 @@ const {
 } = require("../../controller/ownRecipeController");
 const router = express.Router();
 const upload = require("../../middlewares/multer");
-const saveImages = require("../../controller/cloudinary/saveImages");
+const { saveImages } = require("../../controller/cloudinary");
+
 
 router.get("/", auth, getOwnRecipes);
 router.post("/add", auth, validateBody(recipeSchema), addOwnRecipe);
