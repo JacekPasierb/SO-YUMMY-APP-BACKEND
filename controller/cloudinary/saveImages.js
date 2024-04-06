@@ -9,7 +9,7 @@ const saveImages = async (req, res) => {
     status: "success",
     code: 200,
     message: "Recipe pic",
-    sum,
+    sum:sum,
   });
 };
 module.exports = saveImages;
