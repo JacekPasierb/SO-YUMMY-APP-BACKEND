@@ -8,7 +8,7 @@ const saveImages = async (req, res) => {
   res.json({
     status: "success",
     code: 200,
-    message: "Recipe pic",
+    message: "Recipe picttt",
     sum:sum,
   });
 };
