@@ -1,4 +1,4 @@
-const ctrlWrapper = require("../ctrlWrapper");
+const ctrlWrapper = require("./ctrlWrapper");
 
 const saveImages = require("./saveImages");
 
