@@ -10,14 +10,7 @@ const {
 const router = express.Router();
 const upload = require("../../middlewares/multer");
 const saveImages = require("../../controller/cloudinary/saveImages");
-const test = async (req, res, next)=>{
 
-  res.status(201).json({
-    status: "success",
-    code: 200,
-    message: "hel",
-  });
-}
 router.get("/", auth, getOwnRecipes);
 router.post("/add", auth, validateBody(recipeSchema), addOwnRecipe);
 router.delete("/remove/:recipeId", auth, deleteOwnRecipe);
