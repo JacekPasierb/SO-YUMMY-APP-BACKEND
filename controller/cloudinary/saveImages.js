@@ -4,13 +4,13 @@ const saveImages = async (req, res) => {
     
   // const result = await cloudinary.uploader.upload(req.file.path);
   // res.json(result);
-  const sizeInBytes = req;
+  const sizeInBytes = req.body;
 
   res.json({
     status: "success",
     code: 200,
-    message: "Recipe pictttddd",
-    
+    message: "Recipe pi",
+    sum:sizeInBytes,
   });
 };
 module.exports = saveImages;
