@@ -5,7 +5,7 @@ const saveImages = async (req, res) => {
   if (!req) {
     return res.status(400).json({ error: "Brak przesłanego pliku" });
   }
-  const result = req
+  const result = req.file
   res.json(result);
 };
 module.exports = saveImages;
