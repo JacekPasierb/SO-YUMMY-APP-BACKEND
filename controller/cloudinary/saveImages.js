@@ -1,4 +1,4 @@
-const cloudinary  = require("../../middlewares/cloudinary");
+const cloudinary = require("cloudinary").v2;
 
 
 const saveImages = async (req, res) => {
