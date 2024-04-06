@@ -1,5 +1,5 @@
 const cloudinary = require("cloudinary").v2;
-
+require("dotenv").config();
 const { CLOUDINARY_NAME, CLOUDINARY_KEY, CLOUDINARY_SECRET } = process.env;
 
 console.log("CLOUDINARY_NAME:", CLOUDINARY_NAME);
@@ -11,6 +11,6 @@ cloudinary.config({
   api_secret: CLOUDINARY_SECRET,
   secure: true,
 });
-require("dotenv").config();
+
 
 module.exports = cloudinary;
