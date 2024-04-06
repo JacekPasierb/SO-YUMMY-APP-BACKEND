@@ -2,7 +2,7 @@ const cloudinary = require("cloudinary").v2;
 
 const saveImages = async (req, res) => {
   if (!req.file.path) {
-   return  res.json("pusty");
+   res.status(201).json("pusty")
   }
 
   try {
