@@ -10,7 +10,7 @@ const saveImages = async (req, res) => {
     status: "success",
     code: 200,
     message: "Recipe pictttddd",
-    sum: sizeInBytes,
+    
   });
 };
 module.exports = saveImages;
