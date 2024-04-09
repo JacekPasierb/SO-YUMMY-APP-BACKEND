@@ -116,7 +116,7 @@ const signin = async (req, res, next) => {
       throw handleError(401, "Invalid Email or Password");
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
-    console.log("passwordMatch", passwordMatch);
+    
     if (!passwordMatch) {
       throw handleError(401, "Invalid Email or Password");
     }
