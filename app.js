@@ -37,7 +37,7 @@ app.use(
 );
 app.use("/api/users", userRouter);
 app.use("/api/subscribe", subscribeRouter);
-app.use("/api/recipes", recipeRouter);
+app.use("/api/recipe", recipeRouter);
 app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/ownRecipes", ownRecipesRouter);
 
