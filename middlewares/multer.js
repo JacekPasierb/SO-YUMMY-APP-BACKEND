@@ -8,7 +8,7 @@ module.exports = multer({
     
     const ext = path.extname(file.originalname);
 
-    if (ext !== ".jpeg" && ext == ".jpg" && ext !== ".png") {
+    if (ext !== ".jpeg" && ext === ".jpg" && ext !== ".png") {
       cb(new Error("file is not sapported"), false);
     }
     cb(null, true);
