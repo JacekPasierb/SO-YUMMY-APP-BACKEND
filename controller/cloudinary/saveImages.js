@@ -1,6 +1,7 @@
 const cloudinary = require("../../middlewares/cloudinary");
 
 const saveImages = async (req, res) => {
+  console.log("start",req.file);
   if (!req.file || !req.file.path) {
     return res.status(400).json({ error: "Brak przesłanego pliku" });
   }
