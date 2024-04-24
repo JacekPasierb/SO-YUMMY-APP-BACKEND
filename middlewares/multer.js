@@ -6,7 +6,7 @@ module.exports = multer({
 
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-console.log("file",file);
+console.log("poka",file.originalname);
     if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
       cb(new Error("file is not sapported"), false);
     }
