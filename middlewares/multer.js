@@ -7,8 +7,8 @@ module.exports = multer({
   fileFilter: (req, file, cb) => {
     
     const ext = path.extname(file.originalname);
-
-    if (ext !== ".jpeg" && ext === ".jpg" && ext !== ".png") {
+return  res.status(200).json({ fileName: req.file.originalname });
+    if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
       cb(new Error("file is not sapported"), false);
     }
     cb(null, true);
