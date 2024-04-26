@@ -4,8 +4,15 @@ const handleError = require("../utils/handleErrors");
 const getOwnRecipes = async (req, res, next) => {
   try {
     const userId = req?.user?._id;
+    let { page = 1, limit = 4 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const skip = (page - 1) * limit;
 
-    const ownRecipes = await Recipe.find({ owner: userId });
+    const ownRecipes = await Recipe.find({ owner: userId })
+      .skip(skip)
+      .limit(limit);
+
     res.status(200).json({
       status: "success",
       code: 200,
