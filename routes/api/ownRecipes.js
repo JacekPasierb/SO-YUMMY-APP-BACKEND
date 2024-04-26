@@ -12,7 +12,7 @@ const router = express.Router();
 const { saveImages } = require("../../controller/cloudinary/index");
 const { upload } = require("../../middlewares");
 
-router.get("/", auth, getOwnRecipes);
+router.get("/:userId", auth, getOwnRecipes);
 router.post("/add", auth, validateBody(recipeSchema), addOwnRecipe);
 router.delete("/remove/:recipeId", auth, deleteOwnRecipe);
 router.post("/picture", auth, upload.single("file"), saveImages);
