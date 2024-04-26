@@ -13,11 +13,19 @@ const getOwnRecipes = async (req, res, next) => {
       .skip(skip)
       .limit(limit);
 
+      const totalRecipes = await Recipe.find({ owner: userId });
+
+    if (ownRecipes.length === 0) {
+      return handleError(404, "Not found own recipes");
+    }
+    const totalOwnRecipes = totalRecipes.length;
+
     res.status(200).json({
       status: "success",
       code: 200,
       data: {
         ownRecipes,
+        totalOwnRecipes,
       },
     });
   } catch (error) {
