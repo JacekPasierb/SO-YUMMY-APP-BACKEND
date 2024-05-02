@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 require("./config/passport-config");
-const bodyParser = require("body-parser");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const app = express();
@@ -21,8 +20,7 @@ app.use((req, res, next) => {
   next();
 
 });
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+
 app.use(express.json());
 app.use(express.static("public"));
 
