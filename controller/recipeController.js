@@ -115,7 +115,13 @@ const getRecipeById = async (req, res, next) => {
   }
 };
 
-
+// const getPopularRecipe = async (req, res, next) => {
+//   try {
+//     const result = await Recipe.find({ category: category })
+//   } catch (error) {
+//     next(error);
+//   }
+// }
 
 module.exports = {
   getRecipesByFourCategories,
