@@ -41,7 +41,7 @@ app.use("/api/subscribe", subscribeRouter);
 app.use("/api/recipes", recipeRouter);
 app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/ownRecipes", ownRecipesRouter);
-app.use("/api/popularRecipes", popularRecipesRouter);
+// app.use("/api/popularRecipes", popularRecipesRouter);
 
 app.get("/", (req, res) => res.json({ version: "1.0" }));
 
