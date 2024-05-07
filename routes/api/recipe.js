@@ -11,7 +11,7 @@ const validateBody = require("../../middlewares/validateBody");
 const recipeSchema = require("../../schemas/recipeSchema");
 const router = express.Router();
 
-router.get("/", auth, getRecipesByFourCategories);
+router.get("/main-page", auth, getRecipesByFourCategories);
 router.get("/category-list", auth, getCategoriesList);
 router.get("/categories/:category", auth, getRecipesByCategory);
 router.get("/:id", auth, getRecipeById);
