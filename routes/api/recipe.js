@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get("/main-page", auth, getRecipesByFourCategories);
 router.get("/category-list", auth, getCategoriesList);
-router.get("/:category", auth, getRecipesByCategory);
+router.get("/categories/:category", auth, getRecipesByCategory);
 router.get("/:id", auth, getRecipeById);
 
 
