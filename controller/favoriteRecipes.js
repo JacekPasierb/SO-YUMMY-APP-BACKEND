@@ -2,12 +2,12 @@ const Recipe = require("../models/recipeModel");
 
 const addToFavorites = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { recipeId } = req.params;
     const userId = req.user.id;
 
-    const recipe = await Recipe.findById(id);
+    const recipe = await Recipe.findById(recipeId);
     if (!recipe) {
-      return res.status(404).json({ message: `Recipe not found, ${id}` });
+      return res.status(404).json({ message: `Recipe not found, ${recipeId}` });
     }
 
     if (recipe.favorites.includes(userId)) {
