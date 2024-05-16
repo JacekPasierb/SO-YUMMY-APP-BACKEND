@@ -15,10 +15,15 @@ app.use(logger(formatsLogger));
 // app.use(cors());
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
   next();
-
 });
 
 app.use(express.json());
@@ -29,6 +34,7 @@ const subscribeRouter = require("./routes/api/subscribe.js");
 const recipeRouter = require("./routes/api/recipe.js");
 const ingredientsRouter = require("./routes/api/ingredients.js");
 const ownRecipesRouter = require("./routes/api/ownRecipes.js");
+const favoriteRouter = require("./routes/api/favoriteRecipes.js");
 
 const handleError = require("./utils/handleErrors");
 app.use(
@@ -39,8 +45,10 @@ app.use(
 app.use("/api/users", userRouter);
 app.use("/api/subscribe", subscribeRouter);
 app.use("/api/recipes", recipeRouter);
+// app.use("/api/search");
 app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/ownRecipes", ownRecipesRouter);
+app.use("/api/favorite", favoriteRouter);
 // app.use("/api/popularRecipes", popularRecipesRouter);
 
 app.get("/", (req, res) => res.json({ version: "1.0" }));
