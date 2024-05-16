@@ -6,8 +6,8 @@ const addToFavorites = async (req, res, next) => {
     const userId = req.user.id;
 
     const recipe = await Recipe.findById(recipeId);
-    if (recipe) {
-      return res.status(404).json({ message: `Recipe not found, ${userId}` });
+    if (!recipe) {
+      return res.status(404).json({ message: `Recipe not found` });
     }
 
     if (recipe.favorites.includes(userId)) {
@@ -19,7 +19,7 @@ const addToFavorites = async (req, res, next) => {
 
     res.status(200).json({ message: "Recipe added to favorites", recipe });
   } catch (error) {
-    next(error);
+    res.status(500).json({ message: "Recipe "});
   }
 };
 module.exports = {
