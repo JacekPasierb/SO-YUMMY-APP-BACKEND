@@ -1,3 +1,5 @@
+const Recipe = require("../models/recipeModel");
+
 const addToFavorites = async (req, res, next) => {
   try {
     const recipeId = req.params.id;
