@@ -19,7 +19,7 @@ const addToFavorites = async (req, res, next) => {
 
     res.status(200).json({ message: "Recipe added to favorites", recipe });
   } catch (error) {
-    res.status(500).json({ message: "Recipe "});
+    res.status(500).json({ message: `Recipe, ${error.message} `});
   }
 };
 module.exports = {
