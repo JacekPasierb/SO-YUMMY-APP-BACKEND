@@ -28,12 +28,14 @@ const removeFromFavorite = async (req, res, next) => {
     const { recipeId } = req.params;
     const userId = req.user.id;
 
-    const recipe = await Recipe.findById(recipeId);
+    const recipe = await Recipe.findByIdAndUpdate(
+      recipeId,
+      { $pull: { favorites: userId } },
+      { new: true }
+    );
     if (!recipe) {
       return res.status(404).json({ message: `Recipe not found` });
     }
-    recipe.favorites = recipe.favorites.filter(id => id.toString() !== userId.toString());
-    await recipe.save();
 
     res.status(200).json({ message: `Removed from favorites successfully` });
   } catch (error) {
