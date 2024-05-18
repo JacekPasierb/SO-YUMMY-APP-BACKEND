@@ -1,5 +1,16 @@
 const Recipe = require("../models/recipeModel");
 
+const getFavorites = async (req,res,next)=>{
+  try {
+    const userId = req.user.id;
+    const favoriteRecipes = await Recipe.find({ favorites: { $in: [userId] } });
+    res.status(200).json({ data: favoriteRecipes });
+  } catch (error) {
+    res.status(500).json({
+      message: `Error while get Recipe from favorites:, ${error.message} `,
+    });
+  }
+}
 const addToFavorites = async (req, res, next) => {
   try {
     const { recipeId } = req.params;
@@ -47,4 +58,5 @@ const removeFromFavorite = async (req, res, next) => {
 module.exports = {
   addToFavorites,
   removeFromFavorite,
+  getFavorites
 };
