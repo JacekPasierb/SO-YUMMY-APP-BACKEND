@@ -3,7 +3,7 @@ const Recipe = require("../models/recipeModel");
 const getFavorites = async (req,res,next)=>{
   try {
     const userId = req.user.id;
-    const favoriteRecipes = await Recipe.find({ favorites: { $in: [userId] } });
+    const favoriteRecipes = await Recipe.find({ favorites: { $in: userId } });
     res.status(200).json({ data: favoriteRecipes });
   } catch (error) {
     res.status(500).json({
