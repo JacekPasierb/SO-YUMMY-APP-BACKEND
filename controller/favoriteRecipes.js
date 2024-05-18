@@ -2,6 +2,7 @@ const Recipe = require("../models/recipeModel");
 
 const getFavorites = async (req, res, next) => {
   try {
+    console.log("cc");
     const userId = req.user.id;
     console.log(`Fetching favorite recipes for user ID: ${userId}`);
     const favoriteRecipes = await Recipe.find({ favorites: { $in: [userId] } });
