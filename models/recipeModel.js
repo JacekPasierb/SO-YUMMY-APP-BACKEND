@@ -36,7 +36,7 @@ const recipeSchema = new Schema(
     },
     favorites: {
       type: [String],
-     
+
       default: [],
     },
     youtube: {
