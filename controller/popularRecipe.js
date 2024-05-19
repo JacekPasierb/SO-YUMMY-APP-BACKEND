@@ -6,7 +6,7 @@ const getPopularRecipes = async (req, res, next) => {
     const popularRecipes = await Recipe.aggregate([
       { $match: { "favorites.0": { $exists: true } } },
       { $sort: { "favorites.length": -1 } }, 
-      { $limit: count }, 
+      { $limit: Number(count) }, 
     ]);
 
     res.status(200).json({
