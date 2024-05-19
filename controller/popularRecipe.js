@@ -2,10 +2,11 @@ const Recipe = require("../models/recipeModel");
 
 const getPopularRecipes = async (req, res, next) => {
   try {
+    const { count = 4 } = req.query;
     const popularRecipes = await Recipe.aggregate([
       { $match: { "favorites.0": { $exists: true } } },
       { $sort: { "favorites.length": -1 } }, 
-      { $limit: 4 }, 
+      { $limit: {count} }, 
     ]);
 
     res.status(200).json({
