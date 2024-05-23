@@ -4,13 +4,24 @@ const getFavorites = async (req, res, next) => {
   try {
     console.log("cc");
     const userId = req.user.id;
+    let { page = 1, limit = 4 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+    const skip = (page - 1) * limit;
+
     console.log(`Fetching favorite recipes for user ID: ${userId}`);
-    const favoriteRecipes = await Recipe.find({ favorites: { $in: [userId] } });
-    const totalFavoritesRecipes = favoriteRecipes.length;
+    const favoriteRecipes = await Recipe.find({ favorites: { $in: [userId] } })
+      .skip(skip)
+      .limit(limit);
+
+    const totalFavoriteRecipes = await Recipe.find({
+      favorites: { $in: [userId] },
+    });
+    const totalFavoritesRecipes = totalFavoriteRecipes.length;
     res.status(200).json({
       status: "success",
       code: 200,
-       favoriteRecipes,
+      favoriteRecipes,
       totalFavoritesRecipes,
     });
   } catch (error) {
