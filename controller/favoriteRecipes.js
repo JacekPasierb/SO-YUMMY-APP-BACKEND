@@ -10,7 +10,7 @@ const getFavorites = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       code: 200,
-      data: favoriteRecipes,
+       favoriteRecipes,
       totalFavoritesRecipes,
     });
   } catch (error) {
