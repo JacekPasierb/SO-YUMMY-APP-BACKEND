@@ -6,12 +6,12 @@ const getFavorites = async (req, res, next) => {
     const userId = req.user.id;
     console.log(`Fetching favorite recipes for user ID: ${userId}`);
     const favoriteRecipes = await Recipe.find({ favorites: { $in: [userId] } });
+    const totalFavoritesRecipes = favoriteRecipes.length;
     res.status(200).json({
       status: "success",
       code: 200,
-      data: 
-        favoriteRecipes,
-      
+      data: favoriteRecipes,
+      totalFavoritesRecipes,
     });
   } catch (error) {
     res.status(500).json({
