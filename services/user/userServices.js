@@ -31,6 +31,7 @@ const addUser = ({ email, password, name, verificationToken, token }) => {
 
 const findUser = async (query) => {
   try {
+    console.log("qqq",query);
     return await User.findOne(query);
   } catch (error) {
     console.error(error.message);

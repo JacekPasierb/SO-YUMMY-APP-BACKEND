@@ -13,6 +13,7 @@ const {
 
 const { send } = require("../utils/sendGrid");
 const handleError = require("../utils/handleErrors");
+const User = require("../models/userModel");
 
 const register = async (req, res, next) => {
   try {
@@ -90,9 +91,9 @@ const update = async (req, res, next) => {
 const verifyEmail = async (req, res) => {
   try {
     const { verificationToken } = req.params;
-
-    const user = await findUser({ verificationToken });
-
+console.log("ll",verificationToken);
+    const user = await User.findOne({verificationToken})
+console.log("user",user);
     if (!user) {
       throw handleError(404);
     }
