@@ -19,7 +19,7 @@ const {
 } = require("../../schemas/userSchema");
 
 router.post("/register", validateBody(registerSchema), register);
-router.patch("/verify/:verificationToken", verifyEmail);
+router.get("/verify/:verificationToken", verifyEmail);
 router.post("/signin", validateBody(signinSchema), signin);
 router.get("/current", auth, currentUser);
 router.patch("/logout", auth, logout);
