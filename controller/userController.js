@@ -52,8 +52,10 @@ const register = async (req, res, next) => {
       message: "Register Success !",
       data: {
         token: newUser.token,
-        email: newUser.email,
-        name: newUser.name,
+        user: {
+          email: newUser.email,
+          name: newUser.name,
+        },
       },
     });
   } catch (error) {
@@ -116,7 +118,7 @@ const signin = async (req, res, next) => {
       throw handleError(401, "Invalid Email or Password");
     }
     const passwordMatch = await bcrypt.compare(password, user.password);
-    
+
     if (!passwordMatch) {
       throw handleError(401, "Invalid Email or Password");
     }
@@ -162,7 +164,7 @@ const currentUser = async (req, res, next) => {
       status: "success",
       code: 200,
       data: {
-        userId:id,
+        userId: id,
         email,
         name,
         token,
