@@ -9,6 +9,7 @@ const {
   logout,
 
   update,
+  resendVerificationEmail,
 } = require("../../controller/userController");
 const auth = require("../../middlewares/auth");
 const validateBody = require("../../middlewares/validateBody");
@@ -21,6 +22,7 @@ const {
 router.post("/register", validateBody(registerSchema), register);
 router.get("/verify/:verificationToken", verifyEmail);
 router.post("/signin", validateBody(signinSchema), signin);
+router.post("/resend-verification-email", resendVerificationEmail);
 router.get("/current", auth, currentUser);
 router.patch("/logout", auth, logout);
 router.patch("/update", auth, validateBody(updateUserSchema), update);

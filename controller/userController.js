@@ -91,9 +91,9 @@ const update = async (req, res, next) => {
 const verifyEmail = async (req, res) => {
   try {
     const { verificationToken } = req.params;
-console.log("ll",verificationToken);
-    const user = await User.findOne({verificationToken})
-console.log("user",user);
+    console.log("ll", verificationToken);
+    const user = await User.findOne({ verificationToken });
+    console.log("user", user);
     if (!user) {
       throw handleError(404);
     }
@@ -155,6 +155,41 @@ const signin = async (req, res, next) => {
   }
 };
 
+const resendVerificationEmail = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await getUserByEmail({ email });
+
+    if (!user) {
+      throw handleError(404, "User not found");
+    }
+
+    if (user.verify) {
+      throw handleError(400, "Email is already verified");
+    }
+
+    const emailToSend = {
+      to: user.email,
+      subject: "SO YUMMY APP email verification",
+      html: `
+       <div style="text-align: center;">
+       <h1>SO YUMMY APP</h1>
+       <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend.vercel.app/api/users/verify/${user.verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
+       </div>
+       `,
+    };
+
+    await send(emailToSend);
+
+    return res.status(200).json({
+      status: "OK",
+      message: "Verification email sent!",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const currentUser = async (req, res, next) => {
   try {
     const _id = req.user;
@@ -187,4 +222,4 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, verifyEmail, signin, currentUser, logout, update };
+module.exports = { register, verifyEmail, signin, currentUser, logout, update, resendVerificationEmail };
