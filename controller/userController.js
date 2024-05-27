@@ -70,17 +70,16 @@ const update = async (req, res, next) => {
 
     const updatedUser = await updateUser(_id, req.body);
 
-    const { email, name, id, token, avatar } = updatedUser;
+    const {  name,  avatar } = updatedUser;
 
     return res.status(200).json({
       status: "User data updated successfully",
       code: 200,
       data: {
-        id,
-        email,
-        name,
-        token,
-        avatar,
+        user: {
+          name,
+          avatar,
+        },
       },
     });
   } catch (error) {
@@ -91,9 +90,9 @@ const update = async (req, res, next) => {
 const verifyEmail = async (req, res) => {
   try {
     const { verificationToken } = req.params;
-    console.log("ll", verificationToken);
+
     const user = await User.findOne({ verificationToken });
-    console.log("user", user);
+
     if (!user) {
       throw handleError(404);
     }
@@ -222,4 +221,12 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, verifyEmail, signin, currentUser, logout, update, resendVerificationEmail };
+module.exports = {
+  register,
+  verifyEmail,
+  signin,
+  currentUser,
+  logout,
+  update,
+  resendVerificationEmail,
+};
