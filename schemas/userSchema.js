@@ -24,6 +24,9 @@ const updateUserSchema = Joi.object({
     "string.min": "Name must be at least 3 characters long",
   }),
 });
+const toogleThemeSchema = Joi.object({
+  isDarkTheme:Joi.boolean(),
+});
 const signinSchema = Joi.object({
   email: Joi.string().email().trim().required().messages({
     "string.base": "E-mail must be a string",
@@ -37,4 +40,4 @@ const signinSchema = Joi.object({
   }),
 });
 
-module.exports = { registerSchema, signinSchema, updateUserSchema };
+module.exports = { registerSchema, signinSchema, updateUserSchema, toogleThemeSchema };

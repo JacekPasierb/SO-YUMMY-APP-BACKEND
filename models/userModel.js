@@ -33,6 +33,7 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
+  isDarkTheme: { type: Boolean, default: false },
 });
 
 const User = mongoose.model("user", userSchema);

@@ -70,7 +70,7 @@ const update = async (req, res, next) => {
 
     const updatedUser = await updateUser(_id, req.body);
 
-    const {  name,  avatar } = updatedUser;
+    const { name, avatar } = updatedUser;
 
     return res.status(200).json({
       status: "User data updated successfully",
@@ -79,6 +79,28 @@ const update = async (req, res, next) => {
         user: {
           name,
           avatar,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const toogleTheme = async (req, res, next) => {
+  try {
+    const { _id } = req.user;
+
+    const updatedUser = await updateUser(_id, req.body);
+
+    const { isDarkTheme} = updatedUser;
+
+    return res.status(200).json({
+      status: "User data updated successfully",
+      code: 200,
+      data: {
+        user: {
+          isDarkTheme
         },
       },
     });
@@ -146,6 +168,7 @@ const signin = async (req, res, next) => {
           name: user.name,
           avatar: user.avatar,
           userId: user._id,
+          isDarkTheme: user.isDarkTheme,
         },
       },
     });
@@ -204,6 +227,7 @@ const currentUser = async (req, res, next) => {
         name,
         token,
         avatar,
+        isDarkTheme,
       },
     });
   } catch (error) {
@@ -229,4 +253,5 @@ module.exports = {
   logout,
   update,
   resendVerificationEmail,
+  toogleTheme,
 };
