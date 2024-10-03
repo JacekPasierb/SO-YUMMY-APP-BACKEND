@@ -89,14 +89,15 @@ const update = async (req, res, next) => {
 
 const toogleTheme = async (req, res, next) => {
   try {
-    console.log("dzieje");
     
     const { _id } = req.user;
+    console.log("dzieje",_id);
 
     const updatedUser = await updateUser(_id, req.body);
     console.log("dzieje2", updateUser);
-
+    
     const { isDarkTheme} = updatedUser;
+    console.log("dzieje3", isDarkTheme);
 
     return res.status(200).json({
       status: "User data updated successfully",
