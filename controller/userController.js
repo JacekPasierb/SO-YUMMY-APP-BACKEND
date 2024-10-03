@@ -89,9 +89,12 @@ const update = async (req, res, next) => {
 
 const toogleTheme = async (req, res, next) => {
   try {
+    console.log("dzieje");
+    
     const { _id } = req.user;
 
     const updatedUser = await updateUser(_id, req.body);
+    console.log("dzieje2", updateUser);
 
     const { isDarkTheme} = updatedUser;
 
