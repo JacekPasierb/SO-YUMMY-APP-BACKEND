@@ -218,7 +218,7 @@ const currentUser = async (req, res, next) => {
   try {
     const _id = req.user;
 
-    const { email, name, id, token, avatar } = await getUserById(_id);
+    const { email, name, id, token, avatar, isDarkTheme } = await getUserById(_id);
 
     res.status(200).json({
       status: "success",
