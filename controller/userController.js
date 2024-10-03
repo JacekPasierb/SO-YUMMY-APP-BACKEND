@@ -91,7 +91,7 @@ const toogleTheme = async (req, res, next) => {
   try {
     
     const { _id } = req.user;
-    console.log("dzieje",_id);
+    console.log("dzieje",req.body);
 
     const updatedUser = await updateUser(_id, req.body);
     console.log("dzieje2", updateUser);
