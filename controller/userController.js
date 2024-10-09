@@ -89,15 +89,10 @@ const update = async (req, res, next) => {
 
 const toogleTheme = async (req, res, next) => {
   try {
-    
     const { _id } = req.user;
-    const { isDarkTheme } = req.body; 
-    console.log("dzieje",req.body);
+    const { isDarkTheme } = req.body;
 
     const updatedUser = await updateUser(_id, { isDarkTheme });
-    console.log("dzieje2", updateUser);
-    
-   
 
     return res.status(200).json({
       status: "User data updated successfully",
@@ -218,7 +213,9 @@ const currentUser = async (req, res, next) => {
   try {
     const _id = req.user;
 
-    const { email, name, id, token, avatar, isDarkTheme } = await getUserById(_id);
+    const { email, name, id, token, avatar, isDarkTheme } = await getUserById(
+      _id
+    );
 
     res.status(200).json({
       status: "success",

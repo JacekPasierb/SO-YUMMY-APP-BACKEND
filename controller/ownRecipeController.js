@@ -9,16 +9,33 @@ const getOwnRecipes = async (req, res, next) => {
     limit = parseInt(limit);
     const skip = (page - 1) * limit;
 
+    // Znajdź wszystkie przepisy użytkownika, aby policzyć łączną liczbę
+    const totalRecipes = await Recipe.find({ owner: userId });
+    const totalOwnRecipes = totalRecipes.length;
+
+    // Oblicz maksymalną liczbę stron
+    const totalPages = Math.ceil(totalOwnRecipes / limit);
+
+    // Sprawdź, czy żądana strona nie przekracza maksymalnej liczby stron
+    if (page > totalPages) {
+      return res.status(200).json({
+        status: "success",
+        code: 200,
+        data: {
+          ownRecipes: [],
+          totalOwnRecipes,
+        },
+        message: "Page number exceeds total number of available pages.",
+      });
+    }
+
     const ownRecipes = await Recipe.find({ owner: userId })
       .skip(skip)
       .limit(limit);
 
-      const totalRecipes = await Recipe.find({ owner: userId });
-
     if (ownRecipes.length === 0) {
       return handleError(404, "Not found own recipes");
     }
-    const totalOwnRecipes = totalRecipes.length;
 
     res.status(200).json({
       status: "success",
