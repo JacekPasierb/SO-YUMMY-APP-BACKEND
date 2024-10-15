@@ -2,6 +2,24 @@ const { Category } = require("../models/categories");
 const Recipe = require("../models/recipeModel");
 const handleError = require("../utils/handleErrors");
 
+const getRecipes = async(req,res,next)=>{
+  try {
+    const result = await Recipe.find()
+    const totalRecipes = result.length;
+
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        result,
+        totalRecipes,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 const getRecipesByFourCategories = async (req, res, next) => {
   try {
     const { count = 1 } = req.query;
@@ -124,6 +142,7 @@ const getRecipeById = async (req, res, next) => {
 // }
 
 module.exports = {
+  getRecipes,
   getRecipesByFourCategories,
   getCategoriesList,
   getRecipesByCategory,
