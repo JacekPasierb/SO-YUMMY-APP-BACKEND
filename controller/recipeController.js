@@ -4,7 +4,12 @@ const handleError = require("../utils/handleErrors");
 
 const getRecipes = async(req,res,next)=>{
   try {
-    const result = await Recipe.find()
+    const {query, ingredient} = req.query;
+    if(query){
+      filters.title = { $regex: query, $options: "i" };
+      const result = await  Recipe.find(filters);
+        return result
+    }
     const totalRecipes = result.length;
 
     res.status(200).json({
