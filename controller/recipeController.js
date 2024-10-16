@@ -6,7 +6,7 @@ const handleError = require("../utils/handleErrors");
 const getRecipes = async (req, res, next) => {
   try {
     const filters = {};
-    const { query, ingredient, page = 1, limit = 8 } = req.query;
+    const { query, ingredient, page = 1, limit = 6 } = req.query;
     const skip = (page - 1) * limit;
 
     if (query) {
