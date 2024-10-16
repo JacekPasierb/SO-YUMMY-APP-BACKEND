@@ -1,4 +1,5 @@
 const { Category } = require("../models/categories");
+const Ingredient = require("../models/ingredientModel");
 const Recipe = require("../models/recipeModel");
 const handleError = require("../utils/handleErrors");
 
@@ -10,6 +11,14 @@ const getRecipes = async (req, res, next) => {
 
     if (query) {
       filters.title = { $regex: query, $options: "i" };
+    } else if (ingredient) {
+      const ing = await Ingredient.findOne({
+        ttl: { $regex: ingredient, $options: "i" },
+      });
+      const ingID = ing._id;
+      filters.ingredients = {
+        $elemMatch: { id: ingID },
+      };
     }
 
     const result = await Recipe.find(filters).skip(skip).limit(limit);
