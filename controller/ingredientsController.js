@@ -1,6 +1,5 @@
 const Ingredient = require("../models/ingredientModel");
 
-
 const getAllIngredients = async (req, res, next) => {
   try {
     const ingredients = await Ingredient.find();
@@ -20,11 +19,9 @@ const getAllIngredients = async (req, res, next) => {
 const getIngredientById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log("sk",id);
-    
+
     const ingredient = await Ingredient.findById(id);
-    console.log("skladnik",ingredient);
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
