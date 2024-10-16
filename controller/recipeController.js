@@ -2,17 +2,19 @@ const { Category } = require("../models/categories");
 const Recipe = require("../models/recipeModel");
 const handleError = require("../utils/handleErrors");
 
-const getRecipes = async(req,res,next)=>{
+const getRecipes = async (req, res, next) => {
   try {
     const filters = {};
-    const {query, ingredient} = req.query;
-    if(query){
+    const { query, ingredient, page = 1, limit = 8 } = req.query;
+    const skip = (page - 1) * limit;
+
+    if (query) {
       filters.title = { $regex: query, $options: "i" };
-     
-       
     }
-    const result = await  Recipe.find(filters);
-    const totalRecipes = result.length;
+
+    const result = await Recipe.find(filters).skip(skip).limit(limit);
+    const resultAll = await Recipe.find(filters);
+    const totalRecipes = resultAll.length;
 
     res.status(200).json({
       status: "success",
@@ -25,7 +27,7 @@ const getRecipes = async(req,res,next)=>{
   } catch (error) {
     next(error);
   }
-}
+};
 
 const getRecipesByFourCategories = async (req, res, next) => {
   try {
@@ -109,7 +111,7 @@ const getRecipesByCategory = async (req, res, next) => {
       return handleError(404, "Not found recipes by such category");
     }
     const total = totalRecipe.length;
-    
+
     res.status(200).json({
       status: "success",
       code: 200,
@@ -154,5 +156,4 @@ module.exports = {
   getCategoriesList,
   getRecipesByCategory,
   getRecipeById,
-  
 };
