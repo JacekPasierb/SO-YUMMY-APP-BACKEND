@@ -138,6 +138,7 @@ const getRecipeById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const result = await Recipe.findById(id);
+console.log("skladnik",result);
 
     res.status(200).json({
       status: "success",
