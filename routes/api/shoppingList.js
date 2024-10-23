@@ -1,6 +1,10 @@
 const express = require("express");
 const auth = require("../../middlewares/auth");
-const { deleteIngredient, addIngredient, getShoppingList } = require("../../controller/shoppingListController");
+const {
+  deleteIngredient,
+  addIngredient,
+  getShoppingList,
+} = require("../../controller/shoppingListController");
 
 const router = express.Router();
 

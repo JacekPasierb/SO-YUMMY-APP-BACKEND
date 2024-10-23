@@ -47,7 +47,6 @@ app.use(
 app.use("/api/users", userRouter);
 app.use("/api/subscribe", subscribeRouter);
 app.use("/api/recipes", recipeRouter);
-// app.use("/api/search");
 app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/ownRecipes", ownRecipesRouter);
 app.use("/api/favorite", favoriteRouter);
