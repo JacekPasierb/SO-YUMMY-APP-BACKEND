@@ -2,22 +2,14 @@ const ShoppingList = require("../models/shoppingListModel");
 
 const getShoppingList = async (req, res, next) => {
   try {
-    console.log("1");
-    
-    const { recipeId } = req.params; 
     const shoppingList = await ShoppingList.findOne({ userId: req.user._id });
-console.log("2", shoppingList);
 
     if (!shoppingList) {
       return res.status(404).json({ message: "Lista zakupów nie znaleziona" });
     }
 
-    const items = recipeId
-    ? shoppingList.items.filter(item => item.recipeId === recipeId)
-    : shoppingList.items;
-
-  res.status(200).json({ items });
- 
+    
+    res.status(200).json(shoppingList);
   } catch (error) {
     next(error);
   }
