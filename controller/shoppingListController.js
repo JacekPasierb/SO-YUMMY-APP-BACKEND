@@ -41,6 +41,7 @@ const deleteIngredient = async (req, res, next) => {
     try {
         const { ingredientId, recipeId } = req.body;
         const userId = req.user._id;
+    console.log("ccc");
     
         
         await ShoppingList.updateOne(
