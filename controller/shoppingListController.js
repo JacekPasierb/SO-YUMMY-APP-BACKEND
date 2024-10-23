@@ -2,6 +2,7 @@ const ShoppingList = require("../models/shoppingListModel");
 
 const getShoppingList = async (req, res, next) => {
   try {
+    const { recipeId } = req.params; 
     const shoppingList = await ShoppingList.findOne({ userId: req.user._id });
 
     if (!shoppingList) {
