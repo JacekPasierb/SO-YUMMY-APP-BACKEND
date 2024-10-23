@@ -41,14 +41,15 @@ const deleteIngredient = async (req, res, next) => {
     try {
         const { ingredientId, recipeId } = req.body;
         const userId = req.user._id;
-    console.log("ccc");
+    console.log("ccc",ingredientId);
+    console.log("ccc1",recipeId);
     
         
         await ShoppingList.updateOne(
             { userId }, 
             { $pull: { items: { ingredientId, recipeId } } }
           );
-    console.log("dalej",ShoppingList);
+    console.log("dalej");
     
         res.status(200).json({
           message: "Składnik usunięty z listy zakupów",
