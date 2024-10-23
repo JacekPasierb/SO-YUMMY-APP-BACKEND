@@ -20,7 +20,7 @@ const addIngredient = async (req, res, next) => {
       shoppingList = new ShoppingList({ userId, items: [] });
     }
 console.log("Składnie", ingredientId);
-
+console.log("Otrzymane dane:", { ingredientId, thb, name, measure, recipeId });
     shoppingList.items.push({ ingredientId, thb, name, measure, recipeId });
 console.log("dochodzi tu?");
 try {
