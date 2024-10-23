@@ -39,23 +39,14 @@ const addIngredient = async (req, res, next) => {
 
 const deleteIngredient = async (req, res, next) => {
     try {
-        const { ingredientId } = req.params;
+        const { ingredientId, recipeId } = req.body;
         const userId = req.user._id;
     
         
-        const shoppingList = await ShoppingList.findOne({ userId });
-    
-        if (!shoppingList) {
-          return res.status(404).json({ message: "Lista zakupów nie znaleziona" });
-        }
-    
-        shoppingList.items = shoppingList.items.filter(
-            (item) => item.ingredientId !== ingredientId
+        await ShoppingList.updateOne(
+            { userId }, 
+            { $pull: { items: { ingredientId, recipeId } } }
           );
-    
-    
-        // Zapisz zmiany
-        await shoppingList.save();
     
         res.status(200).json({
           message: "Składnik usunięty z listy zakupów",
