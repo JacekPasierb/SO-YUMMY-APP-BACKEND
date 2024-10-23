@@ -10,9 +10,10 @@ const shoppingListSchema = new Schema({
   items: [
     {
       ingredientId: { type: mongoose.Schema.Types.ObjectId, ref: "ingredient" },
+      thb: String,
       name: { type: String, required: true },
-      quantity: { type: Number, required: true },
-      unit: { type: String, required: true },
+      measure: { type: String, required: true },
+      recipeId:{ type: mongoose.Schema.Types.ObjectId, ref: "recipe"}
     },
   ],
 });
