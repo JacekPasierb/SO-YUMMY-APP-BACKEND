@@ -21,7 +21,7 @@ console.log("Składnie", ingredientId);
 
     shoppingList.items.push({ ingredientId, thb, name, measure, recipeId });
 console.log("dochodzi tu?");
-
+shoppingList.save()
     return res.status(201).json({
       message: "Składnik dodany do listy zakupów",
       ingredient: newIngredient,
