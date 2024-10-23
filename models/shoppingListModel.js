@@ -13,7 +13,7 @@ const shoppingListSchema = new Schema({
       thb: String,
       name: { type: String, required: true },
       measure: { type: String, required: true },
-      recipeId:{ type: mongoose.Schema.Types.ObjectId, ref: "recipe"}
+      recipeId: { type: mongoose.Schema.Types.ObjectId, ref: "recipe" },
     },
   ],
 });

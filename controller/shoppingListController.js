@@ -23,7 +23,7 @@ console.log("Składnie", ingredientId);
 
     shoppingList.items.push({ ingredientId, thb, name, measure, recipeId });
 console.log("dochodzi tu?");
-shoppingList.save()
+await shoppingList.save()
 console.log("aaa",shoppingList);
 
     return res.status(201).json({
