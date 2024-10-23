@@ -23,7 +23,12 @@ console.log("Składnie", ingredientId);
 
     shoppingList.items.push({ ingredientId, thb, name, measure, recipeId });
 console.log("dochodzi tu?");
-await shoppingList.save()
+try {
+    await shoppingList.save();
+    console.log("Lista zapisano poprawnie:", shoppingList);
+} catch (err) {
+    console.log("Błąd podczas zapisywania listy zakupów:", err);
+}
 console.log("aaa",shoppingList);
 
     return res.status(201).json({
