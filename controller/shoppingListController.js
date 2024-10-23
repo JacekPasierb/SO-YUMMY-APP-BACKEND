@@ -53,7 +53,7 @@ const deleteIngredient = async (req, res, next) => {
     
         res.status(200).json({
           message: "Składnik usunięty z listy zakupów",
-          shoppingList,
+
         });
       } catch (error) {
         next(error); // Przekazujemy błąd dalej do middleware obsługującego błędy
