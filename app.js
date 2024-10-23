@@ -36,6 +36,7 @@ const ingredientsRouter = require("./routes/api/ingredients.js");
 const ownRecipesRouter = require("./routes/api/ownRecipes.js");
 const favoriteRouter = require("./routes/api/favoriteRecipes.js");
 const popularRecipesRouter = require("./routes/api/popularRecipe.js");
+const shoppingListRouter = require("./routes/api/shoppingList.js");
 
 const handleError = require("./utils/handleErrors");
 app.use(
@@ -51,6 +52,7 @@ app.use("/api/ingredients", ingredientsRouter);
 app.use("/api/ownRecipes", ownRecipesRouter);
 app.use("/api/favorite", favoriteRouter);
 app.use("/api/popularRecipes", popularRecipesRouter);
+app.use("/api/shopping-list", shoppingListRouter);
 
 app.get("/", (req, res) => res.json({ version: "1.0" }));
 
