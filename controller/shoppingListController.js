@@ -6,6 +6,8 @@ const getShoppingList = async (req, res, next) => {
 };
 
 const addIngredient = async (req, res, next) => {
+    console.log("too");
+    
   try {
     const { ingredientId, thb, name, measure, recipeId } = req.body;
     const userId = req.user._id;
