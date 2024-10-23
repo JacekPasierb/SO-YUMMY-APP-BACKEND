@@ -8,7 +8,12 @@ const getShoppingList = async (req, res, next) => {
       return res.status(404).json({ message: "Lista zakupów nie znaleziona" });
     }
 
-    res.status(200).json(shoppingList);
+    const items = recipeId
+    ? shoppingList.items.filter(item => item.recipeId === recipeId)
+    : shoppingList.items;
+
+  res.status(200).json({ items });
+ 
   } catch (error) {
     next(error);
   }
@@ -23,9 +28,7 @@ const addIngredient = async (req, res, next) => {
     if (!shoppingList) {
       shoppingList = new ShoppingList({ userId, items: [] });
     }
-    // shoppingList.items.push({ ingredientId, thb, name, measure, recipeId });
 
-    // await shoppingList.save();
 
     await ShoppingList.updateOne(
         { userId },
