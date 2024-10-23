@@ -48,6 +48,7 @@ const deleteIngredient = async (req, res, next) => {
             { userId }, 
             { $pull: { items: { ingredientId, recipeId } } }
           );
+    console.log("dalej");
     
         res.status(200).json({
           message: "Składnik usunięty z listy zakupów",
