@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get("/", auth, getShoppingList);
 router.post("/add", auth, addIngredient);
-router.delete("/remove/:ingredientId", auth, deleteIngredient);
+router.delete("/remove", auth, deleteIngredient);
 
 module.exports = router;
