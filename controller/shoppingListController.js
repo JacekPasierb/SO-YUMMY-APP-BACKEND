@@ -10,12 +10,17 @@ const addIngredient = async (req, res, next) => {
     const { ingredientId, thb, name, measure, recipeId } = req.body;
     const userId = req.user._id;
     let shoppingList = await ShoppingList.findOne({ userId });
+    console.log("shoppingList", shoppingList);
+   
+    
     
     if (!shoppingList) {
       shoppingList = new ShoppingList({ userId, items: [] });
     }
+console.log("Składnie", ingredientId);
 
     shoppingList.items.push({ ingredientId, thb, name, measure, recipeId });
+console.log("dochodzi tu?");
 
     return res.status(201).json({
       message: "Składnik dodany do listy zakupów",
