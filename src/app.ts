@@ -25,6 +25,7 @@ const CSS_URL =
 const swaggerJsdoc = require("swagger-jsdoc");
 
 app.use(logger(formatsLogger));
+app.use(express.json());
 const allowedOrigins = ["https://so-yummy-jack.netlify.app"];
 
 app.use(cors({
@@ -33,7 +34,7 @@ app.use(cors({
   credentials: true,
   allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
-app.use(express.json());
+
 app.use(express.static("public"));
 
 // app.use((req, res, next) => {
