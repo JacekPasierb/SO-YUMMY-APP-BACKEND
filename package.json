@@ -2,11 +2,11 @@
   "name": "SO-YUMMY-APP-BACKEND",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "start:dev": "nodemon src/index.ts"
+    "start": "node dist/server.js",
+    "start:dev": "nodemon src/server.ts"
   },
   "author": "",
   "license": "ISC",
