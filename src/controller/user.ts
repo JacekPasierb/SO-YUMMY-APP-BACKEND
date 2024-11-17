@@ -239,7 +239,7 @@ const resendVerificationEmail = async (
        `,
     };
 
-    await send(emailToSend);
+    await sendVerificationEmail(emailToSend);
 
     res.status(200).json({
       status: "OK",

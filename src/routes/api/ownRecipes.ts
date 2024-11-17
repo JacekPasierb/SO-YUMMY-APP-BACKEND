@@ -3,8 +3,8 @@ import auth from "../../middlewares/auth";
 import validateBody from "../../middlewares/validateBody";
 import recipeSchema from "../../schemas/recipe";
 import { addOwnRecipe, deleteOwnRecipe, getOwnRecipes } from "../../controller/ownRecipe";
-import { saveImages } from "../../controller/cloudinary/index";
 import upload from "../../middlewares/multer";
+import saveImages from "../../controller/cloudinary/saveImages";
 
 const router = express.Router();
 

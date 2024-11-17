@@ -11,7 +11,7 @@ import ownRecipesRouter from "./routes/api/ownRecipes";
 import favoriteRouter from "./routes/api/favoriteRecipes";
 import popularRecipesRouter from "./routes/api/popularRecipe";
 import shoppingListRouter from "./routes/api/shoppingList";
-import handleError from "./src/utils/utils/handleErrors";
+import handleError from "./utils/handleErrors";
 
 dotenv.config();
 require("./config/passport-config");
@@ -56,14 +56,11 @@ app.use("/api/favorite", favoriteRouter);
 app.use("/api/popularRecipes", popularRecipesRouter);
 app.use("/api/shopping-list", shoppingListRouter);
 
-app.get("/", (req: Request, res: Response) => res.json({ version: "1.0" }));
-
+app.get("/", (req: Request, res: Response) => {
+  res.json({ version: "1.0" });
+});
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  if (handleError) {
-    return res.status(error.status).json({ message: error.message });
-  }
-
-  res.status(500).json({ message: `Internal server error: ${error.message}` });
+  res.status(500).json({ error: error.message });
 });
 
 export default app;
