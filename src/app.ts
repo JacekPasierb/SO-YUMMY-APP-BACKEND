@@ -25,7 +25,7 @@ const CSS_URL =
 const swaggerJsdoc = require("swagger-jsdoc");
 
 app.use(logger(formatsLogger));
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
 
