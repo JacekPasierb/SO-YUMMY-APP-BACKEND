@@ -1,12 +1,15 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
-const app = require("./app");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import app from "./app";
 
-const connection = mongoose.connect(process.env.SO_YUMMY, {
+dotenv.config();
+
+const connectionString = process.env.SO_YUMMY as string;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+
+const connection = mongoose.connect(connectionString, {
   dbName: "so_yummy",
 });
-
-const PORT = process.env.PORT || 3000;
 
 connection
   .then(() => {
@@ -15,7 +18,7 @@ connection
       console.log(`App listens on port ${PORT}`);
     });
   })
-  .catch((err:Error) => {
+  .catch((err: Error) => {
     console.error("Error while establishing connection:", err);
     process.exit(1);
   });
