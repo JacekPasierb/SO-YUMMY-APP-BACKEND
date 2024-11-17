@@ -25,22 +25,29 @@ const CSS_URL =
 const swaggerJsdoc = require("swagger-jsdoc");
 
 app.use(logger(formatsLogger));
-app.use(cors());
+const allowedOrigins = ["https://so-yummy-jack.netlify.app"];
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+}));
 app.use(express.json());
 app.use(express.static("public"));
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+//   );
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
+//   next();
+// });
 
 app.use(
   "/api-docs",
