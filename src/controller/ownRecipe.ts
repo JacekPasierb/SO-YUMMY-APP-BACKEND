@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Recipe from "../models/recipe";
 import handleError from "../utils/handleErrors";
+import { IUser } from "../models/user";
 
 const getOwnRecipes = async (
   req: Request,
@@ -8,7 +9,8 @@ const getOwnRecipes = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?._id;
+    const userId = (req.user as IUser)._id; 
+   
     if (!userId) {
       return next(handleError(401, "Unauthorized"));
     }
@@ -61,7 +63,7 @@ const addOwnRecipe = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = req.user?._id;
+    const userId = (req.user as IUser)._id; 
     if (!userId) {
       return next(handleError(401, "Unauthorized"));
     }

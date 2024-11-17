@@ -85,9 +85,10 @@ const update = async (
     if (!req.user) {
       return next(handleError(401, "Unauthorized"));
     }
-    const { _id } = req.user;
+    const userId = (req.user as IUser)._id; 
+   
 
-    const updatedUser = await updateUser(_id, req.body);
+    const updatedUser = await updateUser(userId, req.body);
 
     if (!updatedUser) {
       throw handleError(404, "User not found");

@@ -16,9 +16,8 @@ exports.getFavorites = exports.removeFromFavorite = exports.addToFavorites = voi
 const recipe_1 = __importDefault(require("../models/recipe"));
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const getFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
-        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        const userId = req.user._id;
         if (!userId) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }
@@ -47,10 +46,9 @@ const getFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
 });
 exports.getFavorites = getFavorites;
 const addToFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
         const { recipeId } = req.params;
-        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        const userId = req.user._id;
         if (!userId) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }
@@ -72,10 +70,9 @@ const addToFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
 });
 exports.addToFavorites = addToFavorites;
 const removeFromFavorite = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
         const { recipeId } = req.params;
-        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        const userId = req.user._id;
         if (!userId) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }

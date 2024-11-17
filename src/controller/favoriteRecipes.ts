@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import Recipe from "../models/recipe";
 import handleError from "../utils/handleErrors";
+import { IUser } from "../models/user";
 
 const getFavorites = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = (req.user as IUser)._id; 
     if (!userId) {
       return next(handleError(401, "Unauthorized"));
     }
@@ -38,7 +39,7 @@ const getFavorites = async (req: Request, res: Response, next: NextFunction): Pr
 const addToFavorites = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { recipeId } = req.params;
-    const userId = req.user?.id;
+    const userId = (req.user as IUser)._id; 
     if (!userId) {
       return next(handleError(401, "Unauthorized"));
     }
@@ -68,7 +69,7 @@ const addToFavorites = async (req: Request, res: Response, next: NextFunction): 
 const removeFromFavorite = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { recipeId } = req.params;
-    const userId = req.user?.id;
+    const userId = (req.user as IUser)._id; 
     if (!userId) {
       return next(handleError(401, "Unauthorized"));
     }

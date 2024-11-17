@@ -18,7 +18,7 @@ const shoppingList_1 = __importDefault(require("./routes/api/shoppingList"));
 dotenv_1.default.config();
 require("./config/passport-config");
 const app = (0, express_1.default)();
-const swaggerDocument = require("./swagger.json");
+const swaggerDocument = require("../swagger.json");
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 const swaggerJsdoc = require("swagger-jsdoc");

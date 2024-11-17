@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import ShoppingList from "../models/shoppingList";
 import handleError from "../utils/handleErrors";
+import { IUser } from "../models/user";
 
 const getShoppingList = async (
   req: Request,
@@ -11,7 +12,7 @@ const getShoppingList = async (
     if (!req.user) {
       return next(handleError(401, "Unauthorized"));
     }
-    const userId = req.user._id;
+    const userId = (req.user as IUser)._id; 
     const shoppingList = await ShoppingList.findOne({ userId });
 
     if (!shoppingList) {
@@ -35,7 +36,7 @@ const addIngredient = async (
       return next(handleError(401, "Unauthorized"));
     }
     const { ingredientId, thb, name, measure, recipeId } = req.body;
-    const userId = req.user._id;
+    const userId = (req.user as IUser)._id; 
     let shoppingList = await ShoppingList.findOne({ userId });
 
     if (!shoppingList) {
@@ -72,7 +73,7 @@ const deleteIngredient = async (
       return next(handleError(401, "Unauthorized"));
     }
     const { ingredientId, recipeId } = req.body;
-    const userId = req.user._id;
+    const userId = (req.user as IUser)._id; 
 
     await ShoppingList.updateOne(
       { userId },

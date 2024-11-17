@@ -75,8 +75,8 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         if (!req.user) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }
-        const { _id } = req.user;
-        const updatedUser = yield (0, user_1.updateUser)(_id, req.body);
+        const userId = req.user._id;
+        const updatedUser = yield (0, user_1.updateUser)(userId, req.body);
         if (!updatedUser) {
             throw (0, handleErrors_1.default)(404, "User not found");
         }

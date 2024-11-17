@@ -17,7 +17,7 @@ dotenv.config();
 require("./config/passport-config");
 
 const app = express();
-const swaggerDocument = require("./swagger.json");
+const swaggerDocument = require("../swagger.json");
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 const CSS_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
