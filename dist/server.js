@@ -1,15 +1,21 @@
 "use strict";
-const mongoose = require("mongoose");
-require("dotenv").config();
-const app = require("./app");
-const connection = mongoose.connect(process.env.SO_YUMMY, {
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const app_1 = __importDefault(require("./app"));
+dotenv_1.default.config();
+const connectionString = process.env.SO_YUMMY;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const connection = mongoose_1.default.connect(connectionString, {
     dbName: "so_yummy",
 });
-const PORT = process.env.PORT || 3000;
 connection
     .then(() => {
     console.log("Database connection successful");
-    app.listen(PORT, () => {
+    app_1.default.listen(PORT, () => {
         console.log(`App listens on port ${PORT}`);
     });
 })
