@@ -6,7 +6,9 @@
   "scripts": {
     "build": "rimraf dist && tsc",
     "start": "node dist/server.js",
-    "start:dev": "nodemon src/server.ts"
+    "start:dev": "nodemon src/server.ts",
+    "ts.check":"tsc --project tsconfig.json",
+    "add-build":"git add"
   },
   "pre-commit": [
     "ts.check",
