@@ -25,14 +25,18 @@ const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger
 const swaggerJsdoc = require("swagger-jsdoc");
 app.use((0, morgan_1.default)(formatsLogger));
 app.use(express_1.default.json());
+app.use(express_1.default.static("public"));
 const allowedOrigins = ["https://so-yummy-jack.netlify.app"];
+app.use((req, res, next) => {
+    console.log('CORS request from:', req.headers.origin);
+    next();
+});
 app.use((0, cors_1.default)({
     origin: allowedOrigins,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true,
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
-app.use(express_1.default.static("public"));
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "*");
 //   res.header(
