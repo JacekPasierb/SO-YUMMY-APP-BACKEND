@@ -40,7 +40,12 @@ app.use((0, cors_1.default)({
     credentials: true,
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
-app.options('*', (0, cors_1.default)());
+app.options('*', (req, res) => {
+    res.header("Access-Control-Allow-Origin", "https://so-yummy-jack.netlify.app");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.sendStatus(204); // No Content
+});
 app.use((req, res, next) => {
     console.log('CORS request from:', req.headers.origin);
     next();
