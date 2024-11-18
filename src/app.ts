@@ -27,7 +27,7 @@ const swaggerJsdoc = require("swagger-jsdoc");
 app.use(logger(formatsLogger));
 app.use(express.json());
 app.use(express.static("public"));
-const allowedOrigins = ["https://so-yummy-jack.netlify.app"];
+const allowedOrigins = ["https://so-yummy-jack.netlify.app", "http://localhost:3000"];
 
 
 
@@ -43,9 +43,10 @@ app.use(cors({
   credentials: true,
   allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
+
 // Obsługa preflight requests
 app.options('*', (req: Request, res: Response) => {
-  res.header("Access-Control-Allow-Origin", "https://so-yummy-jack.netlify.app");
+  res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.sendStatus(204); // No Content
