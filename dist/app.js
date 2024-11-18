@@ -26,7 +26,7 @@ const swaggerJsdoc = require("swagger-jsdoc");
 app.use((0, morgan_1.default)(formatsLogger));
 app.use(express_1.default.json());
 app.use(express_1.default.static("public"));
-const allowedOrigins = ["https://so-yummy-jack.netlify.app"];
+const allowedOrigins = ["https://so-yummy-jack.netlify.app", "http://localhost:3000"];
 app.use((0, cors_1.default)({
     origin: (origin, callback) => {
         if (!origin || allowedOrigins.includes(origin)) {
@@ -42,7 +42,7 @@ app.use((0, cors_1.default)({
 }));
 // Obsługa preflight requests
 app.options('*', (req, res) => {
-    res.header("Access-Control-Allow-Origin", "https://so-yummy-jack.netlify.app");
+    res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     res.sendStatus(204); // No Content
