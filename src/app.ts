@@ -44,6 +44,8 @@ app.use(cors({
   allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
 
+app.options('*', cors());
+
 app.use((req, res, next) => {
   console.log('CORS request from:', req.headers.origin);
   next();
