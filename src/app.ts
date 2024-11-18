@@ -29,32 +29,32 @@ app.use(express.json());
 app.use(express.static("public"));
 const allowedOrigins = ["https://so-yummy-jack.netlify.app"];
 
-app.use((req, res, next) => {
-  console.log('CORS request from:', req.headers.origin);
-  next();
-});
-
-app.use(cors({
-  origin: allowedOrigins,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-}));
-
-
-
 // app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header(
-//     "Access-Control-Allow-Methods",
-//     "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-//   );
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-//   );
+//   console.log('CORS request from:', req.headers.origin);
 //   next();
 // });
+
+// app.use(cors({
+//   origin: allowedOrigins,
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   credentials: true,
+//   allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+// }));
+
+
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  next();
+});
 
 app.use(
   "/api-docs",
