@@ -40,6 +40,7 @@ app.use((0, cors_1.default)({
     credentials: true,
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
+// Middleware do obsługi żądań OPTIONS bez autoryzacji
 app.options('*', (req, res) => {
     res.header("Access-Control-Allow-Origin", "https://so-yummy-jack.netlify.app");
     res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
