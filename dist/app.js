@@ -41,12 +41,12 @@ app.use((0, cors_1.default)({
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
 // Obsługa preflight requests
-app.options('*', (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.sendStatus(204); // No Content
-});
+// app.options('*', (req: Request, res: Response) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//   res.sendStatus(204); // No Content
+// });
 app.use((req, res, next) => {
     console.log('CORS request from:', req.headers.origin);
     next();
