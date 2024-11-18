@@ -26,7 +26,13 @@ const swaggerJsdoc = require("swagger-jsdoc");
 
 app.use(logger(formatsLogger));
 app.use(express.json());
+app.use(express.static("public"));
 const allowedOrigins = ["https://so-yummy-jack.netlify.app"];
+
+app.use((req, res, next) => {
+  console.log('CORS request from:', req.headers.origin);
+  next();
+});
 
 app.use(cors({
   origin: allowedOrigins,
@@ -35,7 +41,7 @@ app.use(cors({
   allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
 
-app.use(express.static("public"));
+
 
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Origin", "*");
