@@ -40,6 +40,7 @@ app.use((0, cors_1.default)({
     credentials: true,
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
 }));
+app.options('*', (0, cors_1.default)());
 app.use((req, res, next) => {
     console.log('CORS request from:', req.headers.origin);
     next();
