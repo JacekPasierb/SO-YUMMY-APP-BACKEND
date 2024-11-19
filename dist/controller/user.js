@@ -30,7 +30,9 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         if (checkEmail) {
             throw (0, handleErrors_1.default)(409, "Email is already in use");
         }
+        console.log("afterCheckEmail");
         const hashPassword = yield bcrypt_1.default.hash(password, 12);
+        console.log("afterHashPassword");
         const newUser = yield (0, user_1.addUser)({
             email,
             password: hashPassword,
@@ -38,6 +40,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             verificationToken: (0, nanoid_1.nanoid)(),
             token: null,
         });
+        console.log("afterAddUser");
         if (!newUser) {
             throw (0, handleErrors_1.default)(500, "Failed to create user");
         }
