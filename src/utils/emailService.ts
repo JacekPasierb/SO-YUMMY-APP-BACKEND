@@ -3,13 +3,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-interface EmailOptions {
+interface VerificationEmailOptions {
+  to: string;
+  verificationToken: string; // Zawsze wymagany
+}
+
+interface GeneralEmailOptions {
   to: string;
   subject?: string;
   text?: string;
   html?: string;
-  email?: string;
-  verificationToken?: string;
 }
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
@@ -17,7 +20,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 const sendVerificationEmail = async ({
   to,
   verificationToken,
-}: EmailOptions): Promise<void> => {
+}: VerificationEmailOptions): Promise<void> => {
   if (!verificationToken) {
     throw new Error("Verification token is required.");
   }
@@ -50,7 +53,7 @@ const sendSubscriptionEmail = async ({
   subject,
   text,
   html,
-}: EmailOptions): Promise<void> => {
+}: GeneralEmailOptions): Promise<void> => {
   const msg = {
     from: "jack_byk@o2.pl",
     to,

@@ -25,15 +25,11 @@ dotenv_1.default.config();
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password } = req.body;
-        console.log("name", name);
         const checkEmail = yield (0, user_1.getUserByEmail)({ email });
-        console.log("checkEmail", checkEmail);
         if (checkEmail) {
             return next((0, handleErrors_1.default)(409, "Email is already in use"));
         }
-        console.log("afterCheckEmail");
         const hashPassword = yield bcrypt_1.default.hash(password, 12);
-        console.log("afterHashPassword");
         const newUser = yield (0, user_1.addUser)({
             email,
             password: hashPassword,
@@ -41,19 +37,12 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             verificationToken: (0, nanoid_1.nanoid)(),
             token: null,
         });
-        console.log("afterAddUser");
         if (!newUser) {
             throw (0, handleErrors_1.default)(500, "Failed to create user");
         }
         const emailToSend = {
             to: newUser.email,
-            subject: "SO YUMMY APP email verification",
-            html: `
-       <div style="text-align: center;">
-       <h1>SO YUMMY APP</h1>
-       <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend.vercel.app/api/users/verify/${newUser.verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
-       </div>
-       `,
+            verificationToken: newUser.verificationToken
         };
         (0, emailService_1.sendVerificationEmail)(emailToSend);
         res.status(201).json({

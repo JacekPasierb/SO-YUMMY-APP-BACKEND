@@ -15,7 +15,6 @@ import {
 import handleError from "../utils/handleErrors";
 import { User, IUser } from "../models/user";
 import { sendVerificationEmail } from "../utils/emailService";
-import { log } from "console";
 
 dotenv.config();
 
@@ -26,16 +25,12 @@ const register = async (
 ): Promise<void> => {
   try {
     const { name, email, password } = req.body;
-console.log("name",name);
 
     const checkEmail = await getUserByEmail({ email });
-    console.log("checkEmail", checkEmail);
     if (checkEmail) {
       return next(handleError(409, "Email is already in use"));
     }
-console.log("afterCheckEmail");
     const hashPassword = await bcrypt.hash(password, 12);
-console.log("afterHashPassword");
     const newUser = await addUser({
       email,
       password: hashPassword,
@@ -43,20 +38,17 @@ console.log("afterHashPassword");
       verificationToken: nanoid(),
       token: null,
     });
-console.log("afterAddUser");
     if (!newUser) {
       throw handleError(500, "Failed to create user");
     }
 
+    if (!newUser.verificationToken) {
+      throw handleError(500, "Verification token generation failed");
+    }
+
     const emailToSend = {
       to: newUser.email,
-      subject: "SO YUMMY APP email verification",
-      html: `
-       <div style="text-align: center;">
-       <h1>SO YUMMY APP</h1>
-       <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend.vercel.app/api/users/verify/${newUser.verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
-       </div>
-       `,
+      verificationToken: newUser.verificationToken,
     };
 
     sendVerificationEmail(emailToSend);
@@ -88,8 +80,7 @@ const update = async (
     if (!req.user) {
       return next(handleError(401, "Unauthorized"));
     }
-    const userId = (req.user as IUser)._id; 
-   
+    const userId = (req.user as IUser)._id;
 
     const updatedUser = await updateUser(userId, req.body);
 
@@ -232,15 +223,13 @@ const resendVerificationEmail = async (
       throw handleError(400, "Email is already verified");
     }
 
+    if (!user.verificationToken) {
+      throw handleError(500, "Verification token generation failed");
+    }
+
     const emailToSend = {
       to: user.email,
-      subject: "SO YUMMY APP email verification",
-      html: `
-       <div style="text-align: center;">
-       <h1>SO YUMMY APP</h1>
-       <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend.vercel.app/api/users/verify/${user.verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
-       </div>
-       `,
+      verificationToken: user.verificationToken,
     };
 
     await sendVerificationEmail(emailToSend);

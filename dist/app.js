@@ -63,6 +63,8 @@ app.get("/", (req, res) => {
     res.json({ version: "1.0" });
 });
 app.use((error, req, res, next) => {
-    res.status(500).json({ error: error.message });
+    const status = error.status || 500;
+    const message = error.message || "Internal Server Error";
+    res.status(status).json({ error: message });
 });
 exports.default = app;
