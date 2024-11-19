@@ -77,7 +77,9 @@ app.get("/", (req: Request, res: Response) => {
   res.json({ version: "1.0" });
 });
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json({ error: error.message });
+  const status = error.status || 500;
+  const message = error.message || "Internal Server Error";
+  res.status(status).json({ error: message });
 });
 
 export default app;
