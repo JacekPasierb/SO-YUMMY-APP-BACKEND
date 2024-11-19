@@ -40,9 +40,12 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         if (!newUser) {
             throw (0, handleErrors_1.default)(500, "Failed to create user");
         }
+        if (!newUser.verificationToken) {
+            throw (0, handleErrors_1.default)(500, "Verification token generation failed");
+        }
         const emailToSend = {
             to: newUser.email,
-            verificationToken: newUser.verificationToken
+            verificationToken: newUser.verificationToken,
         };
         (0, emailService_1.sendVerificationEmail)(emailToSend);
         res.status(201).json({
@@ -188,15 +191,12 @@ const resendVerificationEmail = (req, res, next) => __awaiter(void 0, void 0, vo
         if (user.verify) {
             throw (0, handleErrors_1.default)(400, "Email is already verified");
         }
+        if (!user.verificationToken) {
+            throw (0, handleErrors_1.default)(500, "Verification token generation failed");
+        }
         const emailToSend = {
             to: user.email,
-            subject: "SO YUMMY APP email verification",
-            html: `
-       <div style="text-align: center;">
-       <h1>SO YUMMY APP</h1>
-       <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend.vercel.app/api/users/verify/${user.verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
-       </div>
-       `,
+            verificationToken: user.verificationToken,
         };
         yield (0, emailService_1.sendVerificationEmail)(emailToSend);
         res.status(200).json({
