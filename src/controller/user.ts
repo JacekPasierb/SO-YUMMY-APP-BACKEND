@@ -15,6 +15,7 @@ import {
 import handleError from "../utils/handleErrors";
 import { User, IUser } from "../models/user";
 import { sendVerificationEmail } from "../utils/emailService";
+import { log } from "console";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ const register = async (
 ): Promise<void> => {
   try {
     const { name, email, password } = req.body;
+console.log("name",name);
 
     const checkEmail = await getUserByEmail({ email });
     if (checkEmail) {
