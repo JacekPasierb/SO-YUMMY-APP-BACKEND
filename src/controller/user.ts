@@ -32,9 +32,9 @@ console.log("name",name);
     if (checkEmail) {
       throw handleError(409, "Email is already in use");
     }
-
+console.log("afterCheckEmail");
     const hashPassword = await bcrypt.hash(password, 12);
-
+console.log("afterHashPassword");
     const newUser = await addUser({
       email,
       password: hashPassword,
@@ -42,7 +42,7 @@ console.log("name",name);
       verificationToken: nanoid(),
       token: null,
     });
-
+console.log("afterAddUser");
     if (!newUser) {
       throw handleError(500, "Failed to create user");
     }
