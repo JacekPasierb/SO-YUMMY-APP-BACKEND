@@ -27,6 +27,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         const { name, email, password } = req.body;
         console.log("name", name);
         const checkEmail = yield (0, user_1.getUserByEmail)({ email });
+        console.log("checkEmail", checkEmail);
         if (checkEmail) {
             throw (0, handleErrors_1.default)(409, "Email is already in use");
         }

@@ -31,7 +31,7 @@ console.log("name",name);
     const checkEmail = await getUserByEmail({ email });
     console.log("checkEmail", checkEmail);
     if (checkEmail) {
-      throw handleError(409, "Email is already in use");
+      return next(handleError(409, "Email is already in use"));
     }
 console.log("afterCheckEmail");
     const hashPassword = await bcrypt.hash(password, 12);
