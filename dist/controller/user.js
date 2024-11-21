@@ -69,6 +69,7 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 exports.register = register;
 const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log("req.user", req.user);
         if (!req.user) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }

@@ -86,6 +86,12 @@ const update = async (
     console.log("userId", userId);
     console.log("body", req.body);
 
+      // Sprawdź, czy wystąpił błąd multer
+      if (req.fileValidationError) {
+         res.status(400).json({ error: req.fileValidationError });
+         return
+        }
+
     const updatedUser = await updateUser(userId, req.body);
     console.log("updatedUser", updatedUser);
 
@@ -107,6 +113,7 @@ const update = async (
     });
     return;
   } catch (error) {
+    console.error("Error during update:", error);
     next(error);
   }
 };
