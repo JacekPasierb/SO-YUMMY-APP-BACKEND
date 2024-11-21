@@ -77,6 +77,8 @@ const update = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    console.log("req.user",req.user);
+    
     if (!req.user) {
       return next(handleError(401, "Unauthorized"));
     }
