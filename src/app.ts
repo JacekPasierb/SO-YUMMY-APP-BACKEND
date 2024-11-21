@@ -25,7 +25,9 @@ const CSS_URL =
 const swaggerJsdoc = require("swagger-jsdoc");
 
 app.use(logger(formatsLogger));
-app.use(express.json());
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ limit: "20mb", extended: true }));
+
 app.use(express.static("public"));
 const allowedOrigins = [
   "https://so-yummy-jack.netlify.app",

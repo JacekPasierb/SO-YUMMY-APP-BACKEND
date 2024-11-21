@@ -76,6 +76,11 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         const userId = req.user._id;
         console.log("userId", userId);
         console.log("body", req.body);
+        // Sprawdź, czy wystąpił błąd multer
+        if (req.fileValidationError) {
+            res.status(400).json({ error: req.fileValidationError });
+            return;
+        }
         const updatedUser = yield (0, user_1.updateUser)(userId, req.body);
         console.log("updatedUser", updatedUser);
         if (!updatedUser) {
@@ -95,6 +100,7 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         return;
     }
     catch (error) {
+        console.error("Error during update:", error);
         next(error);
     }
 });
