@@ -81,8 +81,8 @@ const update = async (
       return next(handleError(401, "Unauthorized"));
     }
     const userId = (req.user as IUser)._id;
-console.log("userId",userId);
-console.log("body",req.body);
+    console.log("userId", userId);
+    console.log("body", req.body);
 
     const updatedUser = await updateUser(userId, req.body);
     console.log("updatedUser", updatedUser);
