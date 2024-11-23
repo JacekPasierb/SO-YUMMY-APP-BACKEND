@@ -15,6 +15,8 @@ import {
 import handleError from "../utils/handleErrors";
 import { User, IUser } from "../models/user";
 import { sendVerificationEmail } from "../utils/emailService";
+import upload from "../middlewares/multer";
+import multer from "multer";
 
 dotenv.config();
 
@@ -76,6 +78,7 @@ const update = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+
   try {
     console.log("req.user",req.user);
     
@@ -113,6 +116,10 @@ const update = async (
     });
     return;
   } catch (error) {
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
+       res.status(400).json({ error: "File too large. Maximum size is 10MB." });
+       return
+      }
     console.error("Error during update:", error);
     next(error);
   }
