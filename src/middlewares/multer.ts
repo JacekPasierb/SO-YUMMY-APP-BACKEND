@@ -11,6 +11,8 @@ const fileFilter: multer.Options["fileFilter"] = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
+  console.log("tu");
+  
   const ext = path.extname(file.originalname).toLowerCase();
 
   if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
