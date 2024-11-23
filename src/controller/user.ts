@@ -88,6 +88,7 @@ const update = async (
     const userId = (req.user as IUser)._id;
     console.log("userId", userId);
     console.log("body", req.body);
+console.log("reeee",req);
 
       // Sprawdź, czy wystąpił błąd multer
       if (req.fileValidationError) {

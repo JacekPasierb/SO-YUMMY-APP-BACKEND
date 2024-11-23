@@ -16,6 +16,6 @@ router.post("/signin", (0, validateBody_1.default)(user_2.signinSchema), user_1.
 router.post("/resend-verification-email", user_1.resendVerificationEmail);
 router.get("/current", auth_1.default, user_1.currentUser);
 router.patch("/logout", auth_1.default, user_1.logout);
-router.patch("/update", auth_1.default, (0, validateBody_1.default)(user_2.updateUserSchema), multer_1.default.single("avatar"), user_1.update);
+router.patch("/update", auth_1.default, (0, validateBody_1.default)(user_2.updateUserSchema), multer_1.default.single("file"), user_1.update);
 router.patch("/toogleTheme", auth_1.default, (0, validateBody_1.default)(user_2.toogleThemeSchema), user_1.toogleTheme);
 exports.default = router;
