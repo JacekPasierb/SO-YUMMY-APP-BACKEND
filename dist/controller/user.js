@@ -21,6 +21,7 @@ const user_1 = require("../services/user");
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const user_2 = require("../models/user");
 const emailService_1 = require("../utils/emailService");
+const multer_1 = __importDefault(require("multer"));
 dotenv_1.default.config();
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -100,6 +101,10 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         return;
     }
     catch (error) {
+        if (error instanceof multer_1.default.MulterError && error.code === "LIMIT_FILE_SIZE") {
+            res.status(400).json({ error: "File too large. Maximum size is 10MB." });
+            return;
+        }
         console.error("Error during update:", error);
         next(error);
     }

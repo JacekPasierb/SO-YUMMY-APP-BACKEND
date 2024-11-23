@@ -2,13 +2,7 @@ import multer from "multer";
 import path from "path";
 import { Request } from "express";
 
-declare global {
-  namespace Express {
-    interface Request {
-      fileValidationError?: string;
-    }
-  }
-}
+
 
 const storage = multer.diskStorage({});
 

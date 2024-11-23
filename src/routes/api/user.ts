@@ -27,7 +27,7 @@ router.post("/signin", validateBody(signinSchema), signin);
 router.post("/resend-verification-email", resendVerificationEmail);
 router.get("/current", auth, currentUser);
 router.patch("/logout", auth, logout);
-router.patch("/update", auth, validateBody(updateUserSchema),upload.single("avatar"), update);
+router.patch("/update", auth, validateBody(updateUserSchema),upload.single("file"), update);
 router.patch(
   "/toogleTheme",
   auth,
