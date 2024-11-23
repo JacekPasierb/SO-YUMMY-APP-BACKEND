@@ -18,6 +18,7 @@ import {
   toogleThemeSchema,
 } from "../../schemas/user";
 import upload from "../../middlewares/multer";
+import multerMiddleware from "../../middlewares/multerMiddleware";
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ router.post("/signin", validateBody(signinSchema), signin);
 router.post("/resend-verification-email", resendVerificationEmail);
 router.get("/current", auth, currentUser);
 router.patch("/logout", auth, logout);
-router.patch("/update", auth, validateBody(updateUserSchema),upload.single("file"), update);
+router.patch("/update", auth, validateBody(updateUserSchema),multerMiddleware, update);
 router.patch(
   "/toogleTheme",
   auth,
