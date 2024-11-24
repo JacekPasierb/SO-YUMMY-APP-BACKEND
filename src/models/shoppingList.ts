@@ -1,22 +1,22 @@
-import { Schema, model, Document, Model } from "mongoose";
+import { Schema, model, Document, Model, Types } from "mongoose";
 
 interface IShoppingListItem {
-  ingredientId: Schema.Types.ObjectId;
+  ingredientId: Types.ObjectId;
   thb?: string;
   name: string;
   measure: string;
-  recipeId?: Schema.Types.ObjectId;
+  recipeId?: Types.ObjectId;
 }
 
 interface IShoppingList extends Document {
-  userId: Schema.Types.ObjectId;
+  userId: Types.ObjectId;
   items: IShoppingListItem[];
 }
 
 const shoppingListSchema = new Schema<IShoppingList>(
   {
     userId: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId ,
       ref: "user",
       required: true,
     },

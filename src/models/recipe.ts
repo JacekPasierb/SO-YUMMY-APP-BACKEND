@@ -1,7 +1,7 @@
-import { Schema, model, Document, Model } from "mongoose";
+import { Schema, model, Document, Model, Types } from "mongoose";
 
 interface IIngredient {
-  id: Schema.Types.ObjectId;
+  id: Types.ObjectId;
   measure: string;
 }
 
@@ -18,7 +18,7 @@ interface IRecipe extends Document {
   youtube?: string;
   tags: string[];
   ingredients: IIngredient[];
-  owner?: Schema.Types.ObjectId;
+  owner?: Types.ObjectId;
 }
 
 const recipeSchema = new Schema<IRecipe>(
@@ -55,7 +55,8 @@ const recipeSchema = new Schema<IRecipe>(
       default: "",
     },
     favorites: {
-      type: [String],
+      type: Array,
+      of: String,
       default: [],
     },
     youtube: {
@@ -63,23 +64,28 @@ const recipeSchema = new Schema<IRecipe>(
       default: "",
     },
     tags: {
-      type: [String],
+      type: Array,
+      of: String,
       default: [],
     },
     ingredients: {
-      type: [
-        {
-          id: {
-            type: Schema.Types.ObjectId,
-            ref: "ingredient",
-            required: true,
-          },
-          measure: {
-            type: String,
-            default: "",
-          },
+      type: Array,
+
+      of: new Schema({
+        id: {
+          type: Schema.Types.ObjectId,
+
+          ref: "ingredient",
+
+          required: true,
         },
-      ],
+
+        measure: {
+          type: String,
+
+          default: "",
+        },
+      }),
       default: [],
     },
     owner: {

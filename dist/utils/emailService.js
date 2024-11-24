@@ -34,7 +34,6 @@ const sendVerificationEmail = (_a) => __awaiter(void 0, [_a], void 0, function* 
     };
     try {
         yield mail_1.default.send(msg);
-        console.log("Verification email sent");
     }
     catch (error) {
         console.error("Error sending verification email:", error.response ? error.response.body : error);

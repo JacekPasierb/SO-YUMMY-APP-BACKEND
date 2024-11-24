@@ -4,7 +4,7 @@ const mongoose_1 = require("mongoose");
 const emailRegexp = /^\S+@\S+\.\S+$/;
 const subscribeSchema = new mongoose_1.Schema({
     owner: {
-        type: mongoose_1.Schema.Types.ObjectId,
+        type: mongoose_1.Types.ObjectId,
         ref: "user",
         required: true,
     },

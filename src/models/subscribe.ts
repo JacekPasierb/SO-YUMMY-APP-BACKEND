@@ -1,16 +1,16 @@
-import { Schema, model, Document, Model } from "mongoose";
+import { Schema, model, Document, Model, Types } from "mongoose";
 
 const emailRegexp = /^\S+@\S+\.\S+$/;
 
 interface ISubscribe extends Document {
-  owner: Schema.Types.ObjectId;
+  owner: Types.ObjectId;
   email: string;
 }
 
 const subscribeSchema = new Schema<ISubscribe>(
   {
     owner: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "user",
       required: true,
     },

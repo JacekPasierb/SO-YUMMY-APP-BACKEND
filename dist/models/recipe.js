@@ -34,7 +34,8 @@ const recipeSchema = new mongoose_1.Schema({
         default: "",
     },
     favorites: {
-        type: [String],
+        type: Array,
+        of: String,
         default: [],
     },
     youtube: {
@@ -42,23 +43,23 @@ const recipeSchema = new mongoose_1.Schema({
         default: "",
     },
     tags: {
-        type: [String],
+        type: Array,
+        of: String,
         default: [],
     },
     ingredients: {
-        type: [
-            {
-                id: {
-                    type: mongoose_1.Schema.Types.ObjectId,
-                    ref: "ingredient",
-                    required: true,
-                },
-                measure: {
-                    type: String,
-                    default: "",
-                },
+        type: Array,
+        of: new mongoose_1.Schema({
+            id: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: "ingredient",
+                required: true,
             },
-        ],
+            measure: {
+                type: String,
+                default: "",
+            },
+        }),
         default: [],
     },
     owner: {

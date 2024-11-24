@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const shoppingListSchema = new mongoose_1.Schema({
     userId: {
-        type: mongoose_1.Schema.Types.ObjectId,
+        type: mongoose_1.Types.ObjectId,
         ref: "user",
         required: true,
     },
