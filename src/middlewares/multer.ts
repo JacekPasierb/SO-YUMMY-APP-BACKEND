@@ -2,8 +2,6 @@ import multer from "multer";
 import path from "path";
 import { NextFunction, Request, Response } from "express";
 
-
-
 const storage = multer.diskStorage({});
 
 const fileFilter: multer.Options["fileFilter"] = (
@@ -12,7 +10,7 @@ const fileFilter: multer.Options["fileFilter"] = (
   cb: multer.FileFilterCallback
 ) => {
   console.log("tu");
-  
+
   const ext = path.extname(file.originalname).toLowerCase();
 
   if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
