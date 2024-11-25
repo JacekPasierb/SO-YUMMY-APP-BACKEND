@@ -18,6 +18,7 @@ const supertest_1 = __importDefault(require("supertest"));
 const app_1 = __importDefault(require("../app"));
 const user_1 = require("../models/user");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
     setApiKey: jest.fn(),
@@ -250,6 +251,47 @@ describe("User API ", () => {
                 .send({ email: "nonexistent@example.com" });
             expect(res.status).toBe(404);
             expect(res.body).toHaveProperty("error", "User not found");
+        }));
+    });
+    describe("Current User", () => {
+        let userId;
+        let token;
+        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+            yield user_1.User.deleteMany({});
+            const user = yield user_1.User.create({
+                name: "Test User",
+                email: "testuser@example.com",
+                password: yield bcrypt_1.default.hash("password123", 12),
+                verify: true,
+            });
+            userId = user._id.toString();
+            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
+                expiresIn: "1h",
+            });
+            user.token = token;
+            yield user.save();
+        }));
+        it("should return current user data with valid token", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .get("/api/users/current")
+                .set("Authorization", `Bearer ${token}`);
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("status", "success");
+            expect(res.body.data).toHaveProperty("userId", userId);
+            expect(res.body.data).toHaveProperty("email", "testuser@example.com");
+            expect(res.body.data).toHaveProperty("name", "Test User");
+        }));
+        it("should return 401 if token is missing", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default).get("/api/users/current");
+            expect(res.status).toBe(401);
+            expect(res.body).toHaveProperty("error", "Unauthorized");
+        }));
+        it("should return 401 if token is invalid", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .get("/api/users/current")
+                .set("Authorization", "Bearer invalidtoken");
+            expect(res.status).toBe(401);
+            expect(res.body).toHaveProperty("error", "Unauthorized");
         }));
     });
 });

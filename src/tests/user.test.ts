@@ -4,6 +4,7 @@ import request from "supertest";
 import app from "../app";
 import { User } from "../models/user";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
@@ -275,6 +276,58 @@ describe("User API ", () => {
 
       expect(res.status).toBe(404);
       expect(res.body).toHaveProperty("error", "User not found");
+    });
+  });
+
+  describe("Current User", () => {
+    let userId: string;
+    let token: string;
+    beforeEach(async () => {
+      await User.deleteMany({});
+      const user = await User.create({
+        name: "Test User",
+        email: "testuser@example.com",
+        password: await bcrypt.hash("password123", 12),
+        verify: true,
+      });
+
+      userId = user._id.toString();
+      token = jwt.sign(
+        { id: userId, email: user.email },
+        process.env.SECRET as string,
+        {
+          expiresIn: "1h",
+        }
+      );
+      user.token = token;
+      await user.save();
+    });
+    it("should return current user data with valid token", async () => {
+      const res = await request(app)
+        .get("/api/users/current")
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("status", "success");
+      expect(res.body.data).toHaveProperty("userId", userId);
+      expect(res.body.data).toHaveProperty("email", "testuser@example.com");
+      expect(res.body.data).toHaveProperty("name", "Test User");
+    });
+
+    it("should return 401 if token is missing", async () => {
+      const res = await request(app).get("/api/users/current");
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized");
+    });
+
+    it("should return 401 if token is invalid", async () => {
+      const res = await request(app)
+        .get("/api/users/current")
+        .set("Authorization", "Bearer invalidtoken");
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized");
     });
   });
 });
