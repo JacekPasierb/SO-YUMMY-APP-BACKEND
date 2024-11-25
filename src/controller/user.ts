@@ -78,23 +78,22 @@ const update = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-
   try {
-    console.log("req.user",req.user);
-    
+    console.log("req.user", req.user);
+
     if (!req.user) {
       return next(handleError(401, "Unauthorized"));
     }
     const userId = (req.user as IUser)._id;
     console.log("userId", userId);
     console.log("body", req.body);
-console.log("reeee",req);
+    console.log("reeee", req);
 
-      // Sprawdź, czy wystąpił błąd multer
-      if (req.fileValidationError) {
-         res.status(400).json({ error: req.fileValidationError });
-         return
-        }
+    // Sprawdź, czy wystąpił błąd multer
+    if (req.fileValidationError) {
+      res.status(400).json({ error: req.fileValidationError });
+      return;
+    }
 
     const updatedUser = await updateUser(userId, req.body);
     console.log("updatedUser", updatedUser);
@@ -117,10 +116,13 @@ console.log("reeee",req);
     });
     return;
   } catch (error) {
-    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
-       res.status(400).json({ error: "File too large. Maximum size is 10MB." });
-       return
-      }
+    if (
+      error instanceof multer.MulterError &&
+      error.code === "LIMIT_FILE_SIZE"
+    ) {
+      res.status(400).json({ error: "File too large. Maximum size is 10MB." });
+      return;
+    }
     console.error("Error during update:", error);
     next(error);
   }
@@ -161,7 +163,8 @@ const verifyEmail = async (req: Request, res: Response): Promise<void> => {
     const user = await User.findOne({ verificationToken });
 
     if (!user) {
-      throw handleError(404);
+      res.status(404).json({ message: "User not found" });
+      return;
     }
     user.set("verify", true);
     user.verificationToken = null;

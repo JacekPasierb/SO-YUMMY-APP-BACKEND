@@ -185,4 +185,71 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("error", "email is not verifed");
         }));
     });
+    describe("Email Verification", () => {
+        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+            yield user_1.User.deleteMany({});
+        }));
+        it("should verify a user with a valid verification token", () => __awaiter(void 0, void 0, void 0, function* () {
+            const verificationToken = "valid-token";
+            yield user_1.User.create({
+                name: "User to Verify",
+                email: "verifyuser@example.com",
+                password: "password123",
+                verificationToken,
+                verify: false,
+            });
+            const res = yield (0, supertest_1.default)(app_1.default).get(`/api/users/verify/${verificationToken}`);
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("status", "OK");
+            const user = yield user_1.User.findOne({ email: "verifyuser@example.com" });
+            expect(user).not.toBeNull();
+            expect(user === null || user === void 0 ? void 0 : user.verify).toBe(true);
+            expect(user === null || user === void 0 ? void 0 : user.verificationToken).toBeNull();
+        }));
+        it("should return 404 for an invalid verification token", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default).get(`/api/users/verify/invalid-token`);
+            expect(res.status).toBe(404);
+        }));
+    });
+    describe("Resend Verification Email", () => {
+        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+            yield user_1.User.deleteMany({});
+        }));
+        it("should resend verification email to an unverified user", () => __awaiter(void 0, void 0, void 0, function* () {
+            const verificationToken = "valid-token";
+            yield user_1.User.create({
+                name: "Unverified User",
+                email: "unverifieduser@example.com",
+                password: yield bcrypt_1.default.hash("password123", 12),
+                verificationToken,
+                verify: false,
+            });
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .post("/api/users/resend-verification-email")
+                .send({ email: "unverifieduser@example.com" });
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("status", "OK");
+            expect(res.body).toHaveProperty("message", "Verification email sent!");
+        }));
+        it("should not resend verification email to a verified user", () => __awaiter(void 0, void 0, void 0, function* () {
+            yield user_1.User.create({
+                name: "Verified User",
+                email: "verifieduser@example.com",
+                password: yield bcrypt_1.default.hash("password123", 12),
+                verify: true,
+            });
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .post("/api/users/resend-verification-email")
+                .send({ email: "verifieduser@example.com" });
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "Email is already verified");
+        }));
+        it("should return 404 if user is not found", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .post("/api/users/resend-verification-email")
+                .send({ email: "nonexistent@example.com" });
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty("error", "User not found");
+        }));
+    });
 });

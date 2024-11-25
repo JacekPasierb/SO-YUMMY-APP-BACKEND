@@ -194,4 +194,87 @@ describe("User API ", () => {
       expect(res.body).toHaveProperty("error", "email is not verifed");
     });
   });
+
+  describe("Email Verification", () => {
+    beforeEach(async () => {
+      await User.deleteMany({});
+    });
+
+    it("should verify a user with a valid verification token", async () => {
+      const verificationToken = "valid-token";
+      await User.create({
+        name: "User to Verify",
+        email: "verifyuser@example.com",
+        password: "password123",
+        verificationToken,
+        verify: false,
+      });
+
+      const res = await request(app).get(
+        `/api/users/verify/${verificationToken}`
+      );
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("status", "OK");
+
+      const user = await User.findOne({ email: "verifyuser@example.com" });
+      expect(user).not.toBeNull();
+      expect(user?.verify).toBe(true);
+      expect(user?.verificationToken).toBeNull();
+    });
+
+    it("should return 404 for an invalid verification token", async () => {
+      const res = await request(app).get(`/api/users/verify/invalid-token`);
+      expect(res.status).toBe(404);
+    });
+  });
+
+  describe("Resend Verification Email", () => {
+    beforeEach(async () => {
+      await User.deleteMany({});
+    });
+
+    it("should resend verification email to an unverified user", async () => {
+      const verificationToken = "valid-token";
+      await User.create({
+        name: "Unverified User",
+        email: "unverifieduser@example.com",
+        password: await bcrypt.hash("password123", 12),
+        verificationToken,
+        verify: false,
+      });
+
+      const res = await request(app)
+        .post("/api/users/resend-verification-email")
+        .send({ email: "unverifieduser@example.com" });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("status", "OK");
+      expect(res.body).toHaveProperty("message", "Verification email sent!");
+    });
+
+    it("should not resend verification email to a verified user", async () => {
+      await User.create({
+        name: "Verified User",
+        email: "verifieduser@example.com",
+        password: await bcrypt.hash("password123", 12),
+        verify: true,
+      });
+
+      const res = await request(app)
+        .post("/api/users/resend-verification-email")
+        .send({ email: "verifieduser@example.com" });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "Email is already verified");
+    });
+
+    it("should return 404 if user is not found", async () => {
+      const res = await request(app)
+        .post("/api/users/resend-verification-email")
+        .send({ email: "nonexistent@example.com" });
+
+      expect(res.status).toBe(404);
+      expect(res.body).toHaveProperty("error", "User not found");
+    });
+  });
 });

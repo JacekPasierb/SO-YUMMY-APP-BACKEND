@@ -102,7 +102,8 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         return;
     }
     catch (error) {
-        if (error instanceof multer_1.default.MulterError && error.code === "LIMIT_FILE_SIZE") {
+        if (error instanceof multer_1.default.MulterError &&
+            error.code === "LIMIT_FILE_SIZE") {
             res.status(400).json({ error: "File too large. Maximum size is 10MB." });
             return;
         }
@@ -138,7 +139,8 @@ const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const { verificationToken } = req.params;
         const user = yield user_2.User.findOne({ verificationToken });
         if (!user) {
-            throw (0, handleErrors_1.default)(404);
+            res.status(404).json({ message: "User not found" });
+            return;
         }
         user.set("verify", true);
         user.verificationToken = null;
