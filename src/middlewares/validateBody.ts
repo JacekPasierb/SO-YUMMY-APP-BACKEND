@@ -8,6 +8,8 @@ const validateBody = (schema: Schema) => {
     
     const { error } = schema.validate(req.body);
     if (error) {
+      console.log("co2",error);
+      
       return next(handleError(400, error.message));
     }
     next();
