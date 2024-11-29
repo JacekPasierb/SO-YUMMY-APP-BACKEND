@@ -19,6 +19,8 @@ const app_1 = __importDefault(require("../app"));
 const user_1 = require("../models/user");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const mail_1 = __importDefault(require("@sendgrid/mail"));
+const emailService_1 = require("../utils/emailService");
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
     setApiKey: jest.fn(),
@@ -40,6 +42,18 @@ describe("User API ", () => {
         yield mongoose_1.default.connection.close();
         yield mongoServer.stop();
     }));
+    describe("Email Sending", () => {
+        it("should call setApiKey", () => {
+            expect(mail_1.default.setApiKey).toHaveBeenCalled();
+        });
+        it("should call send function when sending verification email", () => __awaiter(void 0, void 0, void 0, function* () {
+            const emailToSend = { to: 'test@example.com', verificationToken: '12345' };
+            yield (0, emailService_1.sendVerificationEmail)(emailToSend);
+            expect(mail_1.default.send).toHaveBeenCalledWith(expect.objectContaining({
+                to: 'test@example.com',
+            }));
+        }));
+    });
     describe("Registration", () => {
         beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
             yield user_1.User.deleteMany({});

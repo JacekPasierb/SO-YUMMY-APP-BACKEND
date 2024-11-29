@@ -5,6 +5,8 @@ import app from "../app";
 import { User } from "../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import sgMail from '@sendgrid/mail';
+import { sendVerificationEmail } from '../utils/emailService';
 
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
@@ -30,7 +32,20 @@ describe("User API ", () => {
     await mongoose.connection.close();
     await mongoServer.stop();
   });
+  describe("Email Sending", () => {
+    it("should call setApiKey", () => {
+      expect(sgMail.setApiKey).toHaveBeenCalled();
+    });
 
+    it("should call send function when sending verification email", async () => {
+      const emailToSend = { to: 'test@example.com', verificationToken: '12345' };
+      await sendVerificationEmail(emailToSend);
+      expect(sgMail.send).toHaveBeenCalledWith(expect.objectContaining({
+        to: 'test@example.com',
+      }));
+    });
+  });
+  
   describe("Registration", () => {
     beforeEach(async () => {
       await User.deleteMany({});
