@@ -32,7 +32,6 @@ router.patch(
   auth,
   validateBody(updateUserSchema),
   upload.single("file"),
-
   update
 );
 router.patch(
@@ -41,6 +40,5 @@ router.patch(
   validateBody(toogleThemeSchema),
   toogleTheme
 );
-
 
 export default router;

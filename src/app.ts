@@ -82,14 +82,10 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log("fff");
-  
   multerErrorHandler(err, req, res, next);
 });
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  console.log("pokaaa", error);
-
   const status = error.status || 500;
   const message = error.message || "Internal Server Error";
   res.status(status).json({ error: message });

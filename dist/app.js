@@ -65,11 +65,9 @@ app.get("/", (req, res) => {
     res.json({ version: "1.0" });
 });
 app.use((err, req, res, next) => {
-    console.log("fff");
     (0, multer_1.multerErrorHandler)(err, req, res, next);
 });
 app.use((error, req, res, next) => {
-    console.log("pokaaa", error);
     const status = error.status || 500;
     const message = error.message || "Internal Server Error";
     res.status(status).json({ error: message });
