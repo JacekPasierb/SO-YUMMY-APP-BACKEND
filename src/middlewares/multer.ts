@@ -9,7 +9,6 @@ const fileFilter: multer.Options["fileFilter"] = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
-  console.log("File filter called");
   const ext = path.extname(file.originalname).toLowerCase();
 
   if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
@@ -17,7 +16,6 @@ const fileFilter: multer.Options["fileFilter"] = (
       "Invalid file type. Only JPEG, JPG, and PNG are allowed.";
     return cb(null, false);
   }
-  console.log("File type is valid");
 
   cb(null, true);
 };

@@ -70,12 +70,10 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 exports.register = register;
 const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("to 0");
         if (!req.user) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }
         const userId = req.user._id;
-        console.log("to 1");
         if (req.fileValidationError) {
             res.status(400).json({ error: req.fileValidationError });
             return;
@@ -98,7 +96,6 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         return;
     }
     catch (error) {
-        console.log("to 5");
         if (error instanceof multer_1.default.MulterError &&
             error.code === "LIMIT_FILE_SIZE") {
             res.status(400).json({ error: "File too large. Maximum size is 10MB." });

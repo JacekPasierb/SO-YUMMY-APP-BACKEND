@@ -8,14 +8,12 @@ const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const storage = multer_1.default.diskStorage({});
 const fileFilter = (req, file, cb) => {
-    console.log("File filter called");
     const ext = path_1.default.extname(file.originalname).toLowerCase();
     if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
         req.fileValidationError =
             "Invalid file type. Only JPEG, JPG, and PNG are allowed.";
         return cb(null, false);
     }
-    console.log("File type is valid");
     cb(null, true);
 };
 const upload = (0, multer_1.default)({

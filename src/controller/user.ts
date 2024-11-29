@@ -78,13 +78,10 @@ const update = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    console.log("to 0");
-    
     if (!req.user) {
       return next(handleError(401, "Unauthorized"));
     }
     const userId = (req.user as IUser)._id;
-console.log("to 1");
 
     if (req.fileValidationError) {
       res.status(400).json({ error: req.fileValidationError });
@@ -111,7 +108,6 @@ console.log("to 1");
     });
     return;
   } catch (error) {
-    console.log("to 5");
 
     if (
       error instanceof multer.MulterError &&
