@@ -45,7 +45,7 @@ describe("User API ", () => {
       }));
     });
   });
-  
+
   describe("Registration", () => {
     beforeEach(async () => {
       await User.deleteMany({});
