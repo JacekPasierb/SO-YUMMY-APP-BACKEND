@@ -21,7 +21,7 @@ describe("User API ", () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
     sgMail.setApiKey("dummy-api-key");
-    
+
     try {
       await mongoose.connect(uri);
     } catch (error) {
