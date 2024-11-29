@@ -12,6 +12,7 @@ import favoriteRouter from "./routes/api/favoriteRecipes";
 import popularRecipesRouter from "./routes/api/popularRecipe";
 import shoppingListRouter from "./routes/api/shoppingList";
 import handleError from "./utils/handleErrors";
+import { multerErrorHandler } from "./middlewares/multer";
 
 dotenv.config();
 require("./config/passport-config");
@@ -79,7 +80,16 @@ app.use("/api/shopping-list", shoppingListRouter);
 app.get("/", (req: Request, res: Response) => {
   res.json({ version: "1.0" });
 });
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.log("fff");
+  
+  multerErrorHandler(err, req, res, next);
+});
+
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  console.log("pokaaa", error);
+
   const status = error.status || 500;
   const message = error.message || "Internal Server Error";
   res.status(status).json({ error: message });

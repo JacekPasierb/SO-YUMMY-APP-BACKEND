@@ -12,4 +12,4 @@ const validateBody = (schema: Schema) => {
   };
 };
 
-export default validateBody; 
+export default validateBody;

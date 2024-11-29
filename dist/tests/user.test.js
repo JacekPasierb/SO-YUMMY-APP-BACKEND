@@ -42,17 +42,7 @@ describe("User API ", () => {
     }));
     describe("Registration", () => {
         beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            try {
-                yield user_1.User.deleteMany({});
-                yield user_1.User.create({
-                    name: "Existing User",
-                    email: "existinguser@example.com",
-                    password: "password123",
-                });
-            }
-            catch (error) {
-                console.error("Error setting up test data:", error);
-            }
+            yield user_1.User.deleteMany({});
         }));
         it("should register a new user with valid data", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
@@ -100,34 +90,29 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("message", "Register Success !");
         }));
         it("should not allow registration with an existing email", () => __awaiter(void 0, void 0, void 0, function* () {
-            try {
-                const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
-                    name: "New User",
-                    email: "existinguser@example.com",
-                    password: "newpassword123",
-                });
-                expect(res.status).toBe(409);
-                expect(res.body).toHaveProperty("error", "Email is already in use");
-            }
-            catch (error) {
-                console.error("Error during registration request:", error);
-            }
-        }), 10000);
+            yield user_1.User.create({
+                name: "Existing User",
+                email: "existinguser@example.com",
+                password: "password123",
+            });
+            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
+                name: "New User",
+                email: "existinguser@example.com",
+                password: "newpassword123",
+            });
+            expect(res.status).toBe(409);
+            expect(res.body).toHaveProperty("error", "Email is already in use");
+        }));
     });
     describe("User API - Login", () => {
         beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            try {
-                yield user_1.User.deleteMany({});
-                yield user_1.User.create({
-                    name: "Existing User",
-                    email: "existinguser@example.com",
-                    password: yield bcrypt_1.default.hash("password123", 12),
-                    verify: true,
-                });
-            }
-            catch (error) {
-                console.error("Error setting up test data:", error);
-            }
+            yield user_1.User.deleteMany({});
+            yield user_1.User.create({
+                name: "Existing User",
+                email: "existinguser@example.com",
+                password: yield bcrypt_1.default.hash("password123", 12),
+                verify: true,
+            });
         }));
         it("should login a user with valid credentials", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/signin").send({
@@ -137,7 +122,7 @@ describe("User API ", () => {
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "OK");
             expect(res.body).toHaveProperty("code", 200);
-            expect(res.body.data).toHaveProperty("token"); // Zakładamy, że zwraca token
+            expect(res.body.data).toHaveProperty("token");
             expect(res.body.data.user).toHaveProperty("email", "existinguser@example.com");
             expect(res.body.data.user).toHaveProperty("name", "Existing User");
         }));
@@ -293,5 +278,112 @@ describe("User API ", () => {
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty("error", "Unauthorized");
         }));
+    });
+    describe("Logout", () => {
+        let userId;
+        let token;
+        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+            yield user_1.User.deleteMany({});
+            const user = yield user_1.User.create({
+                name: "Test User",
+                email: "testuser@example.com",
+                password: yield bcrypt_1.default.hash("password123", 12),
+                verify: true,
+            });
+            userId = user._id.toString();
+            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
+                expiresIn: "1h",
+            });
+            user.token = token;
+            yield user.save();
+        }));
+        it("should logout a user with a valid token", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/logout")
+                .set("Authorization", `Bearer ${token}`);
+            expect(res.status).toBe(204);
+            const user = yield user_1.User.findById(userId);
+            expect(user === null || user === void 0 ? void 0 : user.token).toBeNull();
+        }));
+        it("should return 401 if token is missing", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default).patch("/api/users/logout");
+            expect(res.status).toBe(401);
+            expect(res.body).toHaveProperty("error", "Unauthorized");
+        }));
+        it("should return 401 if token is invalid", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/logout")
+                .set("Authorization", "Bearer invalidtoken");
+            expect(res.status).toBe(401);
+            expect(res.body).toHaveProperty("error", "Unauthorized");
+        }));
+    });
+    describe("Update User", () => {
+        let userId;
+        let token;
+        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+            yield user_1.User.deleteMany({});
+            const user = yield user_1.User.create({
+                name: "Test User",
+                email: "testuser@example.com",
+                password: yield bcrypt_1.default.hash("password123", 12),
+                verify: true,
+            });
+            userId = user._id.toString();
+            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
+                expiresIn: "1h",
+            });
+            user.token = token;
+            yield user.save();
+        }));
+        it("should update user data with valid token and valid data", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/update")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ name: "Updated User" });
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("status", "User data updated successfully");
+            expect(res.body.data.user).toHaveProperty("name", "Updated User");
+            const user = yield user_1.User.findById(userId);
+            expect(user === null || user === void 0 ? void 0 : user.name).toBe("Updated User");
+        }));
+        it("should return 400 if name is too short", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/update")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ name: "Al" });
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "Name must be at least 3 characters long");
+        }));
+        it("should return 400 if file type is invalid", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/update")
+                .set("Authorization", `Bearer ${token}`)
+                .field("name", "Test User")
+                .attach("file", "src/tests/files/invalid-file.txt");
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "Invalid file type. Only JPEG, JPG, and PNG are allowed.");
+        }));
+        it("should return 400 if file size exceeds limit", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/update")
+                .set("Authorization", `Bearer ${token}`)
+                .attach("file", "src/tests/files/large-file.jpg");
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "File too large. Maximum size is 10MB.");
+        }));
+        // it("should return 401 if token is missing for update", async () => {
+        //   const res = await request(app).patch("/api/users/update").send({ name: "Updated User" });
+        //   expect(res.status).toBe(401);
+        //   expect(res.body).toHaveProperty("error", "Unauthorized");
+        // });
+        // it("should return 401 if token is invalid for update", async () => {
+        //   const res = await request(app)
+        //     .patch("/api/users/update")
+        //     .set("Authorization", "Bearer invalidtoken")
+        //     .send({ name: "Updated User" });
+        //   expect(res.status).toBe(401);
+        //   expect(res.body).toHaveProperty("error", "Unauthorized");
+        // });
     });
 });

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import {
   register,
   verifyEmail,
@@ -32,6 +32,7 @@ router.patch(
   auth,
   validateBody(updateUserSchema),
   upload.single("file"),
+
   update
 );
 router.patch(
@@ -40,5 +41,6 @@ router.patch(
   validateBody(toogleThemeSchema),
   toogleTheme
 );
+
 
 export default router;

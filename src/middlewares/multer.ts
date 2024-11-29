@@ -9,8 +9,7 @@ const fileFilter: multer.Options["fileFilter"] = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
-  console.log("tu");
-
+  console.log("File filter called");
   const ext = path.extname(file.originalname).toLowerCase();
 
   if (ext !== ".jpeg" && ext !== ".jpg" && ext !== ".png") {
@@ -18,6 +17,8 @@ const fileFilter: multer.Options["fileFilter"] = (
       "Invalid file type. Only JPEG, JPG, and PNG are allowed.";
     return cb(null, false);
   }
+  console.log("File type is valid");
+
   cb(null, true);
 };
 
@@ -28,5 +29,21 @@ const upload = multer({
   },
   fileFilter,
 });
+
+export const multerErrorHandler = (
+  err: any,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res
+        .status(400)
+        .json({ error: "File too large. Maximum size is 10MB." });
+    }
+  }
+  next(err);
+};
 
 export default upload;

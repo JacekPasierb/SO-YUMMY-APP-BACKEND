@@ -33,16 +33,7 @@ describe("User API ", () => {
 
   describe("Registration", () => {
     beforeEach(async () => {
-      try {
-        await User.deleteMany({});
-        await User.create({
-          name: "Existing User",
-          email: "existinguser@example.com",
-          password: "password123",
-        });
-      } catch (error) {
-        console.error("Error setting up test data:", error);
-      }
+      await User.deleteMany({});
     });
 
     it("should register a new user with valid data", async () => {
@@ -99,33 +90,31 @@ describe("User API ", () => {
     });
 
     it("should not allow registration with an existing email", async () => {
-      try {
-        const res = await request(app).post("/api/users/register").send({
-          name: "New User",
-          email: "existinguser@example.com",
-          password: "newpassword123",
-        });
-        expect(res.status).toBe(409);
-        expect(res.body).toHaveProperty("error", "Email is already in use");
-      } catch (error) {
-        console.error("Error during registration request:", error);
-      }
-    }, 10000);
+      await User.create({
+        name: "Existing User",
+        email: "existinguser@example.com",
+        password: "password123",
+      });
+
+      const res = await request(app).post("/api/users/register").send({
+        name: "New User",
+        email: "existinguser@example.com",
+        password: "newpassword123",
+      });
+      expect(res.status).toBe(409);
+      expect(res.body).toHaveProperty("error", "Email is already in use");
+    });
   });
 
   describe("User API - Login", () => {
     beforeEach(async () => {
-      try {
-        await User.deleteMany({});
-        await User.create({
-          name: "Existing User",
-          email: "existinguser@example.com",
-          password: await bcrypt.hash("password123", 12),
-          verify: true,
-        });
-      } catch (error) {
-        console.error("Error setting up test data:", error);
-      }
+      await User.deleteMany({});
+      await User.create({
+        name: "Existing User",
+        email: "existinguser@example.com",
+        password: await bcrypt.hash("password123", 12),
+        verify: true,
+      });
     });
 
     it("should login a user with valid credentials", async () => {
@@ -136,7 +125,7 @@ describe("User API ", () => {
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("status", "OK");
       expect(res.body).toHaveProperty("code", 200);
-      expect(res.body.data).toHaveProperty("token"); // Zakładamy, że zwraca token
+      expect(res.body.data).toHaveProperty("token");
       expect(res.body.data.user).toHaveProperty(
         "email",
         "existinguser@example.com"
@@ -329,5 +318,155 @@ describe("User API ", () => {
       expect(res.status).toBe(401);
       expect(res.body).toHaveProperty("error", "Unauthorized");
     });
+  });
+
+  describe("Logout", () => {
+    let userId: string;
+    let token: string;
+
+    beforeEach(async () => {
+      await User.deleteMany({});
+      const user = await User.create({
+        name: "Test User",
+        email: "testuser@example.com",
+        password: await bcrypt.hash("password123", 12),
+        verify: true,
+      });
+
+      userId = user._id.toString();
+      token = jwt.sign(
+        { id: userId, email: user.email },
+        process.env.SECRET as string,
+        {
+          expiresIn: "1h",
+        }
+      );
+      user.token = token;
+      await user.save();
+    });
+
+    it("should logout a user with a valid token", async () => {
+      const res = await request(app)
+        .patch("/api/users/logout")
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(res.status).toBe(204);
+
+      const user = await User.findById(userId);
+      expect(user?.token).toBeNull();
+    });
+
+    it("should return 401 if token is missing", async () => {
+      const res = await request(app).patch("/api/users/logout");
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized");
+    });
+
+    it("should return 401 if token is invalid", async () => {
+      const res = await request(app)
+        .patch("/api/users/logout")
+        .set("Authorization", "Bearer invalidtoken");
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized");
+    });
+  });
+
+  describe("Update User", () => {
+    let userId: string;
+    let token: string;
+
+    beforeEach(async () => {
+      await User.deleteMany({});
+      const user = await User.create({
+        name: "Test User",
+        email: "testuser@example.com",
+        password: await bcrypt.hash("password123", 12),
+        verify: true,
+      });
+
+      userId = user._id.toString();
+      token = jwt.sign(
+        { id: userId, email: user.email },
+        process.env.SECRET as string,
+        {
+          expiresIn: "1h",
+        }
+      );
+      user.token = token;
+      await user.save();
+    });
+
+    it("should update user data with valid token and valid data", async () => {
+      const res = await request(app)
+        .patch("/api/users/update")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ name: "Updated User" });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty(
+        "status",
+        "User data updated successfully"
+      );
+      expect(res.body.data.user).toHaveProperty("name", "Updated User");
+
+      const user = await User.findById(userId);
+      expect(user?.name).toBe("Updated User");
+    });
+
+    it("should return 400 if name is too short", async () => {
+      const res = await request(app)
+        .patch("/api/users/update")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ name: "Al" });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty(
+        "error",
+        "Name must be at least 3 characters long"
+      );
+    });
+
+    it("should return 400 if file type is invalid", async () => {
+      const res = await request(app)
+        .patch("/api/users/update")
+        .set("Authorization", `Bearer ${token}`)
+        .field("name", "Test User")
+        .attach("file", "src/tests/files/invalid-file.txt");
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty(
+        "error",
+        "Invalid file type. Only JPEG, JPG, and PNG are allowed."
+      );
+    });
+
+    it("should return 400 if file size exceeds limit", async () => {
+      const res = await request(app)
+        .patch("/api/users/update")
+        .set("Authorization", `Bearer ${token}`)
+        .attach("file", "src/tests/files/large-file.jpg"); 
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "File too large. Maximum size is 10MB.");
+    });
+
+    // it("should return 401 if token is missing for update", async () => {
+    //   const res = await request(app).patch("/api/users/update").send({ name: "Updated User" });
+
+    //   expect(res.status).toBe(401);
+    //   expect(res.body).toHaveProperty("error", "Unauthorized");
+    // });
+
+    // it("should return 401 if token is invalid for update", async () => {
+    //   const res = await request(app)
+    //     .patch("/api/users/update")
+    //     .set("Authorization", "Bearer invalidtoken")
+    //     .send({ name: "Updated User" });
+
+    //   expect(res.status).toBe(401);
+    //   expect(res.body).toHaveProperty("error", "Unauthorized");
+    // });
   });
 });

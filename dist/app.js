@@ -16,6 +16,7 @@ const ownRecipes_1 = __importDefault(require("./routes/api/ownRecipes"));
 const favoriteRecipes_1 = __importDefault(require("./routes/api/favoriteRecipes"));
 const popularRecipe_1 = __importDefault(require("./routes/api/popularRecipe"));
 const shoppingList_1 = __importDefault(require("./routes/api/shoppingList"));
+const multer_1 = require("./middlewares/multer");
 dotenv_1.default.config();
 require("./config/passport-config");
 const app = (0, express_1.default)();
@@ -63,7 +64,12 @@ app.use("/api/shopping-list", shoppingList_1.default);
 app.get("/", (req, res) => {
     res.json({ version: "1.0" });
 });
+app.use((err, req, res, next) => {
+    console.log("fff");
+    (0, multer_1.multerErrorHandler)(err, req, res, next);
+});
 app.use((error, req, res, next) => {
+    console.log("pokaaa", error);
     const status = error.status || 500;
     const message = error.message || "Internal Server Error";
     res.status(status).json({ error: message });

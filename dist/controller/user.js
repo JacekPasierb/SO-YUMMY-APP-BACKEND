@@ -70,21 +70,17 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 exports.register = register;
 const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("req.user", req.user);
+        console.log("to 0");
         if (!req.user) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }
         const userId = req.user._id;
-        console.log("userId", userId);
-        console.log("body", req.body);
-        console.log("reeee", req);
-        // Sprawdź, czy wystąpił błąd multer
+        console.log("to 1");
         if (req.fileValidationError) {
             res.status(400).json({ error: req.fileValidationError });
             return;
         }
         const updatedUser = yield (0, user_1.updateUser)(userId, req.body);
-        console.log("updatedUser", updatedUser);
         if (!updatedUser) {
             throw (0, handleErrors_1.default)(404, "User not found");
         }
@@ -102,12 +98,12 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         return;
     }
     catch (error) {
+        console.log("to 5");
         if (error instanceof multer_1.default.MulterError &&
             error.code === "LIMIT_FILE_SIZE") {
             res.status(400).json({ error: "File too large. Maximum size is 10MB." });
             return;
         }
-        console.error("Error during update:", error);
         next(error);
     }
 });
