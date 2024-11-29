@@ -24,6 +24,7 @@ const registerSchema = joi_1.default.object({
 });
 exports.registerSchema = registerSchema;
 const updateUserSchema = joi_1.default.object({
+    avatar: joi_1.default.string(),
     name: joi_1.default.string().min(3).trim().messages({
         "string.base": "Name must be a string",
         "string.min": "Name must be at least 3 characters long",
