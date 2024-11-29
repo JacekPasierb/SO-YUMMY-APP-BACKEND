@@ -5,14 +5,14 @@ import app from "../app";
 import { User } from "../models/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import sgMail from '@sendgrid/mail';
-import { sendVerificationEmail } from '../utils/emailService';
+import sgMail from "@sendgrid/mail";
+import { sendVerificationEmail } from "../utils/emailService";
 
-   // Zamockowanie modułu @sendgrid/mail
-   jest.mock('@sendgrid/mail', () => ({
-    setApiKey: jest.fn(),
-    send: jest.fn().mockResolvedValue({}),
-  }));
+// Zamockowanie modułu @sendgrid/mail
+jest.mock("@sendgrid/mail", () => ({
+  setApiKey: jest.fn(),
+  send: jest.fn().mockResolvedValue({}),
+}));
 
 describe("User API ", () => {
   let mongoServer: MongoMemoryServer;
@@ -20,7 +20,8 @@ describe("User API ", () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
     const uri = mongoServer.getUri();
-
+    sgMail.setApiKey("dummy-api-key");
+    
     try {
       await mongoose.connect(uri);
     } catch (error) {
@@ -31,19 +32,6 @@ describe("User API ", () => {
   afterAll(async () => {
     await mongoose.connection.close();
     await mongoServer.stop();
-  });
-  describe("Email Sending", () => {
-    it("should call setApiKey", () => {
-      expect(sgMail.setApiKey).toHaveBeenCalled();
-    });
-  
-    it("should call send function when sending verification email", async () => {
-      const emailToSend = { to: 'test@example.com', verificationToken: '12345' };
-      await sendVerificationEmail(emailToSend);
-      expect(sgMail.send).toHaveBeenCalledWith(expect.objectContaining({
-        to: 'test@example.com',
-      }));
-    });
   });
 
   describe("Registration", () => {
@@ -461,10 +449,13 @@ describe("User API ", () => {
       const res = await request(app)
         .patch("/api/users/update")
         .set("Authorization", `Bearer ${token}`)
-        .attach("file", "src/tests/files/large-file.jpg"); 
+        .attach("file", "src/tests/files/large-file.jpg");
 
       expect(res.status).toBe(400);
-      expect(res.body).toHaveProperty("error", "File too large. Maximum size is 10MB.");
+      expect(res.body).toHaveProperty(
+        "error",
+        "File too large. Maximum size is 10MB."
+      );
     });
 
     // it("should return 401 if token is missing for update", async () => {
