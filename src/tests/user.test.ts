@@ -8,11 +8,11 @@ import jwt from "jsonwebtoken";
 import sgMail from '@sendgrid/mail';
 import { sendVerificationEmail } from '../utils/emailService';
 
-// Zamockowanie modułu @sendgrid/mail
-jest.mock("@sendgrid/mail", () => ({
-  setApiKey: jest.fn(),
-  send: jest.fn().mockResolvedValue({}),
-}));
+   // Zamockowanie modułu @sendgrid/mail
+   jest.mock('@sendgrid/mail', () => ({
+    setApiKey: jest.fn(),
+    send: jest.fn().mockResolvedValue({}),
+  }));
 
 describe("User API ", () => {
   let mongoServer: MongoMemoryServer;
@@ -36,7 +36,7 @@ describe("User API ", () => {
     it("should call setApiKey", () => {
       expect(sgMail.setApiKey).toHaveBeenCalled();
     });
-
+  
     it("should call send function when sending verification email", async () => {
       const emailToSend = { to: 'test@example.com', verificationToken: '12345' };
       await sendVerificationEmail(emailToSend);

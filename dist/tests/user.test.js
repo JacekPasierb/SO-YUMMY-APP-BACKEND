@@ -22,7 +22,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 const emailService_1 = require("../utils/emailService");
 // Zamockowanie modułu @sendgrid/mail
-jest.mock("@sendgrid/mail", () => ({
+jest.mock('@sendgrid/mail', () => ({
     setApiKey: jest.fn(),
     send: jest.fn().mockResolvedValue({}),
 }));
