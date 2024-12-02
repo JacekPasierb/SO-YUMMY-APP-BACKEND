@@ -9,7 +9,8 @@
     "start:dev": "nodemon src/server.ts",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add .",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "pre-commit": [
     "ts.check",

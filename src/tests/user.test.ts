@@ -458,21 +458,108 @@ describe("User API ", () => {
       );
     });
 
-    // it("should return 401 if token is missing for update", async () => {
-    //   const res = await request(app).patch("/api/users/update").send({ name: "Updated User" });
+    it("should return 401 if token is missing for update", async () => {
+      const res = await request(app)
+        .patch("/api/users/update")
+        .send({ name: "Updated User" });
 
-    //   expect(res.status).toBe(401);
-    //   expect(res.body).toHaveProperty("error", "Unauthorized");
-    // });
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized");
+    });
 
-    // it("should return 401 if token is invalid for update", async () => {
-    //   const res = await request(app)
-    //     .patch("/api/users/update")
-    //     .set("Authorization", "Bearer invalidtoken")
-    //     .send({ name: "Updated User" });
+    it("should return 401 if token is invalid for update", async () => {
+      const res = await request(app)
+        .patch("/api/users/update")
+        .set("Authorization", "Bearer invalidtoken")
+        .send({ name: "Updated User" });
 
-    //   expect(res.status).toBe(401);
-    //   expect(res.body).toHaveProperty("error", "Unauthorized");
-    // });
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized");
+    });
+  });
+
+  describe("User API - Toggle Theme", () => {
+    let token: string;
+    let userId: string;
+
+    beforeEach(async () => {
+      await User.deleteMany({});
+      const user = await User.create({
+        name: "Test User",
+        email: "testuser@example.com",
+        password: "password123",
+        isDarkTheme: false, // Zakładamy, że użytkownik ma pole `isDarkTheme`
+        verify: true,
+      });
+
+      userId = user._id.toString();
+      token = jwt.sign(
+        { id: userId, email: user.email },
+        process.env.SECRET as string,
+        {
+          expiresIn: "1h",
+        }
+      );
+      user.token = token;
+      await user.save();
+    });
+
+    it("should toggle theme from light to dark", async () => {
+      const res = await request(app)
+        .patch("/api/users/toogleTheme")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ isDarkTheme: true });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty(
+        "status",
+        "User data updated successfully"
+      );
+      expect(res.body.data).toHaveProperty("isDarkTheme", true);
+
+      const user = await User.findById(userId);
+      expect(user?.isDarkTheme).toBe(true);
+    });
+
+    it("should toggle theme from dark to light", async () => {
+      await User.findByIdAndUpdate(userId, { isDarkTheme: true });
+
+      const res = await request(app)
+        .patch("/api/users/toogleTheme")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ isDarkTheme: false });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty(
+        "status",
+        "User data updated successfully"
+      );
+      expect(res.body.data).toHaveProperty("isDarkTheme", false);
+
+      const user = await User.findById(userId);
+      expect(user?.isDarkTheme).toBe(false);
+    });
+
+    it("should return 401 if token is missing", async () => {
+      const res = await request(app)
+        .patch("/api/users/toogleTheme")
+        .send({ isDarkTheme: true });
+
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error", "Unauthorized");
+    });
+
+    it("should return 400 if theme value is invalid", async () => {
+      const res = await request(app)
+        .patch("/api/users/toogleTheme")
+        .set("Authorization", `Bearer ${token}`)
+        .send({ isDarkTheme: "invalid-value" });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty(
+        "error",
+        '"isDarkTheme" must be a boolean'
+      );
+    });
   });
 });
