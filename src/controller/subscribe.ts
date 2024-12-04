@@ -14,9 +14,7 @@ const addSubscribe = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.user) {
-      return next(handleError(401, "Unauthorized"));
-    }
+
 
     const { _id } = req.user as IUser;
     const owner = _id.toString();
@@ -48,7 +46,10 @@ const addSubscribe = async (
 
     await sendSubscriptionEmail(emailToSend);
 
-    res.status(201).json(result);
+    res.status(201).json({
+      message: "Subscription successful",
+      ...result,
+    });
   } catch (error) {
     next(error);
   }

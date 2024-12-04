@@ -17,9 +17,6 @@ const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const emailService_1 = require("../utils/emailService");
 const addSubscribe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.user) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const { _id } = req.user;
         const owner = _id.toString();
         const { email } = req.body;
@@ -43,7 +40,7 @@ const addSubscribe = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
        `,
         };
         yield (0, emailService_1.sendSubscriptionEmail)(emailToSend);
-        res.status(201).json(result);
+        res.status(201).json(Object.assign({ message: "Subscription successful" }, result));
     }
     catch (error) {
         next(error);
