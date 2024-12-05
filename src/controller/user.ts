@@ -208,6 +208,7 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
     user.token = token;
     console.log("4");
 
+    await user.save();
     console.log("5");
 
     res.status(200).json({
