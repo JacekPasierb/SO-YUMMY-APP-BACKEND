@@ -179,7 +179,7 @@ const signin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         console.log("3");
         user.token = token;
         console.log("4");
-        yield user.save();
+        yield user_2.User.findByIdAndUpdate(user._id, { token });
         console.log("5");
         res.status(200).json({
             status: "OK",
