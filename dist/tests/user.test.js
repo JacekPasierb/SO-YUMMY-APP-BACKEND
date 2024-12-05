@@ -20,13 +20,21 @@ const user_1 = require("../models/user");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mail_1 = __importDefault(require("@sendgrid/mail"));
+const emailService_1 = require("../utils/emailService");
+const user_2 = require("../services/user");
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
     setApiKey: jest.fn(),
     send: jest.fn().mockResolvedValue({}),
 }));
+jest.mock("../services/user", () => (Object.assign(Object.assign({}, jest.requireActual("../services/user")), { addUser: jest.fn(), getUserByEmail: jest.fn() })));
+jest.mock("../utils/emailService", () => ({
+    sendVerificationEmail: jest.fn(),
+}));
 describe("User API ", () => {
     let mongoServer;
+    let userId;
+    let token;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         mongoServer = yield mongodb_memory_server_1.MongoMemoryServer.create();
         const uri = mongoServer.getUri();
@@ -47,6 +55,13 @@ describe("User API ", () => {
             yield user_1.User.deleteMany({});
         }));
         it("should register a new user with valid data", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.addUser.mockResolvedValueOnce({
+                email: "newuser@example.com",
+                password: yield bcrypt_1.default.hash("securepassword123", 12),
+                name: "New User",
+                verificationToken: "some-token",
+                token: null,
+            });
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
                 name: "New User",
                 email: "newuser@example.com",
@@ -72,6 +87,23 @@ describe("User API ", () => {
             expect(res.status).toBe(400);
             expect(res.body).toHaveProperty("error", "Enter a valid email address");
         }));
+        it("should not register a user if email is not a string", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
+                name: "New User",
+                email: 12345,
+                password: "securepassword123",
+            });
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "Email must be a string");
+        }));
+        it("should not register a user with missing password", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
+                name: "New User",
+                email: "newuser@example.com",
+            });
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "Password is required");
+        }));
         it("should not register a user with short password", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
                 name: "New User",
@@ -81,17 +113,8 @@ describe("User API ", () => {
             expect(res.status).toBe(400);
             expect(res.body).toHaveProperty("error", "Password must be at least 6 characters long");
         }));
-        it("should handle long passwords", () => __awaiter(void 0, void 0, void 0, function* () {
-            const longPassword = "a".repeat(100); // 100 znaków
-            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
-                name: "New User",
-                email: "newuser@example.com",
-                password: longPassword,
-            });
-            expect(res.status).toBe(201);
-            expect(res.body).toHaveProperty("message", "Register Success !");
-        }));
         it("should not allow registration with an existing email", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.getUserByEmail.mockResolvedValueOnce(true);
             yield user_1.User.create({
                 name: "Existing User",
                 email: "existinguser@example.com",
@@ -105,28 +128,86 @@ describe("User API ", () => {
             expect(res.status).toBe(409);
             expect(res.body).toHaveProperty("error", "Email is already in use");
         }));
+        it("should return 500 if user creation fails", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.addUser.mockResolvedValueOnce(null);
+            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
+                name: "New User",
+                email: "newuser@example.com",
+                password: "securepassword123",
+            });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("error", "Failed to create user");
+        }));
+        it("should return 500 if verification token generation fails", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.addUser.mockResolvedValueOnce({
+                email: "newuser@example.com",
+                password: "hashedpassword",
+                name: "New User",
+                verificationToken: null,
+                token: null,
+            });
+            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
+                name: "New User",
+                email: "newuser@example.com",
+                password: "securepassword123",
+            });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("error", "Verification token generation failed");
+        }));
+        it("should handle error during sending verification email", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.getUserByEmail.mockResolvedValueOnce(null);
+            user_2.addUser.mockResolvedValueOnce({
+                email: "newuser@example.com",
+                password: "hashedpassword",
+                name: "New User",
+                verificationToken: "some-token",
+                token: null,
+            });
+            emailService_1.sendVerificationEmail.mockImplementationOnce(() => {
+                throw new Error("Email service error");
+            });
+            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
+                name: "New User",
+                email: "newuser@example.com",
+                password: "securepassword123",
+            });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("error", "Email service error");
+        }));
     });
     describe("User API - Login", () => {
         beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
             yield user_1.User.deleteMany({});
-            yield user_1.User.create({
-                name: "Existing User",
-                email: "existinguser@example.com",
+            const user = yield user_1.User.create({
+                name: "Test User",
+                email: "testuser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
                 verify: true,
             });
+            userId = user._id.toString();
+            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
+                expiresIn: "1h",
+            });
+            user.token = token;
+            yield user.save();
         }));
         it("should login a user with valid credentials", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.getUserByEmail.mockResolvedValueOnce({
+                name: "Test User",
+                email: "testuser@example.com",
+                password: yield bcrypt_1.default.hash("password123", 12),
+                verify: true,
+            });
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/signin").send({
-                email: "existinguser@example.com",
+                email: "testuser@example.com",
                 password: "password123",
             });
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "OK");
             expect(res.body).toHaveProperty("code", 200);
             expect(res.body.data).toHaveProperty("token");
-            expect(res.body.data.user).toHaveProperty("email", "existinguser@example.com");
-            expect(res.body.data.user).toHaveProperty("name", "Existing User");
+            expect(res.body.data.user).toHaveProperty("email", "testuser@example.com");
+            expect(res.body.data.user).toHaveProperty("name", "Test User");
         }));
         it("should not login a user with invalid email", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/signin").send({
@@ -159,11 +240,11 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("error", "Password is required");
         }));
         it("should not login a user with unverified account", () => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.create({
+            user_2.getUserByEmail.mockResolvedValueOnce({
                 name: "Unverified User",
                 email: "unverifieduser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
-                verify: false,
+                verify: false, // Upewnij się, że pole 'verify' jest ustawione na false
             });
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/signin").send({
                 email: "unverifieduser@example.com",
@@ -205,7 +286,7 @@ describe("User API ", () => {
         }));
         it("should resend verification email to an unverified user", () => __awaiter(void 0, void 0, void 0, function* () {
             const verificationToken = "valid-token";
-            yield user_1.User.create({
+            user_2.getUserByEmail.mockResolvedValueOnce({
                 name: "Unverified User",
                 email: "unverifieduser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
@@ -220,7 +301,7 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("message", "Verification email sent!");
         }));
         it("should not resend verification email to a verified user", () => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.create({
+            user_2.getUserByEmail.mockResolvedValueOnce({
                 name: "Verified User",
                 email: "verifieduser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),

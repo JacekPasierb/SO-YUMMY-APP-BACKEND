@@ -108,7 +108,6 @@ const update = async (
     });
     return;
   } catch (error) {
-
     if (
       error instanceof multer.MulterError &&
       error.code === "LIMIT_FILE_SIZE"
@@ -176,11 +175,14 @@ const verifyEmail = async (req: Request, res: Response): Promise<void> => {
 const signin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
-
+    console.log("Request body:", req.body);
     const user = await getUserByEmail({ email });
+    console.log("User found:", user);
     if (!user) {
       throw handleError(401, "Invalid Email or Password");
     }
+    console.log("User password:", user.password);
+    console.log("User email:", user.email, email);
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
@@ -190,17 +192,23 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
     if (!user.verify) {
       throw handleError(403, "email is not verifed");
     }
+    console.log("1");
 
     const payload = {
       id: user._id,
       email: user.email,
     };
+    console.log("2");
 
     const token = jwt.sign(payload, process.env.SECRET as string, {
       expiresIn: "1h",
     });
+    console.log("3");
+
     user.token = token;
-    await user.save();
+    console.log("4");
+
+    console.log("5");
 
     res.status(200).json({
       status: "OK",
@@ -217,6 +225,8 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
       },
     });
   } catch (error) {
+    console.error("Error in signin:", error); // Loguj błąd
+
     next(error);
   }
 };

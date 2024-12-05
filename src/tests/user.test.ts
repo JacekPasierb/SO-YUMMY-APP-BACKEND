@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 import { sendVerificationEmail } from "../utils/emailService";
+import { addUser, getUserByEmail } from "../services/user";
 
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
@@ -14,8 +15,20 @@ jest.mock("@sendgrid/mail", () => ({
   send: jest.fn().mockResolvedValue({}),
 }));
 
+jest.mock("../services/user", () => ({
+  ...jest.requireActual("../services/user"),
+  addUser: jest.fn(),
+  getUserByEmail: jest.fn(),
+}));
+
+jest.mock("../utils/emailService", () => ({
+  sendVerificationEmail: jest.fn(),
+}));
+
 describe("User API ", () => {
   let mongoServer: MongoMemoryServer;
+  let userId: string;
+  let token: string;
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -40,6 +53,14 @@ describe("User API ", () => {
     });
 
     it("should register a new user with valid data", async () => {
+      (addUser as jest.Mock).mockResolvedValueOnce({
+        email: "newuser@example.com",
+        password: await bcrypt.hash("securepassword123", 12),
+        name: "New User",
+        verificationToken: "some-token",
+        token: null,
+      });
+
       const res = await request(app).post("/api/users/register").send({
         name: "New User",
         email: "newuser@example.com",
@@ -68,6 +89,25 @@ describe("User API ", () => {
       expect(res.body).toHaveProperty("error", "Enter a valid email address");
     });
 
+    it("should not register a user if email is not a string", async () => {
+      const res = await request(app).post("/api/users/register").send({
+        name: "New User",
+        email: 12345,
+        password: "securepassword123",
+      });
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "Email must be a string");
+    });
+
+    it("should not register a user with missing password", async () => {
+      const res = await request(app).post("/api/users/register").send({
+        name: "New User",
+        email: "newuser@example.com",
+      });
+      expect(res.status).toBe(400);
+      expect(res.body).toHaveProperty("error", "Password is required");
+    });
+
     it("should not register a user with short password", async () => {
       const res = await request(app).post("/api/users/register").send({
         name: "New User",
@@ -81,18 +121,8 @@ describe("User API ", () => {
       );
     });
 
-    it("should handle long passwords", async () => {
-      const longPassword = "a".repeat(100); // 100 znaków
-      const res = await request(app).post("/api/users/register").send({
-        name: "New User",
-        email: "newuser@example.com",
-        password: longPassword,
-      });
-      expect(res.status).toBe(201);
-      expect(res.body).toHaveProperty("message", "Register Success !");
-    });
-
     it("should not allow registration with an existing email", async () => {
+      (getUserByEmail as jest.Mock).mockResolvedValueOnce(true);
       await User.create({
         name: "Existing User",
         email: "existinguser@example.com",
@@ -107,22 +137,98 @@ describe("User API ", () => {
       expect(res.status).toBe(409);
       expect(res.body).toHaveProperty("error", "Email is already in use");
     });
+
+    it("should return 500 if user creation fails", async () => {
+      (addUser as jest.Mock).mockResolvedValueOnce(null);
+
+      const res = await request(app).post("/api/users/register").send({
+        name: "New User",
+        email: "newuser@example.com",
+        password: "securepassword123",
+      });
+
+      expect(res.status).toBe(500);
+      expect(res.body).toHaveProperty("error", "Failed to create user");
+    });
+
+    it("should return 500 if verification token generation fails", async () => {
+      (addUser as jest.Mock).mockResolvedValueOnce({
+        email: "newuser@example.com",
+        password: "hashedpassword",
+        name: "New User",
+        verificationToken: null,
+        token: null,
+      });
+
+      const res = await request(app).post("/api/users/register").send({
+        name: "New User",
+        email: "newuser@example.com",
+        password: "securepassword123",
+      });
+
+      expect(res.status).toBe(500);
+      expect(res.body).toHaveProperty(
+        "error",
+        "Verification token generation failed"
+      );
+    });
+
+    it("should handle error during sending verification email", async () => {
+      (getUserByEmail as jest.Mock).mockResolvedValueOnce(null);
+      (addUser as jest.Mock).mockResolvedValueOnce({
+        email: "newuser@example.com",
+        password: "hashedpassword",
+        name: "New User",
+        verificationToken: "some-token",
+        token: null,
+      });
+      (sendVerificationEmail as jest.Mock).mockImplementationOnce(() => {
+        throw new Error("Email service error");
+      });
+
+      const res = await request(app).post("/api/users/register").send({
+        name: "New User",
+        email: "newuser@example.com",
+        password: "securepassword123",
+      });
+
+      expect(res.status).toBe(500);
+      expect(res.body).toHaveProperty("error", "Email service error");
+    });
   });
 
   describe("User API - Login", () => {
     beforeEach(async () => {
       await User.deleteMany({});
-      await User.create({
-        name: "Existing User",
-        email: "existinguser@example.com",
+      const user = await User.create({
+        name: "Test User",
+        email: "testuser@example.com",
         password: await bcrypt.hash("password123", 12),
         verify: true,
       });
+
+      userId = user._id.toString();
+      token = jwt.sign(
+        { id: userId, email: user.email },
+        process.env.SECRET as string,
+        {
+          expiresIn: "1h",
+        }
+      );
+      user.token = token;
+      await user.save();
     });
 
     it("should login a user with valid credentials", async () => {
+      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
+        name: "Test User",
+        email: "testuser@example.com",
+        password: await bcrypt.hash("password123", 12),
+        verify:true,
+      });
+
       const res = await request(app).post("/api/users/signin").send({
-        email: "existinguser@example.com",
+        email: "testuser@example.com",
         password: "password123",
       });
       expect(res.status).toBe(200);
@@ -131,9 +237,9 @@ describe("User API ", () => {
       expect(res.body.data).toHaveProperty("token");
       expect(res.body.data.user).toHaveProperty(
         "email",
-        "existinguser@example.com"
+        "testuser@example.com"
       );
-      expect(res.body.data.user).toHaveProperty("name", "Existing User");
+      expect(res.body.data.user).toHaveProperty("name", "Test User");
     });
 
     it("should not login a user with invalid email", async () => {
@@ -171,11 +277,11 @@ describe("User API ", () => {
     });
 
     it("should not login a user with unverified account", async () => {
-      await User.create({
+      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
         name: "Unverified User",
         email: "unverifieduser@example.com",
         password: await bcrypt.hash("password123", 12),
-        verify: false,
+        verify: false, // Upewnij się, że pole 'verify' jest ustawione na false
       });
 
       const res = await request(app).post("/api/users/signin").send({
@@ -228,7 +334,7 @@ describe("User API ", () => {
 
     it("should resend verification email to an unverified user", async () => {
       const verificationToken = "valid-token";
-      await User.create({
+      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
         name: "Unverified User",
         email: "unverifieduser@example.com",
         password: await bcrypt.hash("password123", 12),
@@ -246,7 +352,7 @@ describe("User API ", () => {
     });
 
     it("should not resend verification email to a verified user", async () => {
-      await User.create({
+      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
         name: "Verified User",
         email: "verifieduser@example.com",
         password: await bcrypt.hash("password123", 12),

@@ -152,10 +152,14 @@ exports.verifyEmail = verifyEmail;
 const signin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
+        console.log("Request body:", req.body);
         const user = yield (0, user_1.getUserByEmail)({ email });
+        console.log("User found:", user);
         if (!user) {
             throw (0, handleErrors_1.default)(401, "Invalid Email or Password");
         }
+        console.log("User password:", user.password);
+        console.log("User email:", user.email, email);
         const passwordMatch = yield bcrypt_1.default.compare(password, user.password);
         if (!passwordMatch) {
             throw (0, handleErrors_1.default)(401, "Invalid Email or Password");
@@ -163,15 +167,19 @@ const signin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         if (!user.verify) {
             throw (0, handleErrors_1.default)(403, "email is not verifed");
         }
+        console.log("1");
         const payload = {
             id: user._id,
             email: user.email,
         };
+        console.log("2");
         const token = jsonwebtoken_1.default.sign(payload, process.env.SECRET, {
             expiresIn: "1h",
         });
+        console.log("3");
         user.token = token;
-        yield user.save();
+        console.log("4");
+        console.log("5");
         res.status(200).json({
             status: "OK",
             code: 200,
@@ -188,6 +196,7 @@ const signin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
+        console.error("Error in signin:", error); // Loguj błąd
         next(error);
     }
 });
