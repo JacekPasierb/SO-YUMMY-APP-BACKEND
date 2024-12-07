@@ -69,9 +69,6 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
 exports.register = register;
 const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.user) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const userId = req.user._id;
         if (req.fileValidationError) {
             res.status(400).json({ error: req.fileValidationError });
@@ -79,7 +76,8 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         }
         const updatedUser = yield (0, user_1.updateUser)(userId, req.body);
         if (!updatedUser) {
-            throw (0, handleErrors_1.default)(404, "User not found");
+            res.status(500).json({ message: "Failed to update user" });
+            return;
         }
         const { name, avatar } = updatedUser;
         res.status(200).json({
@@ -122,6 +120,7 @@ const toogleTheme = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         return;
     }
     catch (error) {
+        console.log("er", error);
         next(error);
     }
 });
@@ -134,14 +133,20 @@ const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             res.status(404).json({ message: "User not found" });
             return;
         }
-        yield (0, user_1.updateUser)(user._id, { verify: true, verificationToken: null });
+        const update = yield (0, user_1.updateUser)(user._id, {
+            verify: true,
+            verificationToken: null,
+        });
+        if (!update) {
+            res.status(500).json({ message: "Failed to update user" });
+            return;
+        }
         res.status(200).json({
             status: "OK",
         });
         return;
     }
     catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -246,7 +251,10 @@ exports.currentUser = currentUser;
 const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { _id } = req.user;
-        yield (0, user_1.updateUser)(_id, { token: null });
+        const clearToken = yield (0, user_1.updateUser)(_id, { token: null });
+        if (!clearToken) {
+            throw (0, handleErrors_1.default)(404, "Failed to logout: User not found or update unsuccessful");
+        }
         res.status(204).json();
     }
     catch (error) {

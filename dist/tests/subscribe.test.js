@@ -25,7 +25,7 @@ const subscribeServices_1 = require("../services/subscribeServices");
 jest.mock("../utils/emailService", () => ({
     sendSubscriptionEmail: jest.fn().mockResolvedValue({}),
 }));
-jest.mock("../services/subscribeServices", () => (Object.assign(Object.assign({}, jest.requireActual("../services/subscribeServices")), { getSubscribeByOwner: jest.fn(), getSubscribeByEmail: jest.fn(), createSubscribe: jest.fn().mockResolvedValue({
+jest.mock("../services/subscribeServices", () => (Object.assign(Object.assign({}, jest.requireActual("../services/subscribeServices")), { findSubscribe: jest.fn(), createSubscribe: jest.fn().mockResolvedValue({
         _id: "mockedId",
         email: "subscriber@example.com",
         owner: "mockedOwnerId",
@@ -44,6 +44,7 @@ describe("Subscribe API", () => {
         yield mongoServer.stop();
     }));
     beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+        jest.clearAllMocks();
         yield mongoose_1.default.connection.db.dropDatabase();
         const user = yield user_1.User.create({
             name: "Test User",
@@ -59,6 +60,7 @@ describe("Subscribe API", () => {
         yield user.save();
     }));
     it("should subscribe a user with valid email", () => __awaiter(void 0, void 0, void 0, function* () {
+        subscribeServices_1.findSubscribe.mockResolvedValueOnce(null);
         const res = yield (0, supertest_1.default)(app_1.default)
             .post("/api/subscribe")
             .set("Authorization", `Bearer ${token}`)
@@ -75,11 +77,16 @@ describe("Subscribe API", () => {
         expect(res.body).toHaveProperty("error", "Unauthorized");
     }));
     it("should return 409 if user is already subscribed", () => __awaiter(void 0, void 0, void 0, function* () {
-        subscribeServices_1.getSubscribeByOwner.mockResolvedValueOnce({
-            _id: "mockedId",
-            email: "subscriber@example.com",
-            owner: userId,
-        });
+        subscribeServices_1.findSubscribe.mockImplementationOnce((query) => __awaiter(void 0, void 0, void 0, function* () {
+            if (query.owner) {
+                return {
+                    _id: "mockedId",
+                    email: "subscriber@example.com",
+                    owner: userId,
+                };
+            }
+            return null;
+        }));
         const res = yield (0, supertest_1.default)(app_1.default)
             .post("/api/subscribe")
             .set("Authorization", `Bearer ${token}`)
@@ -88,11 +95,15 @@ describe("Subscribe API", () => {
         expect(res.body).toHaveProperty("error", "User is already subscribed");
     }));
     it("should return 409 if email belongs to another user", () => __awaiter(void 0, void 0, void 0, function* () {
-        subscribeServices_1.getSubscribeByEmail.mockResolvedValueOnce({
-            _id: "mockedId",
-            email: "usertwo@example.com",
-            owner: "anotherOwnerId",
-        });
+        subscribeServices_1.findSubscribe.mockImplementation((query) => __awaiter(void 0, void 0, void 0, function* () {
+            if (query.owner) {
+                return false;
+            }
+            if (query.email) {
+                return true;
+            }
+            return null;
+        }));
         const res = yield (0, supertest_1.default)(app_1.default)
             .post("/api/subscribe")
             .set("Authorization", `Bearer ${token}`)
@@ -101,13 +112,20 @@ describe("Subscribe API", () => {
         expect(res.body).toHaveProperty("error", "The email belongs to another user");
     }));
     it("should handle errors during subscription creation", () => __awaiter(void 0, void 0, void 0, function* () {
-        subscribeServices_1.getSubscribeByOwner.mockResolvedValueOnce(null);
-        subscribeServices_1.getSubscribeByEmail.mockResolvedValueOnce(null);
+        subscribeServices_1.findSubscribe.mockImplementation((query) => __awaiter(void 0, void 0, void 0, function* () {
+            if (query.owner) {
+                return false;
+            }
+            if (query.email) {
+                return false;
+            }
+            return false;
+        }));
         subscribeServices_1.createSubscribe.mockRejectedValueOnce(new Error("Internal Server Error"));
         const res = yield (0, supertest_1.default)(app_1.default)
             .post("/api/subscribe")
             .set("Authorization", `Bearer ${token}`)
-            .send({ email: "subscriber@example.com" });
+            .send({ email: "test@example.com" });
         expect(res.status).toBe(500);
         expect(res.body).toHaveProperty("error", "Internal Server Error");
     }));

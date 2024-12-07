@@ -6,11 +6,7 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { sendSubscriptionEmail } from "../utils/emailService";
-import {
-    createSubscribe,
-  getSubscribeByEmail,
-  getSubscribeByOwner,
-} from "../services/subscribeServices";
+import { createSubscribe, findSubscribe } from "../services/subscribeServices";
 
 // Mockowanie funkcji sendSubscriptionEmail
 jest.mock("../utils/emailService", () => ({
@@ -19,8 +15,7 @@ jest.mock("../utils/emailService", () => ({
 
 jest.mock("../services/subscribeServices", () => ({
   ...jest.requireActual("../services/subscribeServices"),
-  getSubscribeByOwner: jest.fn(),
-  getSubscribeByEmail: jest.fn(),
+  findSubscribe: jest.fn(),
   createSubscribe: jest.fn().mockResolvedValue({
     _id: "mockedId",
     email: "subscriber@example.com",
@@ -45,6 +40,8 @@ describe("Subscribe API", () => {
   });
 
   beforeEach(async () => {
+    jest.clearAllMocks(); 
+
     await mongoose.connection.db.dropDatabase();
 
     const user = await User.create({
@@ -67,6 +64,7 @@ describe("Subscribe API", () => {
   });
 
   it("should subscribe a user with valid email", async () => {
+    (findSubscribe as jest.Mock).mockResolvedValueOnce(null);
     const res = await request(app)
       .post("/api/subscribe")
       .set("Authorization", `Bearer ${token}`)
@@ -87,10 +85,15 @@ describe("Subscribe API", () => {
   });
 
   it("should return 409 if user is already subscribed", async () => {
-    (getSubscribeByOwner as jest.Mock).mockResolvedValueOnce({
-      _id: "mockedId",
-      email: "subscriber@example.com",
-      owner: userId,
+    (findSubscribe as jest.Mock).mockImplementationOnce(async (query) => {
+      if (query.owner) {
+        return {
+          _id: "mockedId",
+          email: "subscriber@example.com",
+          owner: userId,
+        };
+      }
+      return null;
     });
 
     const res = await request(app)
@@ -103,10 +106,14 @@ describe("Subscribe API", () => {
   });
 
   it("should return 409 if email belongs to another user", async () => {
-    (getSubscribeByEmail as jest.Mock).mockResolvedValueOnce({
-      _id: "mockedId",
-      email: "usertwo@example.com",
-      owner: "anotherOwnerId",
+    (findSubscribe as jest.Mock).mockImplementation(async (query) => {
+      if (query.owner) {
+        return false;
+      }
+      if (query.email) {
+        return true;
+      }
+      return null;
     });
 
     const res = await request(app)
@@ -122,14 +129,23 @@ describe("Subscribe API", () => {
   });
 
   it("should handle errors during subscription creation", async () => {
-    (getSubscribeByOwner as jest.Mock).mockResolvedValueOnce(null);
-    (getSubscribeByEmail as jest.Mock).mockResolvedValueOnce(null);
-    (createSubscribe as jest.Mock).mockRejectedValueOnce(new Error("Internal Server Error"));
+    (findSubscribe as jest.Mock).mockImplementation(async (query) => {
+      if (query.owner) {
+        return false;
+      }
+      if (query.email) {
+        return false;
+      }
+      return false;
+    });
+    (createSubscribe as jest.Mock).mockRejectedValueOnce(
+      new Error("Internal Server Error")
+    );
 
     const res = await request(app)
       .post("/api/subscribe")
       .set("Authorization", `Bearer ${token}`)
-      .send({ email: "subscriber@example.com" });
+      .send({ email: "test@example.com" });
 
     expect(res.status).toBe(500);
     expect(res.body).toHaveProperty("error", "Internal Server Error");

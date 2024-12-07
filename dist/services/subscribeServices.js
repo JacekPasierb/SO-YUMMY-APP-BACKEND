@@ -12,28 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSubscribe = exports.getSubscribeByEmail = exports.getSubscribeByOwner = void 0;
+exports.createSubscribe = exports.findSubscribe = void 0;
 const subscribe_1 = __importDefault(require("../models/subscribe"));
-const getSubscribeByOwner = (_a) => __awaiter(void 0, [_a], void 0, function* ({ owner, }) {
+const findSubscribe = (query) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield subscribe_1.default.findOne({ owner });
+        return yield subscribe_1.default.findOne(query);
     }
     catch (error) {
-        console.error("Error fetching subscription by owner:", error);
+        console.error("Error fetching subscription:", error);
         return null;
     }
 });
-exports.getSubscribeByOwner = getSubscribeByOwner;
-const getSubscribeByEmail = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, }) {
-    try {
-        return yield subscribe_1.default.findOne({ email });
-    }
-    catch (error) {
-        console.error("Error fetching subscription by email:", error);
-        return null;
-    }
-});
-exports.getSubscribeByEmail = getSubscribeByEmail;
+exports.findSubscribe = findSubscribe;
 const createSubscribe = (_a) => __awaiter(void 0, [_a], void 0, function* ({ body, owner, }) {
     try {
         return yield subscribe_1.default.create(Object.assign(Object.assign({}, body), { owner }));

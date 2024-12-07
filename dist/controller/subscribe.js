@@ -20,11 +20,11 @@ const addSubscribe = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const { _id } = req.user;
         const owner = _id.toString();
         const { email } = req.body;
-        const userSub = yield (0, subscribeServices_1.getSubscribeByOwner)({ owner });
-        const emailSub = yield (0, subscribeServices_1.getSubscribeByEmail)({ email });
+        const userSub = yield (0, subscribeServices_1.findSubscribe)({ owner });
         if (userSub) {
             return next((0, handleErrors_1.default)(409, "User is already subscribed"));
         }
+        const emailSub = yield (0, subscribeServices_1.findSubscribe)({ email });
         if (emailSub) {
             return next((0, handleErrors_1.default)(409, "The email belongs to another user"));
         }

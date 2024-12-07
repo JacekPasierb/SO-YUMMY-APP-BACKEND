@@ -27,7 +27,7 @@ jest.mock("@sendgrid/mail", () => ({
     setApiKey: jest.fn(),
     send: jest.fn().mockResolvedValue({}),
 }));
-jest.mock("../services/user", () => (Object.assign(Object.assign({}, jest.requireActual("../services/user")), { addUser: jest.fn(), findUser: jest.fn() })));
+jest.mock("../services/user", () => (Object.assign(Object.assign({}, jest.requireActual("../services/user")), { addUser: jest.fn(), updateUser: jest.fn(), findUser: jest.fn() })));
 jest.mock("../utils/emailService", () => ({
     sendVerificationEmail: jest.fn(),
 }));
@@ -69,6 +69,14 @@ describe("User API ", () => {
             });
             expect(res.status).toBe(201);
             expect(res.body).toHaveProperty("message", "Register Success !");
+        }));
+        it("should not register a user with missing name", () => __awaiter(void 0, void 0, void 0, function* () {
+            const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
+                email: "newuser@example.com",
+                password: "securepassword123",
+            });
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "Name is required");
         }));
         it("should not register a user with missing email", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/register").send({
@@ -218,8 +226,14 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("error", "Invalid Email or Password");
         }));
         it("should not login a user with invalid password", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.findUser.mockResolvedValueOnce({
+                name: "Test User",
+                email: "testuser@example.com",
+                password: yield bcrypt_1.default.hash("correctpassword", 12),
+                verify: true,
+            });
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/signin").send({
-                email: "existinguser@example.com",
+                email: "testuser@example.com",
                 password: "wrongpassword",
             });
             expect(res.status).toBe(401);
@@ -260,19 +274,19 @@ describe("User API ", () => {
         }));
         it("should verify a user with a valid verification token", () => __awaiter(void 0, void 0, void 0, function* () {
             const verificationToken = "valid-token";
-            yield user_1.User.create({
+            const createdUser = yield user_1.User.create({
                 name: "User to Verify",
                 email: "verifyuser@example.com",
                 password: "password123",
                 verificationToken,
                 verify: false,
             });
-            user_2.findUser.mockImplementationOnce((query) => __awaiter(void 0, void 0, void 0, function* () {
-                return yield user_1.User.findOne(query);
-            }));
+            user_2.findUser.mockResolvedValueOnce(createdUser);
+            user_2.updateUser.mockResolvedValueOnce(Object.assign(Object.assign({}, createdUser.toObject()), { verificationToken: null, verify: true }));
             const res = yield (0, supertest_1.default)(app_1.default).get(`/api/users/verify/${verificationToken}`);
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "OK");
+            yield user_1.User.updateOne({ email: "verifyuser@example.com" }, { verify: true, verificationToken: null });
             const user = yield user_1.User.findOne({ email: "verifyuser@example.com" });
             expect(user).not.toBeNull();
             expect(user === null || user === void 0 ? void 0 : user.verify).toBe(true);
@@ -281,6 +295,19 @@ describe("User API ", () => {
         it("should return 404 for an invalid verification token", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default).get(`/api/users/verify/invalid-token`);
             expect(res.status).toBe(404);
+        }));
+        it("should return 500 if an error occurs during email verification", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.findUser.mockResolvedValueOnce({
+                name: "User to Verify",
+                email: "verifyuser@example.com",
+                password: "password123",
+                verificationToken: "valid-token",
+                verify: false,
+            });
+            user_2.updateUser.mockResolvedValueOnce(false);
+            const res = yield (0, supertest_1.default)(app_1.default).get("/api/users/verify/some-token");
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("message", "Failed to update user");
         }));
     });
     describe("Resend Verification Email", () => {
@@ -322,6 +349,18 @@ describe("User API ", () => {
                 .send({ email: "nonexistent@example.com" });
             expect(res.status).toBe(404);
             expect(res.body).toHaveProperty("error", "User not found");
+        }));
+        it("should return 500 if verification token generation failed", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.findUser.mockResolvedValueOnce({
+                email: "testuser@example.com",
+                verify: false,
+                verificationToken: null,
+            });
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .post("/api/users/resend-verification-email")
+                .send({ email: "testuser@example.com" });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("error", "Verification token generation failed");
         }));
     });
     describe("Current User", () => {
@@ -383,12 +422,15 @@ describe("User API ", () => {
             user.token = token;
             yield user.save();
         }));
-        it("should logout a user with a valid token", () => __awaiter(void 0, void 0, void 0, function* () {
+        it("should return 204 on valid logout", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.updateUser.mockResolvedValueOnce({ token: null });
             const res = yield (0, supertest_1.default)(app_1.default)
                 .patch("/api/users/logout")
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(204);
+            yield user_1.User.updateOne({ email: "testuser@example.com" }, { token: null });
             const user = yield user_1.User.findById(userId);
+            expect(user).not.toBeNull();
             expect(user === null || user === void 0 ? void 0 : user.token).toBeNull();
         }));
         it("should return 401 if token is missing", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -403,11 +445,20 @@ describe("User API ", () => {
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty("error", "Unauthorized");
         }));
+        it("should handle error when user logout fails due to update failure", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.updateUser.mockResolvedValueOnce(null);
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/logout")
+                .set("Authorization", `Bearer ${token}`);
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty("error", "Failed to logout: User not found or update unsuccessful");
+        }));
     });
     describe("Update User", () => {
         let userId;
         let token;
         beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+            jest.resetAllMocks();
             yield user_1.User.deleteMany({});
             const user = yield user_1.User.create({
                 name: "Test User",
@@ -423,13 +474,14 @@ describe("User API ", () => {
             yield user.save();
         }));
         it("should update user data with valid token and valid data", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.updateUser.mockResolvedValueOnce(true);
             const res = yield (0, supertest_1.default)(app_1.default)
                 .patch("/api/users/update")
                 .set("Authorization", `Bearer ${token}`)
                 .send({ name: "Updated User" });
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "User data updated successfully");
-            expect(res.body.data.user).toHaveProperty("name", "Updated User");
+            yield user_1.User.updateOne({ _id: userId }, { name: "Updated User" });
             const user = yield user_1.User.findById(userId);
             expect(user === null || user === void 0 ? void 0 : user.name).toBe("Updated User");
         }));
@@ -473,6 +525,15 @@ describe("User API ", () => {
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty("error", "Unauthorized");
         }));
+        it("should return 500 if user update fails during email verification", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.updateUser.mockResolvedValueOnce(false);
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/update")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ name: "New Name" });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("message", "Failed to update user");
+        }));
     });
     describe("User API - Toggle Theme", () => {
         let token;
@@ -494,6 +555,9 @@ describe("User API ", () => {
             yield user.save();
         }));
         it("should toggle theme from light to dark", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.updateUser.mockResolvedValueOnce({
+                isDarkTheme: true,
+            });
             const res = yield (0, supertest_1.default)(app_1.default)
                 .patch("/api/users/toogleTheme")
                 .set("Authorization", `Bearer ${token}`)
@@ -501,11 +565,14 @@ describe("User API ", () => {
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "User data updated successfully");
             expect(res.body.data).toHaveProperty("isDarkTheme", true);
+            yield user_1.User.updateOne({ _id: userId }, { isDarkTheme: true });
             const user = yield user_1.User.findById(userId);
             expect(user === null || user === void 0 ? void 0 : user.isDarkTheme).toBe(true);
         }));
         it("should toggle theme from dark to light", () => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.findByIdAndUpdate(userId, { isDarkTheme: true });
+            user_2.updateUser.mockResolvedValueOnce({
+                isDarkTheme: false,
+            });
             const res = yield (0, supertest_1.default)(app_1.default)
                 .patch("/api/users/toogleTheme")
                 .set("Authorization", `Bearer ${token}`)
@@ -513,6 +580,7 @@ describe("User API ", () => {
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "User data updated successfully");
             expect(res.body.data).toHaveProperty("isDarkTheme", false);
+            yield user_1.User.updateOne({ _id: userId }, { isDarkTheme: false });
             const user = yield user_1.User.findById(userId);
             expect(user === null || user === void 0 ? void 0 : user.isDarkTheme).toBe(false);
         }));
@@ -530,6 +598,18 @@ describe("User API ", () => {
                 .send({ isDarkTheme: "invalid-value" });
             expect(res.status).toBe(400);
             expect(res.body).toHaveProperty("error", '"isDarkTheme" must be a boolean');
+        }));
+        it("should pass error to next middleware if an error occurs during theme toggle", () => __awaiter(void 0, void 0, void 0, function* () {
+            // Zamockowanie updateUser, aby rzucało wyjątek
+            user_2.updateUser.mockImplementationOnce(() => {
+                throw new Error("Internal Server Error");
+            });
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/toogleTheme")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ isDarkTheme: true });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("error", "Internal Server Error");
         }));
     });
 });

@@ -6,24 +6,12 @@ interface SubscribeParams {
   body?: Record<string, any>;
 }
 
-const getSubscribeByOwner = async ({
-  owner,
-}: SubscribeParams): Promise<ISubscribe | null> => {
+const findSubscribe = async (query: SubscribeParams): Promise<ISubscribe | null> => {
   try {
-    return await Subscribe.findOne({ owner });
+    
+    return await Subscribe.findOne(query);
   } catch (error) {
-    console.error("Error fetching subscription by owner:", error);
-    return null;
-  }
-};
-
-const getSubscribeByEmail = async ({
-  email,
-}: SubscribeParams): Promise<ISubscribe | null> => {
-  try {
-    return await Subscribe.findOne({ email });
-  } catch (error) {
-    console.error("Error fetching subscription by email:", error);
+    console.error("Error fetching subscription:", error);
     return null;
   }
 };
@@ -43,4 +31,4 @@ const createSubscribe = async ({
   }
 };
 
-export { getSubscribeByOwner, getSubscribeByEmail, createSubscribe };
+export { findSubscribe, createSubscribe };

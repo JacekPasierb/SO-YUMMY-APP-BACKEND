@@ -58,6 +58,7 @@ const updateUser = async (
   id: Types.ObjectId,
   body: Partial<IUser>
 ): Promise<IUser | null> => {
+  
   try {
     return await User.findByIdAndUpdate(id, body, { new: true });
   } catch (err) {

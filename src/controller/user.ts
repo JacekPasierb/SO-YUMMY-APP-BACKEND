@@ -72,9 +72,6 @@ const update = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    if (!req.user) {
-      return next(handleError(401, "Unauthorized"));
-    }
     const userId = (req.user as IUser)._id;
 
     if (req.fileValidationError) {
@@ -85,7 +82,8 @@ const update = async (
     const updatedUser = await updateUser(userId, req.body);
 
     if (!updatedUser) {
-      throw handleError(404, "User not found");
+      res.status(500).json({ message: "Failed to update user" });
+      return;
     }
 
     const { name, avatar } = updatedUser;
@@ -137,6 +135,8 @@ const toogleTheme = async (
     });
     return;
   } catch (error) {
+    console.log("er", error);
+
     next(error);
   }
 };
@@ -151,14 +151,21 @@ const verifyEmail = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    await updateUser(user._id, { verify: true, verificationToken: null });
+    const update = await updateUser(user._id, {
+      verify: true,
+      verificationToken: null,
+    });
+
+    if (!update) {
+      res.status(500).json({ message: "Failed to update user" });
+      return;
+    }
 
     res.status(200).json({
       status: "OK",
     });
     return;
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -280,7 +287,14 @@ const currentUser = async (req: Request, res: Response, next: NextFunction) => {
 const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { _id } = req.user as IUser;
-    await updateUser(_id, { token: null });
+    const clearToken = await updateUser(_id, { token: null });
+
+    if (!clearToken) {
+      throw handleError(
+        404,
+        "Failed to logout: User not found or update unsuccessful"
+      );
+    }
     res.status(204).json();
   } catch (error) {
     next(error);

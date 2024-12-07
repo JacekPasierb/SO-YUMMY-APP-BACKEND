@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import {
-  getSubscribeByOwner,
-  getSubscribeByEmail,
-  createSubscribe,
-} from "../services/subscribeServices";
+import { createSubscribe, findSubscribe } from "../services/subscribeServices";
 import handleError from "../utils/handleErrors";
 import { IUser } from "../models/user";
 import { sendSubscriptionEmail } from "../utils/emailService";
@@ -14,19 +10,17 @@ const addSubscribe = async (
   next: NextFunction
 ) => {
   try {
-
-
     const { _id } = req.user as IUser;
     const owner = _id.toString();
     const { email } = req.body;
 
-    const userSub = await getSubscribeByOwner({ owner });
-    const emailSub = await getSubscribeByEmail({ email });
+    const userSub = await findSubscribe({ owner });
 
     if (userSub) {
       return next(handleError(409, "User is already subscribed"));
     }
 
+    const emailSub = await findSubscribe({ email });
     if (emailSub) {
       return next(handleError(409, "The email belongs to another user"));
     }
