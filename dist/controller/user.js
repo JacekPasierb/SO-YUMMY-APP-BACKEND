@@ -19,7 +19,6 @@ const nanoid_1 = require("nanoid");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_1 = require("../services/user");
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
-const user_2 = require("../models/user");
 const emailService_1 = require("../utils/emailService");
 const multer_1 = __importDefault(require("multer"));
 dotenv_1.default.config();
@@ -130,14 +129,12 @@ exports.toogleTheme = toogleTheme;
 const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { verificationToken } = req.params;
-        const user = yield user_2.User.findOne({ verificationToken });
+        const user = yield (0, user_1.findUser)({ verificationToken });
         if (!user) {
             res.status(404).json({ message: "User not found" });
             return;
         }
-        user.set("verify", true);
-        user.verificationToken = null;
-        yield user.save();
+        yield (0, user_1.updateUser)(user._id, { verify: true, verificationToken: null });
         res.status(200).json({
             status: "OK",
         });

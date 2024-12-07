@@ -58,7 +58,6 @@ const addUser = async ({
 
 const findUser = async (query: UserQuery): Promise<IUser | null> => {
   try {
-    console.log("qqq", query);
     return await User.findOne(query);
   } catch (error) {
     console.error(error);

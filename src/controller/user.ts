@@ -151,16 +151,14 @@ const verifyEmail = async (req: Request, res: Response): Promise<void> => {
   try {
     const { verificationToken } = req.params;
 
-    const user = await User.findOne({ verificationToken });
+    const user = await findUser({ verificationToken });
 
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
     }
-    user.set("verify", true);
-    user.verificationToken = null;
 
-    await user.save();
+    await updateUser(user._id, { verify: true, verificationToken: null });
 
     res.status(200).json({
       status: "OK",

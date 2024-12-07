@@ -49,7 +49,6 @@ const addUser = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, pass
 exports.addUser = addUser;
 const findUser = (query) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("qqq", query);
         return yield user_1.User.findOne(query);
     }
     catch (error) {
