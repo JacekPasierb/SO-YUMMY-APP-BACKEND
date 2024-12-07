@@ -7,7 +7,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 import { sendVerificationEmail } from "../utils/emailService";
-import { addUser, getUserByEmail } from "../services/user";
+import { addUser, findUser } from "../services/user";
 
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
@@ -18,7 +18,7 @@ jest.mock("@sendgrid/mail", () => ({
 jest.mock("../services/user", () => ({
   ...jest.requireActual("../services/user"),
   addUser: jest.fn(),
-  getUserByEmail: jest.fn(),
+  findUser: jest.fn(),
 }));
 
 jest.mock("../utils/emailService", () => ({
@@ -122,7 +122,7 @@ describe("User API ", () => {
     });
 
     it("should not allow registration with an existing email", async () => {
-      (getUserByEmail as jest.Mock).mockResolvedValueOnce(true);
+      (findUser as jest.Mock).mockResolvedValueOnce(true);
       await User.create({
         name: "Existing User",
         email: "existinguser@example.com",
@@ -174,7 +174,7 @@ describe("User API ", () => {
     });
 
     it("should handle error during sending verification email", async () => {
-      (getUserByEmail as jest.Mock).mockResolvedValueOnce(null);
+      (findUser as jest.Mock).mockResolvedValueOnce(null);
       (addUser as jest.Mock).mockResolvedValueOnce({
         email: "newuser@example.com",
         password: "hashedpassword",
@@ -220,11 +220,11 @@ describe("User API ", () => {
     });
 
     it("should login a user with valid credentials", async () => {
-      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
+      (findUser as jest.Mock).mockResolvedValueOnce({
         name: "Test User",
         email: "testuser@example.com",
         password: await bcrypt.hash("password123", 12),
-        verify:true,
+        verify: true,
       });
 
       const res = await request(app).post("/api/users/signin").send({
@@ -277,7 +277,7 @@ describe("User API ", () => {
     });
 
     it("should not login a user with unverified account", async () => {
-      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
+      (findUser as jest.Mock).mockResolvedValueOnce({
         name: "Unverified User",
         email: "unverifieduser@example.com",
         password: await bcrypt.hash("password123", 12),
@@ -334,7 +334,7 @@ describe("User API ", () => {
 
     it("should resend verification email to an unverified user", async () => {
       const verificationToken = "valid-token";
-      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
+      (findUser as jest.Mock).mockResolvedValueOnce({
         name: "Unverified User",
         email: "unverifieduser@example.com",
         password: await bcrypt.hash("password123", 12),
@@ -352,7 +352,7 @@ describe("User API ", () => {
     });
 
     it("should not resend verification email to a verified user", async () => {
-      (getUserByEmail as jest.Mock).mockResolvedValueOnce({
+      (findUser as jest.Mock).mockResolvedValueOnce({
         name: "Verified User",
         email: "verifieduser@example.com",
         password: await bcrypt.hash("password123", 12),
@@ -594,7 +594,7 @@ describe("User API ", () => {
         name: "Test User",
         email: "testuser@example.com",
         password: "password123",
-        isDarkTheme: false, // Zakładamy, że użytkownik ma pole `isDarkTheme`
+        isDarkTheme: false,
         verify: true,
       });
 

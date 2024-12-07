@@ -7,19 +7,6 @@ interface UserQuery {
   [key: string]: any;
 }
 
-const getUserByEmail = async ({
-  email,
-}: {
-  email: string;
-}): Promise<IUser | null> => {
-  try {
-    return await User.findOne({ email });
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};
-
 const getUserById = async (_id: Types.ObjectId): Promise<IUser | null> => {
   try {
     return await User.findById(_id);
@@ -40,7 +27,7 @@ const addUser = async ({
   password: string;
   name: string;
   verificationToken: string;
-  token:string | null;
+  token: string | null;
 }): Promise<IUser | null> => {
   try {
     return await User.create({
@@ -77,4 +64,4 @@ const updateUser = async (
   }
 };
 
-export { getUserByEmail, addUser, findUser, getUserById, updateUser };
+export { addUser, findUser, getUserById, updateUser };

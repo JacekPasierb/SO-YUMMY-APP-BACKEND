@@ -4,16 +4,10 @@ import { nanoid } from "nanoid";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
-import {
-  getUserByEmail,
-  addUser,
-  findUser,
-  getUserById,
-  updateUser,
-} from "../services/user";
+import { addUser, findUser, getUserById, updateUser } from "../services/user";
 
 import handleError from "../utils/handleErrors";
-import { User, IUser } from "../models/user";
+import { IUser } from "../models/user";
 import { sendVerificationEmail } from "../utils/emailService";
 import multer from "multer";
 
@@ -27,7 +21,7 @@ const register = async (
   try {
     const { name, email, password } = req.body;
 
-    const checkEmail = await getUserByEmail({ email });
+    const checkEmail = await findUser({ email });
     if (checkEmail) {
       return next(handleError(409, "Email is already in use"));
     }
@@ -174,7 +168,7 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 
-    const user = await getUserByEmail({ email });
+    const user = await findUser({ email });
     if (!user) {
       throw handleError(401, "Invalid Email or Password");
     }
@@ -224,7 +218,7 @@ const resendVerificationEmail = async (
 ): Promise<void> => {
   try {
     const { email } = req.body;
-    const user = await getUserByEmail({ email });
+    const user = await findUser({ email });
 
     if (!user) {
       throw handleError(404, "User not found");

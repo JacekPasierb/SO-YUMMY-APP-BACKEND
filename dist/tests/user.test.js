@@ -27,7 +27,7 @@ jest.mock("@sendgrid/mail", () => ({
     setApiKey: jest.fn(),
     send: jest.fn().mockResolvedValue({}),
 }));
-jest.mock("../services/user", () => (Object.assign(Object.assign({}, jest.requireActual("../services/user")), { addUser: jest.fn(), getUserByEmail: jest.fn() })));
+jest.mock("../services/user", () => (Object.assign(Object.assign({}, jest.requireActual("../services/user")), { addUser: jest.fn(), findUser: jest.fn() })));
 jest.mock("../utils/emailService", () => ({
     sendVerificationEmail: jest.fn(),
 }));
@@ -114,7 +114,7 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("error", "Password must be at least 6 characters long");
         }));
         it("should not allow registration with an existing email", () => __awaiter(void 0, void 0, void 0, function* () {
-            user_2.getUserByEmail.mockResolvedValueOnce(true);
+            user_2.findUser.mockResolvedValueOnce(true);
             yield user_1.User.create({
                 name: "Existing User",
                 email: "existinguser@example.com",
@@ -155,7 +155,7 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("error", "Verification token generation failed");
         }));
         it("should handle error during sending verification email", () => __awaiter(void 0, void 0, void 0, function* () {
-            user_2.getUserByEmail.mockResolvedValueOnce(null);
+            user_2.findUser.mockResolvedValueOnce(null);
             user_2.addUser.mockResolvedValueOnce({
                 email: "newuser@example.com",
                 password: "hashedpassword",
@@ -192,7 +192,7 @@ describe("User API ", () => {
             yield user.save();
         }));
         it("should login a user with valid credentials", () => __awaiter(void 0, void 0, void 0, function* () {
-            user_2.getUserByEmail.mockResolvedValueOnce({
+            user_2.findUser.mockResolvedValueOnce({
                 name: "Test User",
                 email: "testuser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
@@ -240,7 +240,7 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("error", "Password is required");
         }));
         it("should not login a user with unverified account", () => __awaiter(void 0, void 0, void 0, function* () {
-            user_2.getUserByEmail.mockResolvedValueOnce({
+            user_2.findUser.mockResolvedValueOnce({
                 name: "Unverified User",
                 email: "unverifieduser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
@@ -286,7 +286,7 @@ describe("User API ", () => {
         }));
         it("should resend verification email to an unverified user", () => __awaiter(void 0, void 0, void 0, function* () {
             const verificationToken = "valid-token";
-            user_2.getUserByEmail.mockResolvedValueOnce({
+            user_2.findUser.mockResolvedValueOnce({
                 name: "Unverified User",
                 email: "unverifieduser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
@@ -301,7 +301,7 @@ describe("User API ", () => {
             expect(res.body).toHaveProperty("message", "Verification email sent!");
         }));
         it("should not resend verification email to a verified user", () => __awaiter(void 0, void 0, void 0, function* () {
-            user_2.getUserByEmail.mockResolvedValueOnce({
+            user_2.findUser.mockResolvedValueOnce({
                 name: "Verified User",
                 email: "verifieduser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
@@ -480,7 +480,7 @@ describe("User API ", () => {
                 name: "Test User",
                 email: "testuser@example.com",
                 password: "password123",
-                isDarkTheme: false, // Zakładamy, że użytkownik ma pole `isDarkTheme`
+                isDarkTheme: false,
                 verify: true,
             });
             userId = user._id.toString();

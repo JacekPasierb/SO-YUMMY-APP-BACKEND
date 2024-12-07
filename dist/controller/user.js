@@ -25,7 +25,7 @@ dotenv_1.default.config();
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { name, email, password } = req.body;
-        const checkEmail = yield (0, user_1.getUserByEmail)({ email });
+        const checkEmail = yield (0, user_1.findUser)({ email });
         if (checkEmail) {
             return next((0, handleErrors_1.default)(409, "Email is already in use"));
         }
@@ -149,7 +149,7 @@ exports.verifyEmail = verifyEmail;
 const signin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        const user = yield (0, user_1.getUserByEmail)({ email });
+        const user = yield (0, user_1.findUser)({ email });
         if (!user) {
             throw (0, handleErrors_1.default)(401, "Invalid Email or Password");
         }
@@ -191,7 +191,7 @@ exports.signin = signin;
 const resendVerificationEmail = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.body;
-        const user = yield (0, user_1.getUserByEmail)({ email });
+        const user = yield (0, user_1.findUser)({ email });
         if (!user) {
             throw (0, handleErrors_1.default)(404, "User not found");
         }
