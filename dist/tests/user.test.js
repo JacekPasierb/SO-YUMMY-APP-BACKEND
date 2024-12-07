@@ -244,7 +244,7 @@ describe("User API ", () => {
                 name: "Unverified User",
                 email: "unverifieduser@example.com",
                 password: yield bcrypt_1.default.hash("password123", 12),
-                verify: false, // Upewnij się, że pole 'verify' jest ustawione na false
+                verify: false,
             });
             const res = yield (0, supertest_1.default)(app_1.default).post("/api/users/signin").send({
                 email: "unverifieduser@example.com",
@@ -267,6 +267,9 @@ describe("User API ", () => {
                 verificationToken,
                 verify: false,
             });
+            user_2.findUser.mockImplementationOnce((query) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield user_1.User.findOne(query);
+            }));
             const res = yield (0, supertest_1.default)(app_1.default).get(`/api/users/verify/${verificationToken}`);
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "OK");

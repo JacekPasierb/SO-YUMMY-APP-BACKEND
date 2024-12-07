@@ -144,7 +144,6 @@ const toogleTheme = async (
 const verifyEmail = async (req: Request, res: Response): Promise<void> => {
   try {
     const { verificationToken } = req.params;
-
     const user = await findUser({ verificationToken });
 
     if (!user) {

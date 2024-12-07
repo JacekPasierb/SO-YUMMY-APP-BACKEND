@@ -281,7 +281,7 @@ describe("User API ", () => {
         name: "Unverified User",
         email: "unverifieduser@example.com",
         password: await bcrypt.hash("password123", 12),
-        verify: false, // Upewnij się, że pole 'verify' jest ustawione na false
+        verify: false, 
       });
 
       const res = await request(app).post("/api/users/signin").send({
@@ -307,6 +307,10 @@ describe("User API ", () => {
         password: "password123",
         verificationToken,
         verify: false,
+      });
+
+      (findUser as jest.Mock).mockImplementationOnce(async (query) => {
+        return await User.findOne(query);
       });
 
       const res = await request(app).get(
