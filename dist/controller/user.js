@@ -170,7 +170,7 @@ const signin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         const token = jsonwebtoken_1.default.sign(payload, process.env.SECRET, {
             expiresIn: "1h",
         });
-        yield user_2.User.findByIdAndUpdate(user._id, { token });
+        yield (0, user_1.updateUser)(user._id, { token });
         res.status(200).json({
             status: "OK",
             code: 200,

@@ -175,12 +175,13 @@ const verifyEmail = async (req: Request, res: Response): Promise<void> => {
 const signin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
+
     const user = await getUserByEmail({ email });
     if (!user) {
       throw handleError(401, "Invalid Email or Password");
     }
-    const passwordMatch = await bcrypt.compare(password, user.password);
 
+    const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       throw handleError(401, "Invalid Email or Password");
     }
@@ -197,7 +198,7 @@ const signin = async (req: Request, res: Response, next: NextFunction) => {
       expiresIn: "1h",
     });
 
-    await User.findByIdAndUpdate(user._id, { token });
+    await updateUser(user._id, { token });
 
     res.status(200).json({
       status: "OK",
