@@ -20,7 +20,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_1 = require("../services/user");
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const emailService_1 = require("../utils/emailService");
-const multer_1 = __importDefault(require("multer"));
 dotenv_1.default.config();
 const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -93,11 +92,13 @@ const update = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         return;
     }
     catch (error) {
-        if (error instanceof multer_1.default.MulterError &&
-            error.code === "LIMIT_FILE_SIZE") {
-            res.status(400).json({ error: "File too large. Maximum size is 10MB." });
-            return;
-        }
+        // if (
+        //   error instanceof multer.MulterError &&
+        //   error.code === "LIMIT_FILE_SIZE"
+        // ) {
+        //   res.status(400).json({ error: "File too large. Maximum size is 10MB." });
+        //   return;
+        // }
         next(error);
     }
 });
@@ -108,7 +109,7 @@ const toogleTheme = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         const { isDarkTheme } = req.body;
         const updatedUser = yield (0, user_1.updateUser)(_id, { isDarkTheme });
         if (!updatedUser) {
-            throw (0, handleErrors_1.default)(404, "User not found");
+            throw (0, handleErrors_1.default)(500, "Failed to update user");
         }
         res.status(200).json({
             status: "User data updated successfully",
@@ -120,7 +121,6 @@ const toogleTheme = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         return;
     }
     catch (error) {
-        console.log("er", error);
         next(error);
     }
 });

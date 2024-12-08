@@ -100,13 +100,13 @@ const update = async (
     });
     return;
   } catch (error) {
-    if (
-      error instanceof multer.MulterError &&
-      error.code === "LIMIT_FILE_SIZE"
-    ) {
-      res.status(400).json({ error: "File too large. Maximum size is 10MB." });
-      return;
-    }
+    // if (
+    //   error instanceof multer.MulterError &&
+    //   error.code === "LIMIT_FILE_SIZE"
+    // ) {
+    //   res.status(400).json({ error: "File too large. Maximum size is 10MB." });
+    //   return;
+    // }
     next(error);
   }
 };
@@ -123,7 +123,7 @@ const toogleTheme = async (
     const updatedUser = await updateUser(_id, { isDarkTheme });
 
     if (!updatedUser) {
-      throw handleError(404, "User not found");
+      throw handleError(500, "Failed to update user");
     }
 
     res.status(200).json({
@@ -135,8 +135,6 @@ const toogleTheme = async (
     });
     return;
   } catch (error) {
-    console.log("er", error);
-
     next(error);
   }
 };

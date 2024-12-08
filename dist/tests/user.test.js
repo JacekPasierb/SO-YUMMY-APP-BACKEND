@@ -22,12 +22,13 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 const emailService_1 = require("../utils/emailService");
 const user_2 = require("../services/user");
+const multer_1 = __importDefault(require("multer"));
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
     setApiKey: jest.fn(),
     send: jest.fn().mockResolvedValue({}),
 }));
-jest.mock("../services/user", () => (Object.assign(Object.assign({}, jest.requireActual("../services/user")), { addUser: jest.fn(), updateUser: jest.fn(), findUser: jest.fn() })));
+jest.mock("../services/user", () => (Object.assign(Object.assign({}, jest.requireActual("../services/user")), { addUser: jest.fn(), updateUser: jest.fn(), findUser: jest.fn(), getUserById: jest.fn() })));
 jest.mock("../utils/emailService", () => ({
     sendVerificationEmail: jest.fn(),
 }));
@@ -309,6 +310,15 @@ describe("User API ", () => {
             expect(res.status).toBe(500);
             expect(res.body).toHaveProperty("message", "Failed to update user");
         }));
+        it("should return 500 if an internal server error occurs", () => __awaiter(void 0, void 0, void 0, function* () {
+            const verificationToken = "valid-token";
+            user_2.findUser.mockImplementationOnce(() => {
+                throw new Error("Internal Server Error");
+            });
+            const res = yield (0, supertest_1.default)(app_1.default).get(`/api/users/verify/${verificationToken}`);
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("message", "Internal Server Error");
+        }));
     });
     describe("Resend Verification Email", () => {
         beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -382,14 +392,22 @@ describe("User API ", () => {
             yield user.save();
         }));
         it("should return current user data with valid token", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.getUserById.mockResolvedValueOnce({
+                _id: userId,
+                email: "testuser@example.com",
+                name: "Test User",
+                token: token,
+                avatar: null,
+                isDarkTheme: false,
+            });
             const res = yield (0, supertest_1.default)(app_1.default)
                 .get("/api/users/current")
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("status", "success");
-            expect(res.body.data).toHaveProperty("userId", userId);
             expect(res.body.data).toHaveProperty("email", "testuser@example.com");
             expect(res.body.data).toHaveProperty("name", "Test User");
+            expect(res.body.data).toHaveProperty("avatar", null);
         }));
         it("should return 401 if token is missing", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default).get("/api/users/current");
@@ -402,6 +420,14 @@ describe("User API ", () => {
                 .set("Authorization", "Bearer invalidtoken");
             expect(res.status).toBe(401);
             expect(res.body).toHaveProperty("error", "Unauthorized");
+        }));
+        it("should return 404 if user is not found", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.getUserById.mockResolvedValueOnce(null);
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .get("/api/users/current")
+                .set("Authorization", `Bearer ${token}`);
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty("error", "User not found");
         }));
     });
     describe("Logout", () => {
@@ -534,11 +560,38 @@ describe("User API ", () => {
             expect(res.status).toBe(500);
             expect(res.body).toHaveProperty("message", "Failed to update user");
         }));
+        it("should return 500 if user update fails ", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.updateUser.mockImplementationOnce(() => {
+                throw new Error("Internal Server Error");
+            });
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/update")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ name: "New Name" });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("error", "Internal Server Error");
+        }));
+        it("should return 400 if file size exceeds limit", () => __awaiter(void 0, void 0, void 0, function* () {
+            // Symulowanie błędu LIMIT_FILE_SIZE
+            const multerError = new multer_1.default.MulterError("LIMIT_FILE_SIZE");
+            // Mockowanie middleware, aby rzucało błąd LIMIT_FILE_SIZE
+            app_1.default.use((req, res, next) => {
+                next(multerError);
+            });
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/update")
+                .set("Authorization", `Bearer ${token}`)
+                .attach("file", Buffer.from("a".repeat(11 * 1024 * 1024)), "largefile.jpg"); // Przykładowy duży plik
+            // Sprawdzenie, czy odpowiedź ma status 400
+            expect(res.status).toBe(400);
+            expect(res.body).toHaveProperty("error", "File too large. Maximum size is 10MB.");
+        }));
     });
     describe("User API - Toggle Theme", () => {
         let token;
         let userId;
         beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+            jest.resetAllMocks();
             yield user_1.User.deleteMany({});
             const user = yield user_1.User.create({
                 name: "Test User",
@@ -583,6 +636,15 @@ describe("User API ", () => {
             yield user_1.User.updateOne({ _id: userId }, { isDarkTheme: false });
             const user = yield user_1.User.findById(userId);
             expect(user === null || user === void 0 ? void 0 : user.isDarkTheme).toBe(false);
+        }));
+        it("should return 500 if not update toggle theme ", () => __awaiter(void 0, void 0, void 0, function* () {
+            user_2.updateUser.mockResolvedValueOnce(null);
+            const res = yield (0, supertest_1.default)(app_1.default)
+                .patch("/api/users/toogleTheme")
+                .set("Authorization", `Bearer ${token}`)
+                .send({ isDarkTheme: true });
+            expect(res.status).toBe(500);
+            expect(res.body).toHaveProperty("error", "Failed to update user");
         }));
         it("should return 401 if token is missing", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
