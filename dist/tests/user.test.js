@@ -51,10 +51,23 @@ describe("User API ", () => {
         yield mongoose_1.default.connection.close();
         yield mongoServer.stop();
     }));
+    beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+        jest.resetAllMocks();
+        yield user_1.User.deleteMany({});
+        const user = yield user_1.User.create({
+            name: "Test User",
+            email: "testuser@example.com",
+            password: yield bcrypt_1.default.hash("password123", 12),
+            verify: true,
+        });
+        userId = user._id.toString();
+        token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
+            expiresIn: "1h",
+        });
+        user.token = token;
+        yield user.save();
+    }));
     describe("Registration", () => {
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.deleteMany({});
-        }));
         it("should register a new user with valid data", () => __awaiter(void 0, void 0, void 0, function* () {
             user_2.addUser.mockResolvedValueOnce({
                 email: "newuser@example.com",
@@ -185,21 +198,6 @@ describe("User API ", () => {
         }));
     });
     describe("User API - Login", () => {
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.deleteMany({});
-            const user = yield user_1.User.create({
-                name: "Test User",
-                email: "testuser@example.com",
-                password: yield bcrypt_1.default.hash("password123", 12),
-                verify: true,
-            });
-            userId = user._id.toString();
-            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
-                expiresIn: "1h",
-            });
-            user.token = token;
-            yield user.save();
-        }));
         it("should login a user with valid credentials", () => __awaiter(void 0, void 0, void 0, function* () {
             user_2.findUser.mockResolvedValueOnce({
                 name: "Test User",
@@ -270,9 +268,6 @@ describe("User API ", () => {
         }));
     });
     describe("Email Verification", () => {
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.deleteMany({});
-        }));
         it("should verify a user with a valid verification token", () => __awaiter(void 0, void 0, void 0, function* () {
             const verificationToken = "valid-token";
             const createdUser = yield user_1.User.create({
@@ -321,9 +316,6 @@ describe("User API ", () => {
         }));
     });
     describe("Resend Verification Email", () => {
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.deleteMany({});
-        }));
         it("should resend verification email to an unverified user", () => __awaiter(void 0, void 0, void 0, function* () {
             const verificationToken = "valid-token";
             user_2.findUser.mockResolvedValueOnce({
@@ -374,23 +366,6 @@ describe("User API ", () => {
         }));
     });
     describe("Current User", () => {
-        let userId;
-        let token;
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.deleteMany({});
-            const user = yield user_1.User.create({
-                name: "Test User",
-                email: "testuser@example.com",
-                password: yield bcrypt_1.default.hash("password123", 12),
-                verify: true,
-            });
-            userId = user._id.toString();
-            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
-                expiresIn: "1h",
-            });
-            user.token = token;
-            yield user.save();
-        }));
         it("should return current user data with valid token", () => __awaiter(void 0, void 0, void 0, function* () {
             user_2.getUserById.mockResolvedValueOnce({
                 _id: userId,
@@ -431,23 +406,6 @@ describe("User API ", () => {
         }));
     });
     describe("Logout", () => {
-        let userId;
-        let token;
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            yield user_1.User.deleteMany({});
-            const user = yield user_1.User.create({
-                name: "Test User",
-                email: "testuser@example.com",
-                password: yield bcrypt_1.default.hash("password123", 12),
-                verify: true,
-            });
-            userId = user._id.toString();
-            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
-                expiresIn: "1h",
-            });
-            user.token = token;
-            yield user.save();
-        }));
         it("should return 204 on valid logout", () => __awaiter(void 0, void 0, void 0, function* () {
             user_2.updateUser.mockResolvedValueOnce({ token: null });
             const res = yield (0, supertest_1.default)(app_1.default)
@@ -481,24 +439,6 @@ describe("User API ", () => {
         }));
     });
     describe("Update User", () => {
-        let userId;
-        let token;
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            jest.resetAllMocks();
-            yield user_1.User.deleteMany({});
-            const user = yield user_1.User.create({
-                name: "Test User",
-                email: "testuser@example.com",
-                password: yield bcrypt_1.default.hash("password123", 12),
-                verify: true,
-            });
-            userId = user._id.toString();
-            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
-                expiresIn: "1h",
-            });
-            user.token = token;
-            yield user.save();
-        }));
         it("should update user data with valid token and valid data", () => __awaiter(void 0, void 0, void 0, function* () {
             user_2.updateUser.mockResolvedValueOnce(true);
             const res = yield (0, supertest_1.default)(app_1.default)
@@ -588,25 +528,6 @@ describe("User API ", () => {
         }));
     });
     describe("User API - Toggle Theme", () => {
-        let token;
-        let userId;
-        beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
-            jest.resetAllMocks();
-            yield user_1.User.deleteMany({});
-            const user = yield user_1.User.create({
-                name: "Test User",
-                email: "testuser@example.com",
-                password: "password123",
-                isDarkTheme: false,
-                verify: true,
-            });
-            userId = user._id.toString();
-            token = jsonwebtoken_1.default.sign({ id: userId, email: user.email }, process.env.SECRET, {
-                expiresIn: "1h",
-            });
-            user.token = token;
-            yield user.save();
-        }));
         it("should toggle theme from light to dark", () => __awaiter(void 0, void 0, void 0, function* () {
             user_2.updateUser.mockResolvedValueOnce({
                 isDarkTheme: true,

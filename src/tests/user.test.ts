@@ -9,7 +9,6 @@ import sgMail from "@sendgrid/mail";
 import { sendVerificationEmail } from "../utils/emailService";
 import { addUser, findUser, getUserById, updateUser } from "../services/user";
 import multer from "multer";
-import { NextFunction, Request, Response } from "express";
 
 // Zamockowanie modułu @sendgrid/mail
 jest.mock("@sendgrid/mail", () => ({
@@ -51,11 +50,29 @@ describe("User API ", () => {
     await mongoServer.stop();
   });
 
-  describe("Registration", () => {
-    beforeEach(async () => {
-      await User.deleteMany({});
+  beforeEach(async () => {
+    jest.resetAllMocks();
+    await User.deleteMany({});
+    const user = await User.create({
+      name: "Test User",
+      email: "testuser@example.com",
+      password: await bcrypt.hash("password123", 12),
+      verify: true,
     });
 
+    userId = user._id.toString();
+    token = jwt.sign(
+      { id: userId, email: user.email },
+      process.env.SECRET as string,
+      {
+        expiresIn: "1h",
+      }
+    );
+    user.token = token;
+    await user.save();
+  });
+
+  describe("Registration", () => {
     it("should register a new user with valid data", async () => {
       (addUser as jest.Mock).mockResolvedValueOnce({
         email: "newuser@example.com",
@@ -211,27 +228,6 @@ describe("User API ", () => {
   });
 
   describe("User API - Login", () => {
-    beforeEach(async () => {
-      await User.deleteMany({});
-      const user = await User.create({
-        name: "Test User",
-        email: "testuser@example.com",
-        password: await bcrypt.hash("password123", 12),
-        verify: true,
-      });
-
-      userId = user._id.toString();
-      token = jwt.sign(
-        { id: userId, email: user.email },
-        process.env.SECRET as string,
-        {
-          expiresIn: "1h",
-        }
-      );
-      user.token = token;
-      await user.save();
-    });
-
     it("should login a user with valid credentials", async () => {
       (findUser as jest.Mock).mockResolvedValueOnce({
         name: "Test User",
@@ -314,10 +310,6 @@ describe("User API ", () => {
   });
 
   describe("Email Verification", () => {
-    beforeEach(async () => {
-      await User.deleteMany({});
-    });
-
     it("should verify a user with a valid verification token", async () => {
       const verificationToken = "valid-token";
       const createdUser = await User.create({
@@ -388,10 +380,6 @@ describe("User API ", () => {
   });
 
   describe("Resend Verification Email", () => {
-    beforeEach(async () => {
-      await User.deleteMany({});
-    });
-
     it("should resend verification email to an unverified user", async () => {
       const verificationToken = "valid-token";
       (findUser as jest.Mock).mockResolvedValueOnce({
@@ -456,28 +444,6 @@ describe("User API ", () => {
   });
 
   describe("Current User", () => {
-    let userId: string;
-    let token: string;
-    beforeEach(async () => {
-      await User.deleteMany({});
-      const user = await User.create({
-        name: "Test User",
-        email: "testuser@example.com",
-        password: await bcrypt.hash("password123", 12),
-        verify: true,
-      });
-
-      userId = user._id.toString();
-      token = jwt.sign(
-        { id: userId, email: user.email },
-        process.env.SECRET as string,
-        {
-          expiresIn: "1h",
-        }
-      );
-      user.token = token;
-      await user.save();
-    });
     it("should return current user data with valid token", async () => {
       (getUserById as jest.Mock).mockResolvedValueOnce({
         _id: userId,
@@ -527,30 +493,6 @@ describe("User API ", () => {
   });
 
   describe("Logout", () => {
-    let userId: string;
-    let token: string;
-
-    beforeEach(async () => {
-      await User.deleteMany({});
-      const user = await User.create({
-        name: "Test User",
-        email: "testuser@example.com",
-        password: await bcrypt.hash("password123", 12),
-        verify: true,
-      });
-
-      userId = user._id.toString();
-      token = jwt.sign(
-        { id: userId, email: user.email },
-        process.env.SECRET as string,
-        {
-          expiresIn: "1h",
-        }
-      );
-      user.token = token;
-      await user.save();
-    });
-
     it("should return 204 on valid logout", async () => {
       (updateUser as jest.Mock).mockResolvedValueOnce({ token: null });
       const res = await request(app)
@@ -595,31 +537,6 @@ describe("User API ", () => {
   });
 
   describe("Update User", () => {
-    let userId: string;
-    let token: string;
-
-    beforeEach(async () => {
-      jest.resetAllMocks();
-      await User.deleteMany({});
-      const user = await User.create({
-        name: "Test User",
-        email: "testuser@example.com",
-        password: await bcrypt.hash("password123", 12),
-        verify: true,
-      });
-
-      userId = user._id.toString();
-      token = jwt.sign(
-        { id: userId, email: user.email },
-        process.env.SECRET as string,
-        {
-          expiresIn: "1h",
-        }
-      );
-      user.token = token;
-      await user.save();
-    });
-
     it("should update user data with valid token and valid data", async () => {
       (updateUser as jest.Mock).mockResolvedValueOnce(true);
       const res = await request(app)
@@ -752,32 +669,6 @@ describe("User API ", () => {
   });
 
   describe("User API - Toggle Theme", () => {
-    let token: string;
-    let userId: string;
-
-    beforeEach(async () => {
-      jest.resetAllMocks();
-      await User.deleteMany({});
-      const user = await User.create({
-        name: "Test User",
-        email: "testuser@example.com",
-        password: "password123",
-        isDarkTheme: false,
-        verify: true,
-      });
-
-      userId = user._id.toString();
-      token = jwt.sign(
-        { id: userId, email: user.email },
-        process.env.SECRET as string,
-        {
-          expiresIn: "1h",
-        }
-      );
-      user.token = token;
-      await user.save();
-    });
-
     it("should toggle theme from light to dark", async () => {
       (updateUser as jest.Mock).mockResolvedValueOnce({
         isDarkTheme: true,
