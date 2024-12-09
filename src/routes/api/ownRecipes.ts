@@ -8,7 +8,7 @@ import saveImages from "../../controller/cloudinary/saveImages";
 
 const router = express.Router();
 
-router.get("/:userId", auth, getOwnRecipes);
+router.get("/", auth, getOwnRecipes);
 router.post("/add", auth, validateBody(recipeSchema), addOwnRecipe);
 router.delete("/remove/:recipeId", auth, deleteOwnRecipe);
 router.post("/picture", auth, upload.single("file"), saveImages);

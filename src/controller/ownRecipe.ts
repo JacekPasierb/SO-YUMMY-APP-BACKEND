@@ -43,6 +43,7 @@ const getOwnRecipes = async (
     if (ownRecipes.length === 0) {
       return next(handleError(404, "Not found own recipes"));
     }
+console.log("recipes",ownRecipes);
 
     res.status(200).json({
       status: "success",

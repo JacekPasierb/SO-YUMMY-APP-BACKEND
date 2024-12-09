@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import Ingredient from "../models/ingredient";
 import handleError from "../utils/handleErrors";
 
-const getAllIngredients = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const getAllIngredients = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const ingredients = await Ingredient.find();
 
@@ -18,7 +22,11 @@ const getAllIngredients = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-const getIngredientById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const getIngredientById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -40,7 +48,4 @@ const getIngredientById = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export {
-  getAllIngredients,
-  getIngredientById,
-}; 
+export { getAllIngredients, getIngredientById };
