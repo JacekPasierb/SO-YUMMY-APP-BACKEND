@@ -9,8 +9,8 @@ const getOwnRecipes = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = (req.user as IUser)._id; 
-   
+    const userId = (req.user as IUser)._id;
+
     if (!userId) {
       return next(handleError(401, "Unauthorized"));
     }
@@ -18,32 +18,34 @@ const getOwnRecipes = async (
     let { page = 1, limit = 4 } = req.query;
     const pageNumber = parseInt(page as string, 10);
     const limitNumber = parseInt(limit as string, 10);
+
+    if (
+      isNaN(pageNumber) ||
+      isNaN(limitNumber) ||
+      pageNumber < 1 ||
+      limitNumber < 1
+    ) {
+      return next(handleError(400, "Invalid pagination parameters"));
+    }
     const skip = (pageNumber - 1) * limitNumber;
 
     const totalOwnRecipes = await Recipe.countDocuments({ owner: userId });
+
+    if (totalOwnRecipes === 0) {
+      return next(handleError(404, "Not found own recipes"));
+    }
+
     const totalPages = Math.ceil(totalOwnRecipes / limitNumber);
 
     if (pageNumber > totalPages) {
-      res.status(200).json({
-        status: "success",
-        code: 200,
-        data: {
-          ownRecipes: [],
-          totalOwnRecipes,
-        },
-        message: "Page number exceeds total number of available pages.",
-      });
-      return;
+      return next(
+        handleError(404, "Page number exceeds total number of available pages")
+      );
     }
 
     const ownRecipes = await Recipe.find({ owner: userId })
       .skip(skip)
       .limit(limitNumber);
-
-    if (ownRecipes.length === 0) {
-      return next(handleError(404, "Not found own recipes"));
-    }
-console.log("recipes",ownRecipes);
 
     res.status(200).json({
       status: "success",
@@ -64,7 +66,7 @@ const addOwnRecipe = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = (req.user as IUser)._id; 
+    const userId = (req.user as IUser)._id;
     if (!userId) {
       return next(handleError(401, "Unauthorized"));
     }

@@ -40,7 +40,6 @@ describe("ownRecipe API", () => {
     beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
         yield user_1.User.deleteMany({});
         yield recipe_1.default.deleteMany({});
-        // Logowanie użytkownika i generowanie tokena
         const user = yield user_1.User.create({
             name: "Test User",
             email: "testuser@example.com",
@@ -53,8 +52,6 @@ describe("ownRecipe API", () => {
         });
         user.token = token;
         yield user.save();
-    }));
-    it("should get own recipes", () => __awaiter(void 0, void 0, void 0, function* () {
         yield recipe_1.default.create({
             title: "Sample Recipe",
             description: "This is a sample recipe",
@@ -63,9 +60,79 @@ describe("ownRecipe API", () => {
             category: "Dinner",
             time: "30 minutes",
         });
-        const response = yield (0, supertest_1.default)(app_1.default)
-            .get(`/api/ownRecipes`)
-            .set("Authorization", `Bearer ${token}`);
-        expect(response.status).toBe(200);
     }));
+    describe("GET /api/ownRecipes", () => {
+        it("should get own recipes", () => __awaiter(void 0, void 0, void 0, function* () {
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .get(`/api/ownRecipes`)
+                .set("Authorization", `Bearer ${token}`);
+            expect(response.status).toBe(200);
+            expect(response.body).toHaveProperty("data");
+            expect(response.body.data).toHaveProperty("ownRecipes");
+            expect(response.body.data).toHaveProperty("totalOwnRecipes");
+            expect(response.body.data.ownRecipes).toBeInstanceOf(Array);
+            expect(response.body.data.ownRecipes.length).toBeGreaterThan(0);
+            expect(response.body.data.totalOwnRecipes).toBe(response.body.data.ownRecipes.length);
+        }));
+        it("should handle error 500 in catch", () => __awaiter(void 0, void 0, void 0, function* () {
+            jest.spyOn(recipe_1.default, "find").mockReturnValue({
+                skip: jest.fn().mockReturnValue({
+                    limit: jest
+                        .fn()
+                        .mockRejectedValue(new Error("Internal Server Error")),
+                }),
+            });
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .get(`/api/ownRecipes`)
+                .set("Authorization", `Bearer ${token}`);
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty("error");
+            expect(response.body.error).toBe("Internal Server Error");
+        }));
+        it("should return 404 when no own recipes are found", () => __awaiter(void 0, void 0, void 0, function* () {
+            yield recipe_1.default.deleteMany({ owner: userId });
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .get(`/api/ownRecipes`)
+                .set("Authorization", `Bearer ${token}`);
+            expect(response.status).toBe(404);
+            expect(response.body).toHaveProperty("error");
+            expect(response.body.error).toBe("Not found own recipes");
+        }));
+    });
+    describe("POST /api/ownRecipes/add", () => {
+        it("should add a new own recipe", () => __awaiter(void 0, void 0, void 0, function* () {
+            const newRecipe = {
+                title: "New Recipe",
+                description: "This is a new recipe",
+                instructions: "Mix and cook.",
+                category: "Breakfast",
+                time: "20 minutes",
+            };
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .post(`/api/ownRecipes/add`)
+                .set("Authorization", `Bearer ${token}`)
+                .send(newRecipe);
+            expect(response.status).toBe(200);
+            expect(response.body).toHaveProperty("data");
+            expect(response.body.data).toHaveProperty("newRecipe");
+        }));
+        // it("should handle error 500 in catch", async () => {
+        //   jest.spyOn(Recipe, 'create').mockRejectedValue(new Error("Internal Server Error"));
+        //   const response = await request(app)
+        //     .post(`/api/ownRecipes/add`)
+        //     .set("Authorization", `Bearer ${token}`)
+        //     .send({});
+        //   expect(response.status).toBe(500);
+        //   expect(response.body).toHaveProperty("error");
+        //   expect(response.body.error).toBe("Internal Server Error");
+        // });
+        // it("should return 401 when unauthorized", async () => {
+        //   const response = await request(app)
+        //     .post(`/api/ownRecipes/add`)
+        //     .send({});
+        //   expect(response.status).toBe(401);
+        //   expect(response.body).toHaveProperty("error");
+        //   expect(response.body.error).toBe("Unauthorized");
+        // });
+    });
 });

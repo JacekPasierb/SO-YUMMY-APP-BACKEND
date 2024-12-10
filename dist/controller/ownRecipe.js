@@ -24,28 +24,24 @@ const getOwnRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         let { page = 1, limit = 4 } = req.query;
         const pageNumber = parseInt(page, 10);
         const limitNumber = parseInt(limit, 10);
+        if (isNaN(pageNumber) ||
+            isNaN(limitNumber) ||
+            pageNumber < 1 ||
+            limitNumber < 1) {
+            return next((0, handleErrors_1.default)(400, "Invalid pagination parameters"));
+        }
         const skip = (pageNumber - 1) * limitNumber;
         const totalOwnRecipes = yield recipe_1.default.countDocuments({ owner: userId });
+        if (totalOwnRecipes === 0) {
+            return next((0, handleErrors_1.default)(404, "Not found own recipes"));
+        }
         const totalPages = Math.ceil(totalOwnRecipes / limitNumber);
         if (pageNumber > totalPages) {
-            res.status(200).json({
-                status: "success",
-                code: 200,
-                data: {
-                    ownRecipes: [],
-                    totalOwnRecipes,
-                },
-                message: "Page number exceeds total number of available pages.",
-            });
-            return;
+            return next((0, handleErrors_1.default)(404, "Page number exceeds total number of available pages"));
         }
         const ownRecipes = yield recipe_1.default.find({ owner: userId })
             .skip(skip)
             .limit(limitNumber);
-        if (ownRecipes.length === 0) {
-            return next((0, handleErrors_1.default)(404, "Not found own recipes"));
-        }
-        console.log("recipes", ownRecipes);
         res.status(200).json({
             status: "success",
             code: 200,
