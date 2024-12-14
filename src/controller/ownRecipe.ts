@@ -11,10 +11,6 @@ const getOwnRecipes = async (
   try {
     const userId = (req.user as IUser)._id;
 
-    if (!userId) {
-      return next(handleError(401, "Unauthorized"));
-    }
-
     let { page = 1, limit = 4 } = req.query;
     const pageNumber = parseInt(page as string, 10);
     const limitNumber = parseInt(limit as string, 10);
@@ -67,9 +63,6 @@ const addOwnRecipe = async (
 ): Promise<void> => {
   try {
     const userId = (req.user as IUser)._id;
-    if (!userId) {
-      return next(handleError(401, "Unauthorized"));
-    }
 
     const newRecipe = await Recipe.create({
       ...req.body,

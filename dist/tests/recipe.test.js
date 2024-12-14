@@ -41,6 +41,7 @@ describe("Recipe API", () => {
     }));
     beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
         jest.restoreAllMocks();
+        jest.clearAllMocks();
         jest.resetAllMocks();
         yield recipe_1.default.deleteMany({});
         yield user_1.User.deleteMany({});

@@ -30,7 +30,10 @@ describe("Recipe API", () => {
 
   beforeEach(async () => {
     jest.restoreAllMocks();
+    jest.clearAllMocks();
     jest.resetAllMocks();
+    
+
     await Recipe.deleteMany({});
 
     await User.deleteMany({});

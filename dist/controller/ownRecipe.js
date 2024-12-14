@@ -18,9 +18,6 @@ const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const getOwnRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user._id;
-        if (!userId) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         let { page = 1, limit = 4 } = req.query;
         const pageNumber = parseInt(page, 10);
         const limitNumber = parseInt(limit, 10);
@@ -59,9 +56,6 @@ exports.getOwnRecipes = getOwnRecipes;
 const addOwnRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user._id;
-        if (!userId) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const newRecipe = yield recipe_1.default.create(Object.assign(Object.assign({}, req.body), { owner: userId }));
         res.status(200).json({
             status: "success",
