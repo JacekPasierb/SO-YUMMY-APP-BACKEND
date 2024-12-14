@@ -21,6 +21,13 @@ const user_1 = require("../models/user");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const ingredient_1 = __importDefault(require("../models/ingredient"));
 const category_1 = __importDefault(require("../models/category"));
+const API_ROUTES = {
+    RECIPES: "/api/recipes",
+    MAIN_PAGE: "/api/recipes/main-page",
+    CATEGORY_LIST: "/api/recipes/category-list",
+    CATEGORIES: (category) => `/api/recipes/categories/${category}`,
+    RECIPE: (id) => `/api/recipes/${id}`,
+};
 describe("Recipe API", () => {
     let mongoServer;
     let token;
@@ -43,10 +50,11 @@ describe("Recipe API", () => {
         jest.restoreAllMocks();
         jest.clearAllMocks();
         jest.resetAllMocks();
+        // Reset database
         yield recipe_1.default.deleteMany({});
         yield user_1.User.deleteMany({});
         yield ingredient_1.default.deleteMany({});
-        // Tworzenie użytkownika testowego i generowanie tokena
+        // Create test user and generate token
         const user = yield user_1.User.create({
             name: "Test User",
             email: "testuser@example.com",
@@ -135,7 +143,7 @@ describe("Recipe API", () => {
     describe("GET /api/recipes", () => {
         it("Should return a list of recipes", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes")
+                .get(API_ROUTES.RECIPES)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data.result).toHaveLength(6);
@@ -143,7 +151,7 @@ describe("Recipe API", () => {
         }));
         it("should filter recipes by title", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes?query=Chocolate")
+                .get(`${API_ROUTES.RECIPES}?query=Chocolate`)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data.result).toHaveLength(1);
@@ -151,7 +159,7 @@ describe("Recipe API", () => {
         }));
         it("should filter recipes by ingredient", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes?ingredient=Sugar")
+                .get(`${API_ROUTES.RECIPES}?ingredient=Sugar`)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data.result).toHaveLength(1);
@@ -159,14 +167,14 @@ describe("Recipe API", () => {
         }));
         it("should return 404 if ingredient not found", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes?ingredient=NonExistent")
+                .get(`${API_ROUTES.RECIPES}?ingredient=NonExistent`)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(404);
             expect(res.body).toHaveProperty("error", "Ingredient not found");
         }));
         it("should handle invalid page and limit values gracefully", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes?page=invalid&limit=invalid")
+                .get(`${API_ROUTES.RECIPES}?page=invalid&limit=invalid`)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data.result).toHaveLength(8);
@@ -176,7 +184,7 @@ describe("Recipe API", () => {
                 throw new Error("Database error");
             });
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes")
+                .get(API_ROUTES.RECIPES)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(500);
             expect(res.body).toHaveProperty("error", "Database error");
@@ -185,13 +193,13 @@ describe("Recipe API", () => {
     describe("GET /api/recipes/main-page", () => {
         it("should use default count value when not provided", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/main-page")
+                .get(API_ROUTES.MAIN_PAGE)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
         }));
         it("should return recipes from four categories", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/main-page?count=2")
+                .get(`${API_ROUTES.MAIN_PAGE}?count=2`)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data).toHaveProperty("breakfast");
@@ -208,7 +216,7 @@ describe("Recipe API", () => {
                 throw new Error("Database error");
             });
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/main-page?count=2")
+                .get(`${API_ROUTES.MAIN_PAGE}?count=2`)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(500);
             expect(res.body).toHaveProperty("error");
@@ -217,7 +225,7 @@ describe("Recipe API", () => {
     describe("GET /api/recipes/category-list", () => {
         it("should return list of categories", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/category-list")
+                .get(API_ROUTES.CATEGORY_LIST)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data).toHaveProperty("catArr");
@@ -228,13 +236,12 @@ describe("Recipe API", () => {
                 throw new Error("Database error");
             });
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/category-list")
+                .get(API_ROUTES.CATEGORY_LIST)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(500);
             expect(res.body).toHaveProperty("error");
         }));
         it("should return categories sorted alphabetically", () => __awaiter(void 0, void 0, void 0, function* () {
-            // Dodaj kilka kategorii do bazy danych
             yield category_1.default.create([
                 {
                     title: "Dessert",
@@ -258,7 +265,7 @@ describe("Recipe API", () => {
                 },
             ]);
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/category-list")
+                .get(API_ROUTES.CATEGORY_LIST)
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data.catArr).toEqual([
@@ -272,7 +279,7 @@ describe("Recipe API", () => {
     describe("GET /api/recipes/categories/:category", () => {
         it("should return recipes for a specific category", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/categories/Breakfast")
+                .get(API_ROUTES.CATEGORIES("Breakfast"))
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data.result).toHaveProperty("length", 2);
@@ -280,7 +287,7 @@ describe("Recipe API", () => {
         }));
         it("should return 404 if no recipes found for the category", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/categories/NonExistentCategory")
+                .get(API_ROUTES.CATEGORIES("NonExistentCategory"))
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(404);
             expect(res.body).toHaveProperty("error", "No recipes found for this category");
@@ -290,7 +297,7 @@ describe("Recipe API", () => {
                 throw new Error("Database error");
             });
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get("/api/recipes/categories/Breakfast")
+                .get(API_ROUTES.CATEGORIES("Breakfast"))
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(500);
             expect(res.body).toHaveProperty("error");
@@ -299,15 +306,15 @@ describe("Recipe API", () => {
     describe("GET /api/recipes/:id", () => {
         it("should return a recipe by id", () => __awaiter(void 0, void 0, void 0, function* () {
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get(`/api/recipes/${recipeId}`)
+                .get(API_ROUTES.RECIPE(recipeId))
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(200);
             expect(res.body.data.result).toHaveProperty("_id", recipeId);
         }));
         it("should return 404 if recipe not found", () => __awaiter(void 0, void 0, void 0, function* () {
-            const nonExistentId = new mongoose_1.default.Types.ObjectId();
+            const nonExistentId = new mongoose_1.default.Types.ObjectId().toString();
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get(`/api/recipes/${nonExistentId}`)
+                .get(API_ROUTES.RECIPE(nonExistentId))
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(404);
             expect(res.body).toHaveProperty("error", "Recipe not found");
@@ -317,7 +324,7 @@ describe("Recipe API", () => {
                 throw new Error("Database error");
             });
             const res = yield (0, supertest_1.default)(app_1.default)
-                .get(`/api/recipes/${recipeId}`)
+                .get(API_ROUTES.RECIPE(recipeId))
                 .set("Authorization", `Bearer ${token}`);
             expect(res.status).toBe(500);
             expect(res.body).toHaveProperty("error");

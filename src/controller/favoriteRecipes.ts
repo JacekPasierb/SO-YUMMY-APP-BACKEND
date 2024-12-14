@@ -3,12 +3,13 @@ import Recipe from "../models/recipe";
 import handleError from "../utils/handleErrors";
 import { IUser } from "../models/user";
 
-const getFavorites = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const getFavorites = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const userId = (req.user as IUser)._id; 
-    if (!userId) {
-      return next(handleError(401, "Unauthorized"));
-    }
+    const userId = (req.user as IUser)._id;
 
     let { page = 1, limit = 4 } = req.query;
     const pageNumber = parseInt(page as string, 10);
@@ -36,13 +37,14 @@ const getFavorites = async (req: Request, res: Response, next: NextFunction): Pr
   }
 };
 
-const addToFavorites = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const addToFavorites = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { recipeId } = req.params;
-    const userId = (req.user as IUser)._id; 
-    if (!userId) {
-      return next(handleError(401, "Unauthorized"));
-    }
+    const userId = (req.user as IUser)._id;
 
     const recipe = await Recipe.findByIdAndUpdate(
       recipeId,
@@ -66,13 +68,15 @@ const addToFavorites = async (req: Request, res: Response, next: NextFunction): 
   }
 };
 
-const removeFromFavorite = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const removeFromFavorite = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { recipeId } = req.params;
-    const userId = (req.user as IUser)._id; 
-    if (!userId) {
-      return next(handleError(401, "Unauthorized"));
-    }
+    const userId = (req.user as IUser)._id;
+   
 
     const recipe = await Recipe.findByIdAndUpdate(
       recipeId,
@@ -90,8 +94,4 @@ const removeFromFavorite = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-export {
-  addToFavorites,
-  removeFromFavorite,
-  getFavorites,
-}; 
+export { addToFavorites, removeFromFavorite, getFavorites };

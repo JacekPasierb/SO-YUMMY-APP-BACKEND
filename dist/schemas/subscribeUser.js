@@ -8,6 +8,9 @@ const subscribeUserSchema = joi_1.default.object({
     email: joi_1.default.string()
         .pattern(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/)
         .required()
-        .messages({ "any.required": "missing field email" }),
+        .messages({
+        "string.pattern.base": "Invalid email format",
+        "any.required": "Email is required",
+    }),
 });
 exports.default = subscribeUserSchema;

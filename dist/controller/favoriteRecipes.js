@@ -18,9 +18,6 @@ const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const getFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user._id;
-        if (!userId) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         let { page = 1, limit = 4 } = req.query;
         const pageNumber = parseInt(page, 10);
         const limitNumber = parseInt(limit, 10);
@@ -49,9 +46,6 @@ const addToFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     try {
         const { recipeId } = req.params;
         const userId = req.user._id;
-        if (!userId) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const recipe = yield recipe_1.default.findByIdAndUpdate(recipeId, { $addToSet: { favorites: userId } }, { new: true });
         if (!recipe) {
             return next((0, handleErrors_1.default)(404, "Recipe not found"));
@@ -73,9 +67,6 @@ const removeFromFavorite = (req, res, next) => __awaiter(void 0, void 0, void 0,
     try {
         const { recipeId } = req.params;
         const userId = req.user._id;
-        if (!userId) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const recipe = yield recipe_1.default.findByIdAndUpdate(recipeId, { $pull: { favorites: userId } }, { new: true });
         if (!recipe) {
             return next((0, handleErrors_1.default)(404, "Recipe not found"));

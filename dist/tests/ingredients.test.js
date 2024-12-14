@@ -19,6 +19,11 @@ const app_1 = __importDefault(require("../app"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const user_1 = require("../models/user");
 const ingredient_1 = __importDefault(require("../models/ingredient"));
+const API_ROUTES = {
+    INGREDIENTS: "/api/ingredients",
+    ADD_INGREDIENT: "/api/ingredients/add",
+    INGREDIENT: (id) => `/api/ingredients/${id}`,
+};
 describe("Ingredients API", () => {
     let mongoServer;
     let token;
@@ -38,8 +43,11 @@ describe("Ingredients API", () => {
         yield mongoServer.stop();
     }));
     beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
+        jest.restoreAllMocks();
+        jest.clearAllMocks();
+        // Reset database
         yield user_1.User.deleteMany({});
-        // Logowanie użytkownika i generowanie tokena
+        // Create test user and generate token
         const user = yield user_1.User.create({
             name: "Test User",
             email: "testuser@example.com",
@@ -75,14 +83,16 @@ describe("Ingredients API", () => {
     }));
     it("should get all ingredients", () => __awaiter(void 0, void 0, void 0, function* () {
         const response = yield (0, supertest_1.default)(app_1.default)
-            .get("/api/ingredients")
+            .get(API_ROUTES.INGREDIENTS)
             .set("Authorization", `Bearer ${token}`);
         expect(response.status).toBe(200);
     }));
     it("should return error 500 if there's an error in getAllIngredients", () => __awaiter(void 0, void 0, void 0, function* () {
-        jest.spyOn(ingredient_1.default, 'find').mockRejectedValue(new Error("Internal server error"));
+        jest
+            .spyOn(ingredient_1.default, "find")
+            .mockRejectedValue(new Error("Internal server error"));
         const response = yield (0, supertest_1.default)(app_1.default)
-            .get("/api/ingredients")
+            .get(API_ROUTES.INGREDIENTS)
             .set("Authorization", `Bearer ${token}`);
         expect(response.status).toBe(500);
         expect(response.body).toHaveProperty("error", "Internal server error");
@@ -94,17 +104,19 @@ describe("Ingredients API", () => {
         expect(response.status).toBe(200);
     }));
     it("should return error 404 if ingredient not found", () => __awaiter(void 0, void 0, void 0, function* () {
-        jest.spyOn(ingredient_1.default, 'findById').mockResolvedValue(null);
+        jest.spyOn(ingredient_1.default, "findById").mockResolvedValue(null);
         const response = yield (0, supertest_1.default)(app_1.default)
-            .get(`/api/ingredients/${ingredientId}`)
+            .get(API_ROUTES.INGREDIENT(ingredientId))
             .set("Authorization", `Bearer ${token}`);
         expect(response.status).toBe(404);
         expect(response.body).toHaveProperty("error", "Ingredient not found");
     }));
     it("should return error 500 if there's an error in getIngredientById", () => __awaiter(void 0, void 0, void 0, function* () {
-        jest.spyOn(ingredient_1.default, 'findById').mockRejectedValue(new Error("Internal server error"));
+        jest
+            .spyOn(ingredient_1.default, "findById")
+            .mockRejectedValue(new Error("Internal server error"));
         const response = yield (0, supertest_1.default)(app_1.default)
-            .get(`/api/ingredients/${ingredientId}`)
+            .get(API_ROUTES.INGREDIENT(ingredientId))
             .set("Authorization", `Bearer ${token}`);
         expect(response.status).toBe(500);
         expect(response.body).toHaveProperty("error", "Internal server error");

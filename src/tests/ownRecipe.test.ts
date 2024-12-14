@@ -229,22 +229,22 @@ describe("ownRecipe API", () => {
       const response = await request(app)
         .delete(API_ROUTES.DELETE_RECIPE(nonExistentId.toString()))
         .set("Authorization", `Bearer ${token}`);
-  
+
       expect(response.status).toBe(404);
       expect(response.body).toHaveProperty("error", "Recipe not found...");
     });
 
-  it("should handle error 500 in catch", async () => {
-    jest.spyOn(Recipe, "findByIdAndDelete").mockImplementation(() => {
-      throw new Error("Internal Server Error");
+    it("should handle error 500 in catch", async () => {
+      jest.spyOn(Recipe, "findByIdAndDelete").mockImplementation(() => {
+        throw new Error("Internal Server Error");
+      });
+
+      const response = await request(app)
+        .delete(API_ROUTES.DELETE_RECIPE(recipeId))
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty("error", "Internal Server Error");
     });
-
-    const response = await request(app)
-      .delete(API_ROUTES.DELETE_RECIPE(recipeId))
-      .set("Authorization", `Bearer ${token}`);
-
-    expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty("error", "Internal Server Error");
-  });
   });
 });

@@ -8,6 +8,14 @@ import jwt from "jsonwebtoken";
 import Ingredient from "../models/ingredient";
 import Category from "../models/category";
 
+const API_ROUTES = {
+  RECIPES: "/api/recipes",
+  MAIN_PAGE: "/api/recipes/main-page",
+  CATEGORY_LIST: "/api/recipes/category-list",
+  CATEGORIES: (category: string) => `/api/recipes/categories/${category}`,
+  RECIPE: (id: string) => `/api/recipes/${id}`,
+};
+
 describe("Recipe API", () => {
   let mongoServer: MongoMemoryServer;
   let token: string;
@@ -32,14 +40,13 @@ describe("Recipe API", () => {
     jest.restoreAllMocks();
     jest.clearAllMocks();
     jest.resetAllMocks();
-    
 
+    // Reset database
     await Recipe.deleteMany({});
-
     await User.deleteMany({});
     await Ingredient.deleteMany({});
 
-    // Tworzenie użytkownika testowego i generowanie tokena
+    // Create test user and generate token
     const user = await User.create({
       name: "Test User",
       email: "testuser@example.com",
@@ -132,7 +139,7 @@ describe("Recipe API", () => {
   describe("GET /api/recipes", () => {
     it("Should return a list of recipes", async () => {
       const res = await request(app)
-        .get("/api/recipes")
+        .get(API_ROUTES.RECIPES)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -142,7 +149,7 @@ describe("Recipe API", () => {
 
     it("should filter recipes by title", async () => {
       const res = await request(app)
-        .get("/api/recipes?query=Chocolate")
+        .get(`${API_ROUTES.RECIPES}?query=Chocolate`)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -152,7 +159,7 @@ describe("Recipe API", () => {
 
     it("should filter recipes by ingredient", async () => {
       const res = await request(app)
-        .get("/api/recipes?ingredient=Sugar")
+        .get(`${API_ROUTES.RECIPES}?ingredient=Sugar`)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -162,7 +169,7 @@ describe("Recipe API", () => {
 
     it("should return 404 if ingredient not found", async () => {
       const res = await request(app)
-        .get("/api/recipes?ingredient=NonExistent")
+        .get(`${API_ROUTES.RECIPES}?ingredient=NonExistent`)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(404);
@@ -171,7 +178,7 @@ describe("Recipe API", () => {
 
     it("should handle invalid page and limit values gracefully", async () => {
       const res = await request(app)
-        .get("/api/recipes?page=invalid&limit=invalid")
+        .get(`${API_ROUTES.RECIPES}?page=invalid&limit=invalid`)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -183,7 +190,7 @@ describe("Recipe API", () => {
         throw new Error("Database error");
       });
       const res = await request(app)
-        .get("/api/recipes")
+        .get(API_ROUTES.RECIPES)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(500);
@@ -194,7 +201,7 @@ describe("Recipe API", () => {
   describe("GET /api/recipes/main-page", () => {
     it("should use default count value when not provided", async () => {
       const res = await request(app)
-        .get("/api/recipes/main-page")
+        .get(API_ROUTES.MAIN_PAGE)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -202,7 +209,7 @@ describe("Recipe API", () => {
 
     it("should return recipes from four categories", async () => {
       const res = await request(app)
-        .get("/api/recipes/main-page?count=2")
+        .get(`${API_ROUTES.MAIN_PAGE}?count=2`)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -222,7 +229,7 @@ describe("Recipe API", () => {
         throw new Error("Database error");
       });
       const res = await request(app)
-        .get("/api/recipes/main-page?count=2")
+        .get(`${API_ROUTES.MAIN_PAGE}?count=2`)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(500);
@@ -233,7 +240,7 @@ describe("Recipe API", () => {
   describe("GET /api/recipes/category-list", () => {
     it("should return list of categories", async () => {
       const res = await request(app)
-        .get("/api/recipes/category-list")
+        .get(API_ROUTES.CATEGORY_LIST)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -246,7 +253,7 @@ describe("Recipe API", () => {
         throw new Error("Database error");
       });
       const res = await request(app)
-        .get("/api/recipes/category-list")
+        .get(API_ROUTES.CATEGORY_LIST)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(500);
@@ -254,7 +261,6 @@ describe("Recipe API", () => {
     });
 
     it("should return categories sorted alphabetically", async () => {
-      // Dodaj kilka kategorii do bazy danych
       await Category.create([
         {
           title: "Dessert",
@@ -279,7 +285,7 @@ describe("Recipe API", () => {
       ]);
 
       const res = await request(app)
-        .get("/api/recipes/category-list")
+        .get(API_ROUTES.CATEGORY_LIST)
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -295,7 +301,7 @@ describe("Recipe API", () => {
   describe("GET /api/recipes/categories/:category", () => {
     it("should return recipes for a specific category", async () => {
       const res = await request(app)
-        .get("/api/recipes/categories/Breakfast")
+        .get(API_ROUTES.CATEGORIES("Breakfast"))
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -305,7 +311,7 @@ describe("Recipe API", () => {
 
     it("should return 404 if no recipes found for the category", async () => {
       const res = await request(app)
-        .get("/api/recipes/categories/NonExistentCategory")
+        .get(API_ROUTES.CATEGORIES("NonExistentCategory"))
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(404);
@@ -319,7 +325,7 @@ describe("Recipe API", () => {
         throw new Error("Database error");
       });
       const res = await request(app)
-        .get("/api/recipes/categories/Breakfast")
+        .get(API_ROUTES.CATEGORIES("Breakfast"))
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(500);
@@ -330,7 +336,7 @@ describe("Recipe API", () => {
   describe("GET /api/recipes/:id", () => {
     it("should return a recipe by id", async () => {
       const res = await request(app)
-        .get(`/api/recipes/${recipeId}`)
+        .get(API_ROUTES.RECIPE(recipeId))
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(200);
@@ -338,9 +344,9 @@ describe("Recipe API", () => {
     });
 
     it("should return 404 if recipe not found", async () => {
-      const nonExistentId = new mongoose.Types.ObjectId();
+      const nonExistentId = new mongoose.Types.ObjectId().toString();
       const res = await request(app)
-        .get(`/api/recipes/${nonExistentId}`)
+        .get(API_ROUTES.RECIPE(nonExistentId))
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(404);
@@ -352,7 +358,7 @@ describe("Recipe API", () => {
         throw new Error("Database error");
       });
       const res = await request(app)
-        .get(`/api/recipes/${recipeId}`)
+        .get(API_ROUTES.RECIPE(recipeId))
         .set("Authorization", `Bearer ${token}`);
 
       expect(res.status).toBe(500);
