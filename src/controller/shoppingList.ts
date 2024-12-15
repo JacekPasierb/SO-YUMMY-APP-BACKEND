@@ -81,7 +81,7 @@ const deleteIngredient = async (
     );
 
     res.status(200).json({
-      message: "Składnik usunięty z listy zakupów",
+      message: "Item removed successfully",
     });
   } catch (error) {
     const err = error as Error;

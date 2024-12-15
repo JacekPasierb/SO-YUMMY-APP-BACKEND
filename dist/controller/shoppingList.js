@@ -65,7 +65,7 @@ const deleteIngredient = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         const userId = req.user._id;
         yield shoppingList_1.default.updateOne({ userId }, { $pull: { items: { ingredientId, recipeId } } });
         res.status(200).json({
-            message: "Składnik usunięty z listy zakupów",
+            message: "Item removed successfully",
         });
     }
     catch (error) {
