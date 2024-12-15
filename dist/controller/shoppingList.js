@@ -13,17 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteIngredient = exports.addIngredient = exports.getShoppingList = void 0;
-const shoppingList_1 = __importDefault(require("../models/shoppingList"));
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
+const shoppingList_1 = require("../services/shoppingList");
 const getShoppingList = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!req.user) {
             return next((0, handleErrors_1.default)(401, "Unauthorized"));
         }
         const userId = req.user._id;
-        const shoppingList = yield shoppingList_1.default.findOne({ userId });
+        const shoppingList = yield (0, shoppingList_1.getShoppingListByUserId)(userId);
         if (!shoppingList) {
-            return next((0, handleErrors_1.default)(404));
+            return next((0, handleErrors_1.default)(404, "Shopping list not found"));
         }
         res.status(200).json(shoppingList);
     }
@@ -40,11 +40,13 @@ const addIngredient = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         }
         const { ingredientId, thb, name, measure, recipeId } = req.body;
         const userId = req.user._id;
-        let shoppingList = yield shoppingList_1.default.findOne({ userId });
-        if (!shoppingList) {
-            shoppingList = new shoppingList_1.default({ userId, items: [] });
-        }
-        yield shoppingList_1.default.updateOne({ userId }, { $push: { items: { ingredientId, thb, name, measure, recipeId } } });
+        const shoppingList = yield (0, shoppingList_1.addIngredientToShoppingList)(userId, {
+            ingredientId,
+            thb,
+            name,
+            measure,
+            recipeId,
+        });
         res.status(201).json({
             message: "Składnik dodany do listy zakupów",
             shoppingList,
@@ -63,7 +65,7 @@ const deleteIngredient = (req, res, next) => __awaiter(void 0, void 0, void 0, f
         }
         const { ingredientId, recipeId } = req.body;
         const userId = req.user._id;
-        yield shoppingList_1.default.updateOne({ userId }, { $pull: { items: { ingredientId, recipeId } } });
+        yield (0, shoppingList_1.deleteIngredientFromShoppingList)(userId, { ingredientId, recipeId });
         res.status(200).json({
             message: "Item removed successfully",
         });

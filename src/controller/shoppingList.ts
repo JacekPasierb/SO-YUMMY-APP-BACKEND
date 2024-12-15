@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import ShoppingList from "../models/shoppingList";
 import handleError from "../utils/handleErrors";
 import { IUser } from "../models/user";
+import {
+  addIngredientToShoppingList,
+  deleteIngredientFromShoppingList,
+  getShoppingListByUserId,
+} from "../services/shoppingList";
 
 const getShoppingList = async (
   req: Request,
@@ -12,11 +16,11 @@ const getShoppingList = async (
     if (!req.user) {
       return next(handleError(401, "Unauthorized"));
     }
-    const userId = (req.user as IUser)._id; 
-    const shoppingList = await ShoppingList.findOne({ userId });
+    const userId = (req.user as IUser)._id;
+    const shoppingList = await getShoppingListByUserId(userId);
 
     if (!shoppingList) {
-      return next(handleError(404));
+      return next(handleError(404, "Shopping list not found"));
     }
 
     res.status(200).json(shoppingList);
@@ -36,17 +40,14 @@ const addIngredient = async (
       return next(handleError(401, "Unauthorized"));
     }
     const { ingredientId, thb, name, measure, recipeId } = req.body;
-    const userId = (req.user as IUser)._id; 
-    let shoppingList = await ShoppingList.findOne({ userId });
-
-    if (!shoppingList) {
-      shoppingList = new ShoppingList({ userId, items: [] });
-    }
-
-    await ShoppingList.updateOne(
-      { userId },
-      { $push: { items: { ingredientId, thb, name, measure, recipeId } } }
-    );
+    const userId = (req.user as IUser)._id;
+    const shoppingList = await addIngredientToShoppingList(userId, {
+      ingredientId,
+      thb,
+      name,
+      measure,
+      recipeId,
+    });
 
     res.status(201).json({
       message: "Składnik dodany do listy zakupów",
@@ -73,12 +74,9 @@ const deleteIngredient = async (
       return next(handleError(401, "Unauthorized"));
     }
     const { ingredientId, recipeId } = req.body;
-    const userId = (req.user as IUser)._id; 
+    const userId = (req.user as IUser)._id;
 
-    await ShoppingList.updateOne(
-      { userId },
-      { $pull: { items: { ingredientId, recipeId } } }
-    );
+    await deleteIngredientFromShoppingList(userId, { ingredientId, recipeId });
 
     res.status(200).json({
       message: "Item removed successfully",
