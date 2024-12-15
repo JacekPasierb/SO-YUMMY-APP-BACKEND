@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import Recipe from "../models/recipe";
 import handleError from "../utils/handleErrors";
 import { IUser } from "../models/user";
+import {
+  addToFavoritesRecipe,
+  getFavoritesRecipe,
+  removeFromFavoritesRecipe,
+} from "../services/favoriteRecipes";
 
 const getFavorites = async (
   req: Request,
@@ -16,13 +20,11 @@ const getFavorites = async (
     const limitNumber = parseInt(limit as string, 10);
     const skip = (pageNumber - 1) * limitNumber;
 
-    const favoriteRecipes = await Recipe.find({ favorites: { $in: [userId] } })
-      .skip(skip)
-      .limit(limitNumber);
-
-    const totalFavoritesRecipes = await Recipe.countDocuments({
-      favorites: { $in: [userId] },
-    });
+    const { favoriteRecipes, totalFavoritesRecipes } = await getFavoritesRecipe(
+      userId,
+      skip,
+      limitNumber
+    );
 
     res.status(200).json({
       status: "success",
@@ -46,11 +48,7 @@ const addToFavorites = async (
     const { recipeId } = req.params;
     const userId = (req.user as IUser)._id;
 
-    const recipe = await Recipe.findByIdAndUpdate(
-      recipeId,
-      { $addToSet: { favorites: userId } },
-      { new: true }
-    );
+    const recipe = await addToFavoritesRecipe(userId, recipeId);
 
     if (!recipe) {
       return next(handleError(404, "Recipe not found"));
@@ -76,13 +74,8 @@ const removeFromFavorite = async (
   try {
     const { recipeId } = req.params;
     const userId = (req.user as IUser)._id;
-   
 
-    const recipe = await Recipe.findByIdAndUpdate(
-      recipeId,
-      { $pull: { favorites: userId } },
-      { new: true }
-    );
+    const recipe = await removeFromFavoritesRecipe(userId, recipeId);
 
     if (!recipe) {
       return next(handleError(404, "Recipe not found"));

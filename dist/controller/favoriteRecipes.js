@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFavorites = exports.removeFromFavorite = exports.addToFavorites = void 0;
-const recipe_1 = __importDefault(require("../models/recipe"));
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
+const favoriteRecipes_1 = require("../services/favoriteRecipes");
 const getFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user._id;
@@ -22,12 +22,7 @@ const getFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         const pageNumber = parseInt(page, 10);
         const limitNumber = parseInt(limit, 10);
         const skip = (pageNumber - 1) * limitNumber;
-        const favoriteRecipes = yield recipe_1.default.find({ favorites: { $in: [userId] } })
-            .skip(skip)
-            .limit(limitNumber);
-        const totalFavoritesRecipes = yield recipe_1.default.countDocuments({
-            favorites: { $in: [userId] },
-        });
+        const { favoriteRecipes, totalFavoritesRecipes } = yield (0, favoriteRecipes_1.getFavoritesRecipe)(userId, skip, limitNumber);
         res.status(200).json({
             status: "success",
             code: 200,
@@ -46,7 +41,7 @@ const addToFavorites = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
     try {
         const { recipeId } = req.params;
         const userId = req.user._id;
-        const recipe = yield recipe_1.default.findByIdAndUpdate(recipeId, { $addToSet: { favorites: userId } }, { new: true });
+        const recipe = yield (0, favoriteRecipes_1.addToFavoritesRecipe)(userId, recipeId);
         if (!recipe) {
             return next((0, handleErrors_1.default)(404, "Recipe not found"));
         }
@@ -67,7 +62,7 @@ const removeFromFavorite = (req, res, next) => __awaiter(void 0, void 0, void 0,
     try {
         const { recipeId } = req.params;
         const userId = req.user._id;
-        const recipe = yield recipe_1.default.findByIdAndUpdate(recipeId, { $pull: { favorites: userId } }, { new: true });
+        const recipe = yield (0, favoriteRecipes_1.removeFromFavoritesRecipe)(userId, recipeId);
         if (!recipe) {
             return next((0, handleErrors_1.default)(404, "Recipe not found"));
         }
