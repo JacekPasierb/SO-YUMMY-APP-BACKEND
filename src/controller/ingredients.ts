@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import Ingredient from "../models/ingredient";
 import handleError from "../utils/handleErrors";
+import {
+  fetchAllIngredients,
+  fetchIngredientById,
+} from "../services/ingredients";
 
 const getAllIngredients = async (
   req: Request,
@@ -8,7 +11,7 @@ const getAllIngredients = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const ingredients = await Ingredient.find();
+    const ingredients = await fetchAllIngredients();
 
     res.status(200).json({
       status: "success",
@@ -30,7 +33,7 @@ const getIngredientById = async (
   try {
     const { id } = req.params;
 
-    const ingredient = await Ingredient.findById(id);
+    const ingredient = await fetchIngredientById(id);
 
     if (!ingredient) {
       return next(handleError(404, "Ingredient not found"));

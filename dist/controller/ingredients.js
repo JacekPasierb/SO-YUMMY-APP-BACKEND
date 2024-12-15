@@ -13,11 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getIngredientById = exports.getAllIngredients = void 0;
-const ingredient_1 = __importDefault(require("../models/ingredient"));
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
+const ingredients_1 = require("../services/ingredients");
 const getAllIngredients = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const ingredients = yield ingredient_1.default.find();
+        const ingredients = yield (0, ingredients_1.fetchAllIngredients)();
         res.status(200).json({
             status: "success",
             code: 200,
@@ -34,7 +34,7 @@ exports.getAllIngredients = getAllIngredients;
 const getIngredientById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        const ingredient = yield ingredient_1.default.findById(id);
+        const ingredient = yield (0, ingredients_1.fetchIngredientById)(id);
         if (!ingredient) {
             return next((0, handleErrors_1.default)(404, "Ingredient not found"));
         }

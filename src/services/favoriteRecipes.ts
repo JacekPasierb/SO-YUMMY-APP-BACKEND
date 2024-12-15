@@ -21,26 +21,22 @@ const addToFavoritesRecipe = async (
   userId: Types.ObjectId,
   recipeId: string
 ) => {
-  const recipe = await Recipe.findByIdAndUpdate(
+  return await Recipe.findByIdAndUpdate(
     recipeId,
     { $addToSet: { favorites: userId } },
     { new: true }
   );
-
-  return recipe;
 };
 
 const removeFromFavoritesRecipe = async (
   userId: Types.ObjectId,
   recipeId: string
 ) => {
-  const recipe = await Recipe.findByIdAndUpdate(
+  return await Recipe.findByIdAndUpdate(
     recipeId,
     { $pull: { favorites: userId } },
     { new: true }
   );
-
-  return recipe;
 };
 
 export { getFavoritesRecipe, addToFavoritesRecipe, removeFromFavoritesRecipe };

@@ -25,12 +25,10 @@ const getFavoritesRecipe = (userId, skip, limit) => __awaiter(void 0, void 0, vo
 });
 exports.getFavoritesRecipe = getFavoritesRecipe;
 const addToFavoritesRecipe = (userId, recipeId) => __awaiter(void 0, void 0, void 0, function* () {
-    const recipe = yield recipe_1.default.findByIdAndUpdate(recipeId, { $addToSet: { favorites: userId } }, { new: true });
-    return recipe;
+    return yield recipe_1.default.findByIdAndUpdate(recipeId, { $addToSet: { favorites: userId } }, { new: true });
 });
 exports.addToFavoritesRecipe = addToFavoritesRecipe;
 const removeFromFavoritesRecipe = (userId, recipeId) => __awaiter(void 0, void 0, void 0, function* () {
-    const recipe = yield recipe_1.default.findByIdAndUpdate(recipeId, { $pull: { favorites: userId } }, { new: true });
-    return recipe;
+    return yield recipe_1.default.findByIdAndUpdate(recipeId, { $pull: { favorites: userId } }, { new: true });
 });
 exports.removeFromFavoritesRecipe = removeFromFavoritesRecipe;
