@@ -14,24 +14,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchRecipeById = exports.fetchRecipesByCategory = exports.fetchCategoriesList = exports.fetchRecipesByFourCategories = exports.fetchRecipes = void 0;
 const category_1 = __importDefault(require("../models/category"));
-const ingredient_1 = __importDefault(require("../models/ingredient"));
 const recipe_1 = __importDefault(require("../models/recipe"));
-const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
-const fetchRecipes = (query, ingredient, page, limit) => __awaiter(void 0, void 0, void 0, function* () {
-    const filters = {};
-    const skip = (page - 1) * limit;
-    if (query) {
-        filters.title = { $regex: query, $options: "i" };
-    }
-    else if (ingredient) {
-        const ing = yield ingredient_1.default.findOne({
-            ttl: { $regex: ingredient, $options: "i" },
-        });
-        if (!ing)
-            throw (0, handleErrors_1.default)(404, "Ingredient not found");
-        filters.ingredients = { $elemMatch: { id: ing._id } };
-    }
-    const result = yield recipe_1.default.find(filters).skip(skip).limit(limit);
+const fetchRecipes = (filters, pageNumber, limitNumber) => __awaiter(void 0, void 0, void 0, function* () {
+    const skip = (pageNumber - 1) * limitNumber;
+    const result = yield recipe_1.default.find(filters).skip(skip).limit(limitNumber);
     const totalRecipes = yield recipe_1.default.countDocuments(filters);
     return { result, totalRecipes };
 });
@@ -49,7 +35,7 @@ const fetchRecipesByFourCategories = (count) => __awaiter(void 0, void 0, void 0
         },
         { $limit: count },
     ];
-    const result = yield recipe_1.default.aggregate([
+    return yield recipe_1.default.aggregate([
         {
             $facet: {
                 breakfast: [{ $match: { category: "Breakfast" } }, ...options],
@@ -59,7 +45,6 @@ const fetchRecipesByFourCategories = (count) => __awaiter(void 0, void 0, void 0
             },
         },
     ]);
-    return result[0];
 });
 exports.fetchRecipesByFourCategories = fetchRecipesByFourCategories;
 const fetchCategoriesList = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -70,19 +55,14 @@ const fetchCategoriesList = () => __awaiter(void 0, void 0, void 0, function* ()
     return { catArr };
 });
 exports.fetchCategoriesList = fetchCategoriesList;
-const fetchRecipesByCategory = (category, page, limit) => __awaiter(void 0, void 0, void 0, function* () {
-    const skip = (page - 1) * limit;
-    const result = yield recipe_1.default.find({ category }).skip(skip).limit(limit);
+const fetchRecipesByCategory = (category, pageNumber, limitNumber) => __awaiter(void 0, void 0, void 0, function* () {
+    const skip = (pageNumber - 1) * limitNumber;
+    const result = yield recipe_1.default.find({ category }).skip(skip).limit(limitNumber);
     const total = yield recipe_1.default.countDocuments({ category });
-    if (result.length === 0)
-        throw (0, handleErrors_1.default)(404, "No recipes found for this category");
     return { result, total };
 });
 exports.fetchRecipesByCategory = fetchRecipesByCategory;
 const fetchRecipeById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield recipe_1.default.findById(id);
-    if (!result)
-        throw (0, handleErrors_1.default)(404, "Recipe not found");
-    return { result };
+    return yield recipe_1.default.findById(id);
 });
 exports.fetchRecipeById = fetchRecipeById;

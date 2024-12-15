@@ -4,26 +4,12 @@ import Recipe from "../models/recipe";
 import handleError from "../utils/handleErrors";
 
 const fetchRecipes = async (
-  query: string,
-  ingredient: string,
-  page: number,
-  limit: number
+  filters: Object,
+  pageNumber: number,
+  limitNumber: number
 ) => {
-  const filters: any = {};
-  const skip = (page - 1) * limit;
-
-  if (query) {
-    filters.title = { $regex: query, $options: "i" };
-  } else if (ingredient) {
-    const ing = await Ingredient.findOne({
-      ttl: { $regex: ingredient, $options: "i" },
-    });
-    if (!ing) throw handleError(404, "Ingredient not found");
-
-    filters.ingredients = { $elemMatch: { id: ing._id } };
-  }
-
-  const result = await Recipe.find(filters).skip(skip).limit(limit);
+  const skip = (pageNumber - 1) * limitNumber;
+  const result = await Recipe.find(filters).skip(skip).limit(limitNumber);
   const totalRecipes = await Recipe.countDocuments(filters);
 
   return { result, totalRecipes };
@@ -43,7 +29,7 @@ const fetchRecipesByFourCategories = async (count: number) => {
     { $limit: count },
   ];
 
-  const result = await Recipe.aggregate([
+  return await Recipe.aggregate([
     {
       $facet: {
         breakfast: [{ $match: { category: "Breakfast" } }, ...options],
@@ -53,8 +39,6 @@ const fetchRecipesByFourCategories = async (count: number) => {
       },
     },
   ]);
-
-  return result[0];
 };
 
 const fetchCategoriesList = async () => {
@@ -67,25 +51,19 @@ const fetchCategoriesList = async () => {
 
 const fetchRecipesByCategory = async (
   category: string,
-  page: number,
-  limit: number
+  pageNumber: number,
+  limitNumber: number
 ) => {
-  const skip = (page - 1) * limit;
+  const skip = (pageNumber - 1) * limitNumber;
 
-  const result = await Recipe.find({ category }).skip(skip).limit(limit);
+  const result = await Recipe.find({ category }).skip(skip).limit(limitNumber);
   const total = await Recipe.countDocuments({ category });
-
-  if (result.length === 0)
-    throw handleError(404, "No recipes found for this category");
 
   return { result, total };
 };
 
 const fetchRecipeById = async (id: string) => {
-  const result = await Recipe.findById(id);
-  if (!result) throw handleError(404, "Recipe not found");
-
-  return { result };
+  return await Recipe.findById(id);
 };
 
 export {

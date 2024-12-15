@@ -8,4 +8,10 @@ const fetchIngredientById = async (id: string) => {
   return await Ingredient.findById(id);
 };
 
-export { fetchAllIngredients, fetchIngredientById };
+const fetchIngredientByName = async (ingredient:string)=>{
+  return await Ingredient.findOne({
+    ttl: { $regex: ingredient, $options: "i" },
+  });
+}
+
+export { fetchAllIngredients, fetchIngredientById , fetchIngredientByName};

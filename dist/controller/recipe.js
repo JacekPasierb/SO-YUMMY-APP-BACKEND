@@ -13,16 +13,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRecipeById = exports.getRecipesByCategory = exports.getCategoriesList = exports.getRecipesByFourCategories = exports.getRecipes = void 0;
-const recipe_1 = require("../services/recipe");
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
+const ingredients_1 = require("../services/ingredients");
+const recipe_1 = require("../services/recipe");
 const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { query, ingredient, page = 1, limit = 6 } = req.query;
-        const result = yield (0, recipe_1.fetchRecipes)(query, ingredient, Number(page), Number(limit));
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+        const filters = {};
+        if (query) {
+            filters.title = { $regex: query, $options: "i" };
+        }
+        else if (ingredient) {
+            const ing = yield (0, ingredients_1.fetchIngredientByName)(ingredient);
+            if (!ing) {
+                return next((0, handleErrors_1.default)(404, "Ingredient not found"));
+            }
+            filters.ingredients = {
+                $elemMatch: { id: ing._id },
+            };
+        }
+        const { result, totalRecipes } = yield (0, recipe_1.fetchRecipes)(filters, pageNumber, limitNumber);
         res.status(200).json({
             status: "success",
             code: 200,
-            data: result,
+            data: {
+                result,
+                totalRecipes,
+            },
         });
     }
     catch (error) {
@@ -33,11 +52,11 @@ exports.getRecipes = getRecipes;
 const getRecipesByFourCategories = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { count = 1 } = req.query;
-        const result = yield (0, recipe_1.fetchRecipesByFourCategories)(Number(count));
+        const result = yield (0, recipe_1.fetchRecipesByFourCategories)(+count);
         res.status(200).json({
             status: "success",
             code: 200,
-            data: result,
+            data: Object.assign({}, result[0]),
         });
     }
     catch (error) {
@@ -47,11 +66,13 @@ const getRecipesByFourCategories = (req, res, next) => __awaiter(void 0, void 0,
 exports.getRecipesByFourCategories = getRecipesByFourCategories;
 const getCategoriesList = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield (0, recipe_1.fetchCategoriesList)();
+        const { catArr } = yield (0, recipe_1.fetchCategoriesList)();
         res.status(200).json({
             status: "success",
             code: 200,
-            data: result,
+            data: {
+                catArr,
+            },
         });
     }
     catch (error) {
@@ -62,12 +83,21 @@ exports.getCategoriesList = getCategoriesList;
 const getRecipesByCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { category } = req.params;
-        const { page = 1, limit = 8 } = req.query;
-        const result = yield (0, recipe_1.fetchRecipesByCategory)(category, Number(page), Number(limit));
+        let { page = 1, limit = 8 } = req.query;
+        const pageNumber = parseInt(page, 10);
+        const limitNumber = parseInt(limit, 10);
+        const skip = (pageNumber - 1) * limitNumber;
+        const { result, total } = yield (0, recipe_1.fetchRecipesByCategory)(category, pageNumber, limitNumber);
+        if (result.length === 0) {
+            return next((0, handleErrors_1.default)(404, "No recipes found for this category"));
+        }
         res.status(200).json({
             status: "success",
             code: 200,
-            data: result,
+            data: {
+                result,
+                total,
+            },
         });
     }
     catch (error) {
@@ -79,10 +109,15 @@ const getRecipeById = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         const { id } = req.params;
         const result = yield (0, recipe_1.fetchRecipeById)(id);
+        if (!result) {
+            return next((0, handleErrors_1.default)(404, "Recipe not found"));
+        }
         res.status(200).json({
             status: "success",
             code: 200,
-            data: result,
+            data: {
+                result,
+            },
         });
     }
     catch (error) {

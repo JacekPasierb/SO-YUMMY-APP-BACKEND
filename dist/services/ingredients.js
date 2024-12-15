@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchIngredientById = exports.fetchAllIngredients = void 0;
+exports.fetchIngredientByName = exports.fetchIngredientById = exports.fetchAllIngredients = void 0;
 const ingredient_1 = __importDefault(require("../models/ingredient"));
 const fetchAllIngredients = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield ingredient_1.default.find();
@@ -22,3 +22,9 @@ const fetchIngredientById = (id) => __awaiter(void 0, void 0, void 0, function* 
     return yield ingredient_1.default.findById(id);
 });
 exports.fetchIngredientById = fetchIngredientById;
+const fetchIngredientByName = (ingredient) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield ingredient_1.default.findOne({
+        ttl: { $regex: ingredient, $options: "i" },
+    });
+});
+exports.fetchIngredientByName = fetchIngredientByName;
