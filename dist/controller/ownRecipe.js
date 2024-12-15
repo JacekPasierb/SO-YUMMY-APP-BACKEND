@@ -13,8 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteOwnRecipe = exports.addOwnRecipe = exports.getOwnRecipes = void 0;
-const recipe_1 = __importDefault(require("../models/recipe"));
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
+const ownRecipe_1 = require("../services/ownRecipe");
 const getOwnRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user._id;
@@ -27,8 +27,7 @@ const getOwnRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, func
             limitNumber < 1) {
             return next((0, handleErrors_1.default)(400, "Invalid pagination parameters"));
         }
-        const skip = (pageNumber - 1) * limitNumber;
-        const totalOwnRecipes = yield recipe_1.default.countDocuments({ owner: userId });
+        const { recipes: ownRecipes, totalOwnRecipes } = yield (0, ownRecipe_1.fetchOwnRecipes)(userId, pageNumber, limitNumber);
         if (totalOwnRecipes === 0) {
             return next((0, handleErrors_1.default)(404, "Not found own recipes"));
         }
@@ -36,9 +35,6 @@ const getOwnRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         if (pageNumber > totalPages) {
             return next((0, handleErrors_1.default)(404, "Page number exceeds total number of available pages"));
         }
-        const ownRecipes = yield recipe_1.default.find({ owner: userId })
-            .skip(skip)
-            .limit(limitNumber);
         res.status(200).json({
             status: "success",
             code: 200,
@@ -56,7 +52,7 @@ exports.getOwnRecipes = getOwnRecipes;
 const addOwnRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.user._id;
-        const newRecipe = yield recipe_1.default.create(Object.assign(Object.assign({}, req.body), { owner: userId }));
+        const newRecipe = yield (0, ownRecipe_1.createRecipe)(Object.assign(Object.assign({}, req.body), { owner: userId }));
         res.status(200).json({
             status: "success",
             code: 200,
@@ -73,7 +69,7 @@ exports.addOwnRecipe = addOwnRecipe;
 const deleteOwnRecipe = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { recipeId } = req.params;
-        const result = yield recipe_1.default.findByIdAndDelete(recipeId);
+        const result = yield (0, ownRecipe_1.deleteRecipeById)(recipeId);
         if (!result) {
             return next((0, handleErrors_1.default)(404, "Recipe not found..."));
         }

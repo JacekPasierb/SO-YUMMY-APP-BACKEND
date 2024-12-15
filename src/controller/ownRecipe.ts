@@ -2,6 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import Recipe from "../models/recipe";
 import handleError from "../utils/handleErrors";
 import { IUser } from "../models/user";
+import {
+  createRecipe,
+  deleteRecipeById,
+  fetchOwnRecipes,
+} from "../services/ownRecipe";
 
 const getOwnRecipes = async (
   req: Request,
@@ -23,9 +28,12 @@ const getOwnRecipes = async (
     ) {
       return next(handleError(400, "Invalid pagination parameters"));
     }
-    const skip = (pageNumber - 1) * limitNumber;
 
-    const totalOwnRecipes = await Recipe.countDocuments({ owner: userId });
+    const { recipes: ownRecipes, totalOwnRecipes } = await fetchOwnRecipes(
+      userId,
+      pageNumber,
+      limitNumber
+    );
 
     if (totalOwnRecipes === 0) {
       return next(handleError(404, "Not found own recipes"));
@@ -38,10 +46,6 @@ const getOwnRecipes = async (
         handleError(404, "Page number exceeds total number of available pages")
       );
     }
-
-    const ownRecipes = await Recipe.find({ owner: userId })
-      .skip(skip)
-      .limit(limitNumber);
 
     res.status(200).json({
       status: "success",
@@ -64,7 +68,7 @@ const addOwnRecipe = async (
   try {
     const userId = (req.user as IUser)._id;
 
-    const newRecipe = await Recipe.create({
+    const newRecipe = await createRecipe({
       ...req.body,
       owner: userId,
     });
@@ -88,7 +92,8 @@ const deleteOwnRecipe = async (
 ): Promise<void> => {
   try {
     const { recipeId } = req.params;
-    const result = await Recipe.findByIdAndDelete(recipeId);
+    const result = await deleteRecipeById(recipeId);
+
     if (!result) {
       return next(handleError(404, "Recipe not found..."));
     }

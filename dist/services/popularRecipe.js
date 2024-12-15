@@ -8,22 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPopularRecipes = void 0;
-const popularRecipe_1 = require("../services/popularRecipe");
-const getPopularRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const count = Number(req.query.count) || 4;
-        const popularRecipes = yield (0, popularRecipe_1.fetchPopularRecipes)(count);
-        res.status(200).json({
-            popularRecipes,
-        });
-    }
-    catch (error) {
-        next({
-            status: 500,
-            message: `Error while getting popular recipes: ${error.message}`,
-        });
-    }
+exports.fetchPopularRecipes = void 0;
+const recipe_1 = __importDefault(require("../models/recipe"));
+const fetchPopularRecipes = (count) => __awaiter(void 0, void 0, void 0, function* () {
+    return recipe_1.default.aggregate([
+        { $match: { "favorites.0": { $exists: true } } },
+        { $sort: { "favorites.length": -1 } },
+        { $limit: count },
+    ]);
 });
-exports.getPopularRecipes = getPopularRecipes;
+exports.fetchPopularRecipes = fetchPopularRecipes;
