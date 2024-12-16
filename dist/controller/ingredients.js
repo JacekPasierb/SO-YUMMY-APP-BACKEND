@@ -27,7 +27,7 @@ const getAllIngredients = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         });
     }
     catch (error) {
-        next((0, handleErrors_1.default)(500, error.message));
+        next((0, handleErrors_1.default)(500, `Error fetching ingredients`));
     }
 });
 exports.getAllIngredients = getAllIngredients;

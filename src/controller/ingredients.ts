@@ -21,7 +21,7 @@ const getAllIngredients = async (
       },
     });
   } catch (error) {
-    next(handleError(500, (error as Error).message));
+    next(handleError(500,`Error fetching ingredients`));
   }
 };
 

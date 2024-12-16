@@ -85,13 +85,13 @@ describe("Ingredients API", () => {
   it("should return error 500 if there's an error in getAllIngredients", async () => {
     jest
       .spyOn(Ingredient, "find")
-      .mockRejectedValue(new Error("Internal server error"));
+      .mockRejectedValue(new Error("Error fetching ingredients"));
 
     const response = await request(app)
       .get(API_ROUTES.INGREDIENTS)
       .set("Authorization", `Bearer ${token}`);
     expect(response.status).toBe(500);
-    expect(response.body).toHaveProperty("error", "Internal server error");
+    expect(response.body).toHaveProperty("error", "Error fetching ingredients");
   });
 
   it("should get ingredient by id", async () => {

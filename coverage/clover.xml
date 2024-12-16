@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1734307243464" clover="3.2.0">
-  <project timestamp="1734307243464" name="All files">
-    <metrics statements="716" coveredstatements="659" conditionals="94" coveredconditionals="73" methods="122" coveredmethods="103" elements="932" coveredelements="835" complexity="0" loc="716" ncloc="716" packages="10" files="42" classes="42"/>
+<coverage generated="1734376352859" clover="3.2.0">
+  <project timestamp="1734376352859" name="All files">
+    <metrics statements="717" coveredstatements="659" conditionals="94" coveredconditionals="73" methods="122" coveredmethods="103" elements="933" coveredelements="835" complexity="0" loc="717" ncloc="717" packages="10" files="42" classes="42"/>
     <package name="src">
       <metrics statements="53" coveredstatements="49" conditionals="10" coveredconditionals="8" methods="5" coveredmethods="4"/>
       <file name="app.ts" path="C:\Users\pasie\OneDrive\Dokumenty\GO-IT\TESTOWE PROJEKTY\SO YUMMY\SO-YUMMY-APP-BACKEND\src\app.ts">
@@ -694,7 +694,7 @@
       </file>
     </package>
     <package name="src.services">
-      <metrics statements="119" coveredstatements="91" conditionals="1" coveredconditionals="0" methods="50" coveredmethods="38"/>
+      <metrics statements="120" coveredstatements="91" conditionals="1" coveredconditionals="0" methods="50" coveredmethods="38"/>
       <file name="favoriteRecipes.ts" path="C:\Users\pasie\OneDrive\Dokumenty\GO-IT\TESTOWE PROJEKTY\SO YUMMY\SO-YUMMY-APP-BACKEND\src\services\favoriteRecipes.ts">
         <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="6" coveredmethods="6"/>
         <line num="2" count="9" type="stmt"/>
@@ -796,20 +796,21 @@
         <line num="37" count="9" type="stmt"/>
       </file>
       <file name="subscribeServices.ts" path="C:\Users\pasie\OneDrive\Dokumenty\GO-IT\TESTOWE PROJEKTY\SO YUMMY\SO-YUMMY-APP-BACKEND\src\services\subscribeServices.ts">
-        <metrics statements="13" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <metrics statements="14" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="0"/>
         <line num="1" count="9" type="stmt"/>
         <line num="9" count="9" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
         <line num="12" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
         <line num="15" count="0" type="stmt"/>
-        <line num="19" count="9" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="20" count="9" type="stmt"/>
         <line num="23" count="0" type="stmt"/>
         <line num="24" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
         <line num="30" count="0" type="stmt"/>
-        <line num="34" count="9" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="35" count="9" type="stmt"/>
       </file>
       <file name="user.ts" path="C:\Users\pasie\OneDrive\Dokumenty\GO-IT\TESTOWE PROJEKTY\SO YUMMY\SO-YUMMY-APP-BACKEND\src\services\user.ts">
         <metrics statements="24" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="8" coveredmethods="0"/>
