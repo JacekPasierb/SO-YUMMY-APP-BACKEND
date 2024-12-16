@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -20,6 +43,7 @@ const user_1 = require("../models/user");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const recipe_1 = __importDefault(require("../models/recipe"));
 const shoppingList_1 = __importDefault(require("../models/shoppingList"));
+const shoppingListService = __importStar(require("../services/shoppingList"));
 describe("shopping-list API", () => {
     let mongoServer;
     let token;
@@ -92,35 +116,56 @@ describe("shopping-list API", () => {
                 .set("Authorization", `Bearer ${token}`);
             expect(response.status).toBe(200);
         }));
+        it("should return 404 if shopping list not found", () => __awaiter(void 0, void 0, void 0, function* () {
+            jest
+                .spyOn(shoppingListService, "getShoppingListByUserId")
+                .mockResolvedValue(null);
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .get("/api/shopping-list")
+                .set("Authorization", `Bearer ${token}`);
+            expect(response.status).toBe(404);
+            expect(response.body).toHaveProperty("error", "Shopping list not found");
+        }));
+        it("should return 500 if an error occurs", () => __awaiter(void 0, void 0, void 0, function* () {
+            jest
+                .spyOn(shoppingListService, "getShoppingListByUserId")
+                .mockImplementationOnce(() => {
+                throw new Error("Database error");
+            });
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .get("/api/shopping-list")
+                .set("Authorization", `Bearer ${token}`);
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty("error", "Internal server error: Database error");
+        }));
     });
     describe("POST /api/shopping-list/add", () => {
+        const newItem = {
+            ingredientId: new mongoose_1.default.Types.ObjectId(),
+            name: "New Ingredient",
+            measure: "liters",
+            recipeId: recipeId,
+        };
         it("should add an item to the shopping list", () => __awaiter(void 0, void 0, void 0, function* () {
-            const newItem = {
-                ingredientId: new mongoose_1.default.Types.ObjectId(),
-                name: "New Ingredient",
-                measure: "liters",
-                recipeId: recipeId,
-            };
             const response = yield (0, supertest_1.default)(app_1.default)
                 .post("/api/shopping-list/add")
                 .set("Authorization", `Bearer ${token}`)
                 .send(newItem);
             expect(response.status).toBe(201);
         }));
-        // it("should create new sshoppingList if not have", async () => {
-        //     (findOne as jest.Mock).mockResolvedValueOnce(false);
-        //     const newItem = {
-        //       ingredientId: new mongoose.Types.ObjectId(),
-        //       name: "New Ingredient",
-        //       measure: "liters",
-        //       recipeId: recipeId,
-        //     };
-        //     const response = await request(app)
-        //       .post("/api/shopping-list/add")
-        //       .set("Authorization", `Bearer ${token}`)
-        //       .send(newItem);
-        //     expect(response.status).toBe(201);
-        //   });
+        it("should return 500 if an error occurs in catch", () => __awaiter(void 0, void 0, void 0, function* () {
+            jest
+                .spyOn(shoppingListService, "addIngredientToShoppingList")
+                .mockImplementationOnce(() => {
+                throw new Error("Database error");
+            });
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .post("/api/shopping-list/add")
+                .set("Authorization", `Bearer ${token}`)
+                .send(newItem);
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty("error", "Error adding ingredient to shopping list: Database error");
+        }));
     });
     describe("DELETE /api/shopping-list/remove", () => {
         it("should remove an item from the shopping list", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -130,6 +175,19 @@ describe("shopping-list API", () => {
                 .send({ ingredientId, recipeId: null });
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty("message", "Item removed successfully");
+        }));
+        it("should return 500 if an error occurs in catch", () => __awaiter(void 0, void 0, void 0, function* () {
+            jest
+                .spyOn(shoppingListService, "deleteIngredientFromShoppingList")
+                .mockImplementationOnce(() => {
+                throw new Error("Database error");
+            });
+            const response = yield (0, supertest_1.default)(app_1.default)
+                .delete(`/api/shopping-list/remove`)
+                .set("Authorization", `Bearer ${token}`)
+                .send({ ingredientId, recipeId: null });
+            expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty("error", "Error removing ingredient from shopping list: Database error");
         }));
     });
 });

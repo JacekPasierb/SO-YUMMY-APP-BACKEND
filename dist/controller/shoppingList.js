@@ -17,9 +17,6 @@ const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const shoppingList_1 = require("../services/shoppingList");
 const getShoppingList = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.user) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const userId = req.user._id;
         const shoppingList = yield (0, shoppingList_1.getShoppingListByUserId)(userId);
         if (!shoppingList) {
@@ -35,9 +32,6 @@ const getShoppingList = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
 exports.getShoppingList = getShoppingList;
 const addIngredient = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.user) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const { ingredientId, thb, name, measure, recipeId } = req.body;
         const userId = req.user._id;
         const shoppingList = yield (0, shoppingList_1.addIngredientToShoppingList)(userId, {
@@ -60,9 +54,6 @@ const addIngredient = (req, res, next) => __awaiter(void 0, void 0, void 0, func
 exports.addIngredient = addIngredient;
 const deleteIngredient = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        if (!req.user) {
-            return next((0, handleErrors_1.default)(401, "Unauthorized"));
-        }
         const { ingredientId, recipeId } = req.body;
         const userId = req.user._id;
         yield (0, shoppingList_1.deleteIngredientFromShoppingList)(userId, { ingredientId, recipeId });

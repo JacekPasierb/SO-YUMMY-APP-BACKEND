@@ -13,9 +13,7 @@ const getShoppingList = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.user) {
-      return next(handleError(401, "Unauthorized"));
-    }
+
     const userId = (req.user as IUser)._id;
     const shoppingList = await getShoppingListByUserId(userId);
 
@@ -36,9 +34,7 @@ const addIngredient = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.user) {
-      return next(handleError(401, "Unauthorized"));
-    }
+
     const { ingredientId, thb, name, measure, recipeId } = req.body;
     const userId = (req.user as IUser)._id;
     const shoppingList = await addIngredientToShoppingList(userId, {
@@ -70,9 +66,7 @@ const deleteIngredient = async (
   next: NextFunction
 ) => {
   try {
-    if (!req.user) {
-      return next(handleError(401, "Unauthorized"));
-    }
+ 
     const { ingredientId, recipeId } = req.body;
     const userId = (req.user as IUser)._id;
 

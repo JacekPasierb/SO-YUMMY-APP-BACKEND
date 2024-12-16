@@ -6,7 +6,8 @@ import { User } from "../models/user";
 import jwt from "jsonwebtoken";
 import Recipe from "../models/recipe";
 import ShoppingList from "../models/shoppingList";
-
+import { addIngredientToShoppingList } from "../services/shoppingList";
+import * as shoppingListService from "../services/shoppingList";
 describe("shopping-list API", () => {
   let mongoServer: MongoMemoryServer;
   let token: string;
@@ -87,16 +88,48 @@ describe("shopping-list API", () => {
 
       expect(response.status).toBe(200);
     });
-  });
-  describe("POST /api/shopping-list/add", () => {
-    it("should add an item to the shopping list", async () => {
-      const newItem = {
-        ingredientId: new mongoose.Types.ObjectId(),
-        name: "New Ingredient",
-        measure: "liters",
-        recipeId: recipeId,
-      };
 
+    it("should return 404 if shopping list not found", async () => {
+      jest
+        .spyOn(shoppingListService, "getShoppingListByUserId")
+        .mockResolvedValue(null);
+
+      const response = await request(app)
+        .get("/api/shopping-list")
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(404);
+      expect(response.body).toHaveProperty("error", "Shopping list not found");
+    });
+
+    it("should return 500 if an error occurs", async () => {
+      jest
+        .spyOn(shoppingListService, "getShoppingListByUserId")
+        .mockImplementationOnce(() => {
+          throw new Error("Database error");
+        });
+
+      const response = await request(app)
+        .get("/api/shopping-list")
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty(
+        "error",
+        "Internal server error: Database error"
+      );
+    });
+  });
+
+  describe("POST /api/shopping-list/add", () => {
+    const newItem = {
+      ingredientId: new mongoose.Types.ObjectId(),
+      name: "New Ingredient",
+      measure: "liters",
+      recipeId: recipeId,
+    };
+
+    it("should add an item to the shopping list", async () => {
       const response = await request(app)
         .post("/api/shopping-list/add")
         .set("Authorization", `Bearer ${token}`)
@@ -105,22 +138,24 @@ describe("shopping-list API", () => {
       expect(response.status).toBe(201);
     });
 
-    // it("should create new sshoppingList if not have", async () => {
-    //     (findOne as jest.Mock).mockResolvedValueOnce(false);
-    //     const newItem = {
-    //       ingredientId: new mongoose.Types.ObjectId(),
-    //       name: "New Ingredient",
-    //       measure: "liters",
-    //       recipeId: recipeId,
-    //     };
-  
-    //     const response = await request(app)
-    //       .post("/api/shopping-list/add")
-    //       .set("Authorization", `Bearer ${token}`)
-    //       .send(newItem);
-  
-    //     expect(response.status).toBe(201);
-    //   });
+    it("should return 500 if an error occurs in catch", async () => {
+      jest
+        .spyOn(shoppingListService, "addIngredientToShoppingList")
+        .mockImplementationOnce(() => {
+          throw new Error("Database error");
+        });
+
+      const response = await request(app)
+        .post("/api/shopping-list/add")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newItem);
+
+      expect(response.status).toBe(500);
+      expect(response.body).toHaveProperty(
+        "error",
+        "Error adding ingredient to shopping list: Database error"
+      );
+    });
   });
 
   describe("DELETE /api/shopping-list/remove", () => {
@@ -136,5 +171,23 @@ describe("shopping-list API", () => {
         "Item removed successfully"
       );
     });
+  it("should return 500 if an error occurs in catch", async () => {
+    jest
+      .spyOn(shoppingListService, "deleteIngredientFromShoppingList")
+      .mockImplementationOnce(() => {
+        throw new Error("Database error");
+      });
+
+    const response = await request(app)
+      .delete(`/api/shopping-list/remove`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ ingredientId, recipeId: null });
+
+    expect(response.status).toBe(500);
+    expect(response.body).toHaveProperty(
+      "error",
+      "Error removing ingredient from shopping list: Database error"
+    );
+  });
   });
 });

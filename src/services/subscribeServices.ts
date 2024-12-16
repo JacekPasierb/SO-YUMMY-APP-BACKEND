@@ -6,9 +6,10 @@ interface SubscribeParams {
   body?: Record<string, any>;
 }
 
-const findSubscribe = async (query: SubscribeParams): Promise<ISubscribe | null> => {
+const findSubscribe = async (
+  query: SubscribeParams
+): Promise<ISubscribe | null> => {
   try {
-    
     return await Subscribe.findOne(query);
   } catch (error) {
     console.error("Error fetching subscription:", error);
