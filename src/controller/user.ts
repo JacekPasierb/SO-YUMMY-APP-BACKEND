@@ -159,10 +159,7 @@ const verifyEmail = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    res.status(200).json({
-      status: "OK",
-    });
-    return;
+    res.redirect(`https://so-yummy-jack.netlify.app/signin?verified=true`);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }

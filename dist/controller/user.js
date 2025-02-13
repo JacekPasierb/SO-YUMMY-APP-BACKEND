@@ -141,10 +141,7 @@ const verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             res.status(500).json({ message: "Failed to update user" });
             return;
         }
-        res.status(200).json({
-            status: "OK",
-        });
-        return;
+        res.redirect(`https://so-yummy-jack.netlify.app/signin?verified=true`);
     }
     catch (error) {
         res.status(500).json({ message: "Internal Server Error" });
