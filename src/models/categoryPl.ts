@@ -6,7 +6,7 @@ interface ICategory extends Document {
   description: string;
 }
 
-const categorySchemaPl = new Schema<ICategory>(
+const categorySchema = new Schema<ICategory>(
   {
     title: { type: String, required: true },
     thumb: { type: String, required: true },
@@ -15,6 +15,6 @@ const categorySchemaPl = new Schema<ICategory>(
   { versionKey: false }
 );
 
-const CategoryPl: Model<ICategory> = model("categoryPl", categorySchemaPl);
+const CategoryPl: Model<ICategory> = model("categoryPl", categorySchema);
 
 export default  CategoryPl ;
