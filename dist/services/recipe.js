@@ -58,6 +58,7 @@ const fetchCategoriesList = () => __awaiter(void 0, void 0, void 0, function* ()
 exports.fetchCategoriesList = fetchCategoriesList;
 const fetchCategoriesListPl = () => __awaiter(void 0, void 0, void 0, function* () {
     const categories = yield categoryPl_1.default.find();
+    console.log("ccc", categories);
     const catArr = categories
         .map((cat) => cat.title)
         .sort((a, b) => a.localeCompare(b));

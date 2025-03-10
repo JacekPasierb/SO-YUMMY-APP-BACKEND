@@ -53,6 +53,8 @@ const fetchCategoriesList = async () => {
 
 const fetchCategoriesListPl = async () => {
   const categories = await CategoryPl.find();
+  console.log("ccc",categories);
+  
   const catArr = categories
     .map((cat) => cat.title)
     .sort((a, b) => a.localeCompare(b));
