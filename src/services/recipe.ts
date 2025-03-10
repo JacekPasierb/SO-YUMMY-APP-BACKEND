@@ -52,12 +52,17 @@ const fetchCategoriesList = async () => {
 };
 
 const fetchCategoriesListPl = async () => {
+  console.log("🛠️ Pobieranie kategorii PL...");
   const categories = await CategoryPl.find();
-  console.log("ccc",categories);
+  console.log("📌 Kategorie zwrócone przez MongoDB:", categories);
+  if (!categories.length) {
+    console.log("❌ MongoDB zwróciło pustą tablicę!");
+  }
   
   const catArr = categories
     .map((cat) => cat.title)
     .sort((a, b) => a.localeCompare(b));
+    console.log("✅ Kategorie po mapowaniu:", catArr);
   return { catArr };
 };
 

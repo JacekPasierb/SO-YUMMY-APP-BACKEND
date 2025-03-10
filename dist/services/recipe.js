@@ -57,11 +57,16 @@ const fetchCategoriesList = () => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.fetchCategoriesList = fetchCategoriesList;
 const fetchCategoriesListPl = () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("🛠️ Pobieranie kategorii PL...");
     const categories = yield categoryPl_1.default.find();
-    console.log("ccc", categories);
+    console.log("📌 Kategorie zwrócone przez MongoDB:", categories);
+    if (!categories.length) {
+        console.log("❌ MongoDB zwróciło pustą tablicę!");
+    }
     const catArr = categories
         .map((cat) => cat.title)
         .sort((a, b) => a.localeCompare(b));
+    console.log("✅ Kategorie po mapowaniu:", catArr);
     return { catArr };
 });
 exports.fetchCategoriesListPl = fetchCategoriesListPl;
