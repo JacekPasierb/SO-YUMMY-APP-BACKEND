@@ -3,7 +3,7 @@ import handleError from "../utils/handleErrors";
 import {fetchIngredientByName} from "../services/ingredients";
 import {
   fetchCategoriesList,
-
+fetchCategoriesListPl,
   fetchRecipeById,
   fetchRecipes,
   fetchRecipesByCategory,
@@ -97,25 +97,25 @@ const getCategoriesList = async (
   }
 };
 
-// const getCategoriesListPl = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void> => {
-//   try {
-//     const {catArr} = await fetchCategoriesListPl();
+const getCategoriesListPl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const {catArr} = await fetchCategoriesListPl();
 
-//     res.status(200).json({
-//       status: "success",
-//       code: 200,
-//       data: {
-//         catArr,
-//       },
-//     });
-//   } catch (error) {
-//     next(handleError(500, (error as Error).message));
-//   }
-// };
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        catArr,
+      },
+    });
+  } catch (error) {
+    next(handleError(500, (error as Error).message));
+  }
+};
 
 
 const getRecipesByCategory = async (
@@ -182,7 +182,7 @@ export {
   getRecipes,
   getRecipesByFourCategories,
   getCategoriesList,
-
+getCategoriesListPl,
   getRecipesByCategory,
   getRecipeById,
 };

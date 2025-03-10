@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchRecipeById = exports.fetchRecipesByCategory = exports.fetchCategoriesList = exports.fetchRecipesByFourCategories = exports.fetchRecipes = void 0;
+exports.fetchRecipeById = exports.fetchRecipesByCategory = exports.fetchCategoriesListPl = exports.fetchCategoriesList = exports.fetchRecipesByFourCategories = exports.fetchRecipes = void 0;
 const category_1 = __importDefault(require("../models/category"));
+const categoryPl_1 = __importDefault(require("../models/categoryPl"));
 const recipe_1 = __importDefault(require("../models/recipe"));
 const fetchRecipes = (filters, pageNumber, limitNumber) => __awaiter(void 0, void 0, void 0, function* () {
     const skip = (pageNumber - 1) * limitNumber;
@@ -55,13 +56,14 @@ const fetchCategoriesList = () => __awaiter(void 0, void 0, void 0, function* ()
     return { catArr };
 });
 exports.fetchCategoriesList = fetchCategoriesList;
-// const fetchCategoriesListPl = async () => {
-//   const categories = await CategoryPl.find();
-//   const catArr = categories
-//     .map((cat) => cat.title)
-//     .sort((a, b) => a.localeCompare(b));
-//   return { catArr };
-// };
+const fetchCategoriesListPl = () => __awaiter(void 0, void 0, void 0, function* () {
+    const categories = yield categoryPl_1.default.find();
+    const catArr = categories
+        .map((cat) => cat.title)
+        .sort((a, b) => a.localeCompare(b));
+    return { catArr };
+});
+exports.fetchCategoriesListPl = fetchCategoriesListPl;
 const fetchRecipesByCategory = (category, pageNumber, limitNumber) => __awaiter(void 0, void 0, void 0, function* () {
     const skip = (pageNumber - 1) * limitNumber;
     const result = yield recipe_1.default.find({ category }).skip(skip).limit(limitNumber);

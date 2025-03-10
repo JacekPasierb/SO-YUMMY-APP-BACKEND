@@ -1,4 +1,5 @@
 import Category from "../models/category";
+import CategoryPl from "../models/categoryPl";
 
 import Ingredient from "../models/ingredient";
 import Recipe from "../models/recipe";
@@ -50,13 +51,13 @@ const fetchCategoriesList = async () => {
   return { catArr };
 };
 
-// const fetchCategoriesListPl = async () => {
-//   const categories = await CategoryPl.find();
-//   const catArr = categories
-//     .map((cat) => cat.title)
-//     .sort((a, b) => a.localeCompare(b));
-//   return { catArr };
-// };
+const fetchCategoriesListPl = async () => {
+  const categories = await CategoryPl.find();
+  const catArr = categories
+    .map((cat) => cat.title)
+    .sort((a, b) => a.localeCompare(b));
+  return { catArr };
+};
 
 const fetchRecipesByCategory = async (
   category: string,
@@ -79,6 +80,7 @@ export {
   fetchRecipes,
   fetchRecipesByFourCategories,
   fetchCategoriesList,
+  fetchCategoriesListPl,
 
   fetchRecipesByCategory,
   fetchRecipeById,
