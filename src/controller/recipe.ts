@@ -1,8 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import {Request, Response, NextFunction} from "express";
 import handleError from "../utils/handleErrors";
-import { fetchIngredientByName } from "../services/ingredients";
+import {fetchIngredientByName} from "../services/ingredients";
 import {
   fetchCategoriesList,
+  fetchCategoriesListPl,
   fetchRecipeById,
   fetchRecipes,
   fetchRecipesByCategory,
@@ -15,14 +16,14 @@ const getRecipes = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { query, ingredient, page = 1, limit = 6 } = req.query;
+    const {query, ingredient, page = 1, limit = 6} = req.query;
     const pageNumber = parseInt(page as string, 10);
     const limitNumber = parseInt(limit as string, 10);
 
     const filters: any = {};
 
     if (query) {
-      filters.title = { $regex: query, $options: "i" };
+      filters.title = {$regex: query, $options: "i"};
     } else if (ingredient) {
       const ing = await fetchIngredientByName(ingredient as string);
 
@@ -31,11 +32,11 @@ const getRecipes = async (
       }
 
       filters.ingredients = {
-        $elemMatch: { id: ing._id },
+        $elemMatch: {id: ing._id},
       };
     }
 
-    const { result, totalRecipes } = await fetchRecipes(
+    const {result, totalRecipes} = await fetchRecipes(
       filters,
       pageNumber,
       limitNumber
@@ -60,7 +61,7 @@ const getRecipesByFourCategories = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { count = 1 } = req.query;
+    const {count = 1} = req.query;
 
     const result = await fetchRecipesByFourCategories(+count);
 
@@ -82,7 +83,7 @@ const getCategoriesList = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { catArr } = await fetchCategoriesList();
+    const {catArr} = await fetchCategoriesList();
 
     res.status(200).json({
       status: "success",
@@ -96,19 +97,40 @@ const getCategoriesList = async (
   }
 };
 
+const getCategoriesListPl = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const {catArr} = await fetchCategoriesListPl();
+
+    res.status(200).json({
+      status: "success",
+      code: 200,
+      data: {
+        catArr,
+      },
+    });
+  } catch (error) {
+    next(handleError(500, (error as Error).message));
+  }
+};
+
+
 const getRecipesByCategory = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { category } = req.params;
-    let { page = 1, limit = 8 } = req.query;
+    const {category} = req.params;
+    let {page = 1, limit = 8} = req.query;
     const pageNumber = parseInt(page as string, 10);
     const limitNumber = parseInt(limit as string, 10);
     const skip = (pageNumber - 1) * limitNumber;
 
-    const { result, total } = await fetchRecipesByCategory(
+    const {result, total} = await fetchRecipesByCategory(
       category,
       pageNumber,
       limitNumber
@@ -137,7 +159,7 @@ const getRecipeById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { id } = req.params;
+    const {id} = req.params;
     const result = await fetchRecipeById(id);
 
     if (!result) {
@@ -160,6 +182,7 @@ export {
   getRecipes,
   getRecipesByFourCategories,
   getCategoriesList,
+  getCategoriesListPl,
   getRecipesByCategory,
   getRecipeById,
 };

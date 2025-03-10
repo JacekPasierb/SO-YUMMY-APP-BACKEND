@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRecipeById = exports.getRecipesByCategory = exports.getCategoriesList = exports.getRecipesByFourCategories = exports.getRecipes = void 0;
+exports.getRecipeById = exports.getRecipesByCategory = exports.getCategoriesListPl = exports.getCategoriesList = exports.getRecipesByFourCategories = exports.getRecipes = void 0;
 const handleErrors_1 = __importDefault(require("../utils/handleErrors"));
 const ingredients_1 = require("../services/ingredients");
 const recipe_1 = require("../services/recipe");
@@ -80,6 +80,22 @@ const getCategoriesList = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.getCategoriesList = getCategoriesList;
+const getCategoriesListPl = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { catArr } = yield (0, recipe_1.fetchCategoriesListPl)();
+        res.status(200).json({
+            status: "success",
+            code: 200,
+            data: {
+                catArr,
+            },
+        });
+    }
+    catch (error) {
+        next((0, handleErrors_1.default)(500, error.message));
+    }
+});
+exports.getCategoriesListPl = getCategoriesListPl;
 const getRecipesByCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { category } = req.params;
