@@ -1,12 +1,12 @@
 import { Schema, model, Document, Model } from "mongoose";
 
-interface ICategory extends Document {
+interface ICategoryPl extends Document {
   title: string;
   thumb: string;
   description: string;
 }
 
-const categorySchema = new Schema<ICategory>(
+const categorySchemaPl = new Schema<ICategoryPl>(
   {
     title: { type: String, required: true },
     thumb: { type: String, required: true },
@@ -15,6 +15,6 @@ const categorySchema = new Schema<ICategory>(
   { versionKey: false }
 );
 
-const CategoryPl: Model<ICategory> = model("categoryPl", categorySchema);
+const CategoryPl: Model<ICategoryPl> = model("categoryPl", categorySchemaPl);
 
-export default  CategoryPl ;
+export default CategoryPl;
