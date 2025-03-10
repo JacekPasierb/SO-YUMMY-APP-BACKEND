@@ -12,7 +12,7 @@ const categorySchemaPl = new Schema<ICategoryPl>(
     thumb: { type: String, required: true },
     description: { type: String, required: true },
   },
-  { versionKey: false }
+  { collection: "categoriesPl", versionKey: false }
 );
 
 const CategoryPl: Model<ICategoryPl> = model("categoryPl", categorySchemaPl);

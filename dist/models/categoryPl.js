@@ -5,6 +5,6 @@ const categorySchemaPl = new mongoose_1.Schema({
     title: { type: String, required: true },
     thumb: { type: String, required: true },
     description: { type: String, required: true },
-}, { versionKey: false });
+}, { collection: "categoriesPl", versionKey: false });
 const CategoryPl = (0, mongoose_1.model)("categoryPl", categorySchemaPl);
 exports.default = CategoryPl;
