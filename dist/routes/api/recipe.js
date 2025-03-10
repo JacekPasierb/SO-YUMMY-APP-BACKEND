@@ -10,7 +10,7 @@ const router = express_1.default.Router();
 router.get("/", auth_1.default, recipe_1.getRecipes);
 router.get("/main-page", auth_1.default, recipe_1.getRecipesByFourCategories);
 router.get("/category-list", auth_1.default, recipe_1.getCategoriesList);
-router.get("/category-listPl", auth_1.default, recipe_1.getCategoriesListPl);
+// router.get("/category-listPl", auth, getCategoriesListPl);
 router.get("/categories/:category", auth_1.default, recipe_1.getRecipesByCategory);
 router.get("/:id", auth_1.default, recipe_1.getRecipeById);
 exports.default = router;
