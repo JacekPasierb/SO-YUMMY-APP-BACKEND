@@ -2,6 +2,7 @@ import { Schema, model, Document, Model } from "mongoose";
 
 interface IIngredient extends Document {
   ttl: string;
+  ttlPl: string;
   desc: string;
   t: string;
   thb: string;
@@ -10,6 +11,7 @@ interface IIngredient extends Document {
 const ingredientSchema = new Schema<IIngredient>(
   {
     ttl: { type: String, required: true },
+    ttlPl: { type: String, required: true },
     desc: { type: String, required: true },
     t: { type: String, required: true },
     thb: { type: String, required: true },
