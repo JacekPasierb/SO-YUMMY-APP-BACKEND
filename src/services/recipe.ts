@@ -17,7 +17,7 @@ const fetchRecipes = async (
   return { result, totalRecipes };
 };
 
-const fetchRecipesByFourCategories = async (count: number) => {
+const fetchRecipesByFourCategories = async (count: number,lang:string) => {
   const options = [
     {
       $project: {
@@ -34,10 +34,10 @@ const fetchRecipesByFourCategories = async (count: number) => {
   return await Recipe.aggregate([
     {
       $facet: {
-        breakfast: [{ $match: { category: "Breakfast" } }, ...options],
-        miscellaneous: [{ $match: { category: "Miscellaneous" } }, ...options],
-        chicken: [{ $match: { category: "Chicken" } }, ...options],
-        dessert: [{ $match: { category: "Dessert" } }, ...options],
+        breakfast: [{ $match: { category: lang ==="en" ? "Breakfast" : "Śniadanie"} }, ...options],
+        miscellaneous: [{ $match: { category:  lang ==="en" ?"Miscellaneous" :"Różne"} }, ...options],
+        chicken: [{ $match: { category:  lang ==="en" ?"Chicken" :"Kurczak"} }, ...options],
+        dessert: [{ $match: { category:  lang ==="en" ?"Dessert" :"Desery"} }, ...options],
       },
     },
   ]);
