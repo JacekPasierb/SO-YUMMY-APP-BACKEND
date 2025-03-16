@@ -51,6 +51,11 @@ app.use((0, cors_1.default)({
         "Authorization",
     ],
 }));
+// 🔍 Logowanie żądań CORS do debugowania
+app.use((req, res, next) => {
+    console.log(`CORS request from: ${req.headers.origin}`);
+    next();
+});
 app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument, { customCssUrl: CSS_URL }));
 app.use("/api/users", user_1.default);
 app.use("/api/subscribe", subscribe_1.default);

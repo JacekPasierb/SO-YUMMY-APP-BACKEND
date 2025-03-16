@@ -56,7 +56,11 @@ app.use(
     ],
   })
 );
-
+// 🔍 Logowanie żądań CORS do debugowania
+app.use((req, res, next) => {
+  console.log(`CORS request from: ${req.headers.origin}`);
+  next();
+});
 
 
 app.use(
