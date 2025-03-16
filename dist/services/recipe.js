@@ -39,22 +39,10 @@ const fetchRecipesByFourCategories = (count) => __awaiter(void 0, void 0, void 0
     return yield recipe_1.default.aggregate([
         {
             $facet: {
-                breakfast: [
-                    { $match: { category: "Breakfast" } },
-                    ...options,
-                ],
-                miscellaneous: [
-                    { $match: { category: "Miscellaneous" } },
-                    ...options,
-                ],
-                chicken: [
-                    { $match: { category: "Chicken" } },
-                    ...options,
-                ],
-                dessert: [
-                    { $match: { category: "Dessert" } },
-                    ...options,
-                ],
+                breakfast: [{ $match: { category: "Breakfast" } }, ...options],
+                miscellaneous: [{ $match: { category: "Miscellaneous" } }, ...options],
+                chicken: [{ $match: { category: "Chicken" } }, ...options],
+                dessert: [{ $match: { category: "Dessert" } }, ...options],
             },
         },
     ]);

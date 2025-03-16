@@ -14,7 +14,7 @@ const fetchRecipes = async (
   const result = await Recipe.find(filters).skip(skip).limit(limitNumber);
   const totalRecipes = await Recipe.countDocuments(filters);
 
-  return {result, totalRecipes};
+  return { result, totalRecipes };
 };
 
 const fetchRecipesByFourCategories = async (count: number) => {
@@ -28,28 +28,16 @@ const fetchRecipesByFourCategories = async (count: number) => {
         thumb: 1,
       },
     },
-    {$limit: count},
+    { $limit: count },
   ];
 
   return await Recipe.aggregate([
     {
       $facet: {
-        breakfast: [
-          {$match: {category:  "Breakfast"}},
-          ...options,
-        ],
-        miscellaneous: [
-          {$match: {category: "Miscellaneous"}},
-          ...options,
-        ],
-        chicken: [
-          {$match: {category:  "Chicken" }},
-          ...options,
-        ],
-        dessert: [
-          {$match: {category:  "Dessert" }},
-          ...options,
-        ],
+        breakfast: [{ $match: { category: "Breakfast" } }, ...options],
+        miscellaneous: [{ $match: { category: "Miscellaneous" } }, ...options],
+        chicken: [{ $match: { category: "Chicken" } }, ...options],
+        dessert: [{ $match: { category: "Dessert" } }, ...options],
       },
     },
   ]);
@@ -60,7 +48,7 @@ const fetchCategoriesList = async () => {
   const catArr = categories
     .map((cat) => cat.title)
     .sort((a, b) => a.localeCompare(b));
-  return {catArr};
+  return { catArr };
 };
 
 const fetchCategoriesListPl = async () => {
@@ -70,12 +58,12 @@ const fetchCategoriesListPl = async () => {
   if (!categories.length) {
     console.log("❌ MongoDB zwróciło pustą tablicę!");
   }
-
+  
   const catArr = categories
     .map((cat) => cat.title)
     .sort((a, b) => a.localeCompare(b));
-  console.log("✅ Kategorie po mapowaniu:", catArr);
-  return {catArr};
+    console.log("✅ Kategorie po mapowaniu:", catArr);
+  return { catArr };
 };
 
 const fetchRecipesByCategory = async (
@@ -85,10 +73,10 @@ const fetchRecipesByCategory = async (
 ) => {
   const skip = (pageNumber - 1) * limitNumber;
 
-  const result = await Recipe.find({category}).skip(skip).limit(limitNumber);
-  const total = await Recipe.countDocuments({category});
+  const result = await Recipe.find({ category }).skip(skip).limit(limitNumber);
+  const total = await Recipe.countDocuments({ category });
 
-  return {result, total};
+  return { result, total };
 };
 
 const fetchRecipeById = async (id: string) => {
@@ -100,6 +88,7 @@ export {
   fetchRecipesByFourCategories,
   fetchCategoriesList,
   fetchCategoriesListPl,
+
   fetchRecipesByCategory,
   fetchRecipeById,
 };
