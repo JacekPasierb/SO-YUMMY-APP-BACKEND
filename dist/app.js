@@ -41,17 +41,16 @@ app.use((0, cors_1.default)({
             callback(new Error("Not allowed by CORS"));
         }
     },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+    credentials: true, // 🚀 Uwierzytelnione żądania CORS (np. tokeny JWT)
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    allowedHeaders: [
+        "Origin",
+        "X-Requested-With",
+        "Content-Type",
+        "Accept",
+        "Authorization",
+    ],
 }));
-// Obsługa preflight requests
-app.options("*", (req, res) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET,HEAD,PUT,PATCH,POST,DELETE");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.sendStatus(204); // No Content
-});
 app.use("/api-docs", swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swaggerDocument, { customCssUrl: CSS_URL }));
 app.use("/api/users", user_1.default);
 app.use("/api/subscribe", subscribe_1.default);
