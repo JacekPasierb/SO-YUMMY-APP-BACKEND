@@ -61,9 +61,9 @@ const getRecipesByFourCategories = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const {count = 1} = req.query;
+    const {count = 1, lang = "pl" } = req.query;
 
-    const result = await fetchRecipesByFourCategories(+count);
+    const result = await fetchRecipesByFourCategories(+count, lang as string);
 
     res.status(200).json({
       status: "success",

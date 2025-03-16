@@ -23,7 +23,7 @@ const fetchRecipes = (filters, pageNumber, limitNumber) => __awaiter(void 0, voi
     return { result, totalRecipes };
 });
 exports.fetchRecipes = fetchRecipes;
-const fetchRecipesByFourCategories = (count) => __awaiter(void 0, void 0, void 0, function* () {
+const fetchRecipesByFourCategories = (count, lang) => __awaiter(void 0, void 0, void 0, function* () {
     const options = [
         {
             $project: {
@@ -39,10 +39,22 @@ const fetchRecipesByFourCategories = (count) => __awaiter(void 0, void 0, void 0
     return yield recipe_1.default.aggregate([
         {
             $facet: {
-                breakfast: [{ $match: { category: "Breakfast" } }, ...options],
-                miscellaneous: [{ $match: { category: "Miscellaneous" } }, ...options],
-                chicken: [{ $match: { category: "Chicken" } }, ...options],
-                dessert: [{ $match: { category: "Dessert" } }, ...options],
+                breakfast: [
+                    { $match: { category: lang === "en" ? "Breakfast" : "Śniadanie" } },
+                    ...options,
+                ],
+                miscellaneous: [
+                    { $match: { category: lang === "en" ? "Miscellaneous" : "Różne" } },
+                    ...options,
+                ],
+                chicken: [
+                    { $match: { category: lang === "en" ? "Chicken" : "Kurczak" } },
+                    ...options,
+                ],
+                dessert: [
+                    { $match: { category: lang === "en" ? "Dessert" : "Desery" } },
+                    ...options,
+                ],
             },
         },
     ]);
