@@ -25,10 +25,10 @@ const categoryTranslations: Record<string, Record<string, string>> = {
 };
 
 const sectionTranslations: Record<string, Record<string, string>> = {
-  breakfast: { en: "breakfast", pl: "sniadanie" },
-  miscellaneous: { en: "miscellaneous", pl: "rozne" },
-  chicken: { en: "chicken", pl: "kurczak" },
-  dessert: { en: "dessert", pl: "desery" },
+  breakfast: { en: "Breakfast", pl: "Śniadanie" },
+  miscellaneous: { en: "Miscellaneous", pl: "Różne" },
+  chicken: { en: "Chicken", pl: "Kurczak" },
+  dessert: { en: "Dessert", pl: "Desery" },
 };
 
 const fetchRecipesByFourCategories = async (count: number, lang: string) => {

@@ -30,10 +30,10 @@ const categoryTranslations = {
     dessert: { en: "Dessert", pl: "Desery" },
 };
 const sectionTranslations = {
-    breakfast: { en: "breakfast", pl: "sniadanie" },
-    miscellaneous: { en: "miscellaneous", pl: "rozne" },
-    chicken: { en: "chicken", pl: "kurczak" },
-    dessert: { en: "dessert", pl: "desery" },
+    breakfast: { en: "Breakfast", pl: "Śniadanie" },
+    miscellaneous: { en: "Miscellaneous", pl: "Różne" },
+    chicken: { en: "Chicken", pl: "Kurczak" },
+    dessert: { en: "Dessert", pl: "Desery" },
 };
 const fetchRecipesByFourCategories = (count, lang) => __awaiter(void 0, void 0, void 0, function* () {
     const options = [
