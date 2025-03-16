@@ -23,29 +23,39 @@ const fetchRecipes = (filters, pageNumber, limitNumber) => __awaiter(void 0, voi
     return { result, totalRecipes };
 });
 exports.fetchRecipes = fetchRecipes;
+const categoryTranslations = {
+    breakfast: { en: "Breakfast", pl: "Śniadanie" },
+    miscellaneous: { en: "Miscellaneous", pl: "Różne" },
+    chicken: { en: "Chicken", pl: "Kurczak" },
+    dessert: { en: "Dessert", pl: "Desery" },
+};
+const sectionTranslations = {
+    breakfast: { en: "breakfast", pl: "sniadanie" },
+    miscellaneous: { en: "miscellaneous", pl: "rozne" },
+    chicken: { en: "chicken", pl: "kurczak" },
+    dessert: { en: "dessert", pl: "desery" },
+};
 const fetchRecipesByFourCategories = (count, lang) => __awaiter(void 0, void 0, void 0, function* () {
     const options = [
         {
             $project: {
                 _id: 1,
-                title: 1,
                 category: 1,
                 preview: 1,
                 thumb: 1,
+                title: { $ifNull: [`$translations.${lang}.title`, "$title"] },
             },
         },
         { $limit: count },
     ];
-    return yield recipe_1.default.aggregate([
-        {
-            $facet: {
-                breakfast: [{ $match: { category: lang === "en" ? "Breakfast" : "Śniadanie" } }, ...options],
-                miscellaneous: [{ $match: { category: lang === "en" ? "Miscellaneous" : "Różne" } }, ...options],
-                chicken: [{ $match: { category: lang === "en" ? "Chicken" : "Kurczak" } }, ...options],
-                dessert: [{ $match: { category: lang === "en" ? "Dessert" : "Desery" } }, ...options],
-            },
-        },
-    ]);
+    // Dynamiczne budowanie `$facet`
+    const facetObject = Object.entries(categoryTranslations).reduce((acc, [key, translations]) => {
+        const translatedCategory = translations[lang] || translations.en; // Domyślnie angielski
+        const translatedSection = sectionTranslations[key][lang] || sectionTranslations[key].en; // Domyślna nazwa sekcji
+        acc[translatedSection] = [{ $match: { category: translatedCategory } }, ...options];
+        return acc;
+    }, {});
+    return yield recipe_1.default.aggregate([{ $facet: facetObject }]);
 });
 exports.fetchRecipesByFourCategories = fetchRecipesByFourCategories;
 const fetchCategoriesList = () => __awaiter(void 0, void 0, void 0, function* () {

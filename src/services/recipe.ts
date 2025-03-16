@@ -17,30 +17,44 @@ const fetchRecipes = async (
   return { result, totalRecipes };
 };
 
-const fetchRecipesByFourCategories = async (count: number,lang:string) => {
+const categoryTranslations: Record<string, Record<string, string>> = {
+  breakfast: { en: "Breakfast", pl: "Śniadanie" },
+  miscellaneous: { en: "Miscellaneous", pl: "Różne" },
+  chicken: { en: "Chicken", pl: "Kurczak" },
+  dessert: { en: "Dessert", pl: "Desery" },
+};
+
+const sectionTranslations: Record<string, Record<string, string>> = {
+  breakfast: { en: "breakfast", pl: "sniadanie" },
+  miscellaneous: { en: "miscellaneous", pl: "rozne" },
+  chicken: { en: "chicken", pl: "kurczak" },
+  dessert: { en: "dessert", pl: "desery" },
+};
+
+const fetchRecipesByFourCategories = async (count: number, lang: string) => {
   const options = [
     {
       $project: {
         _id: 1,
-        title: 1,
         category: 1,
         preview: 1,
         thumb: 1,
+        title: { $ifNull: [`$translations.${lang}.title`, "$title"] },
       },
     },
     { $limit: count },
   ];
 
-  return await Recipe.aggregate([
-    {
-      $facet: {
-        breakfast: [{ $match: { category: lang ==="en" ? "Breakfast" : "Śniadanie"} }, ...options],
-        miscellaneous: [{ $match: { category:  lang ==="en" ?"Miscellaneous" :"Różne"} }, ...options],
-        chicken: [{ $match: { category:  lang ==="en" ?"Chicken" :"Kurczak"} }, ...options],
-        dessert: [{ $match: { category:  lang ==="en" ?"Dessert" :"Desery"} }, ...options],
-      },
-    },
-  ]);
+  // Dynamiczne budowanie `$facet`
+  const facetObject = Object.entries(categoryTranslations).reduce((acc, [key, translations]) => {
+    const translatedCategory = translations[lang] || translations.en; // Domyślnie angielski
+    const translatedSection = sectionTranslations[key][lang] || sectionTranslations[key].en; // Domyślna nazwa sekcji
+
+    acc[translatedSection] = [{ $match: { category: translatedCategory } }, ...options];
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  return await Recipe.aggregate([{ $facet: facetObject }]);
 };
 
 const fetchCategoriesList = async () => {
