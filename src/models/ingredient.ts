@@ -1,11 +1,13 @@
 import { Schema, model, Document, Model } from "mongoose";
+import { Types } from "mongoose";
 
 interface IIngredient extends Document {
+  _id: Types.ObjectId;
   ttl: string;
   ttlPl: string;
-  desc: string;
-  t: string;
   thb: string;
+  t: string;
+  desc: string;
 }
 
 const ingredientSchema = new Schema<IIngredient>(
@@ -21,4 +23,5 @@ const ingredientSchema = new Schema<IIngredient>(
 
 const Ingredient: Model<IIngredient> = model("ingredient", ingredientSchema);
 
-export default Ingredient; 
+export default Ingredient;
+export type { IIngredient }; 

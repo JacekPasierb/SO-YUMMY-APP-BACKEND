@@ -10,7 +10,7 @@ interface ISubscribe extends Document {
 const subscribeSchema = new Schema<ISubscribe>(
   {
     owner: {
-      type: Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },

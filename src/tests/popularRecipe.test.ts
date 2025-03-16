@@ -2,7 +2,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import request from "supertest";
 import app from "../app";
-import Recipe from "../models/recipe";
+import Recipe, { IRecipe } from "../models/recipe";
 import { User } from "../models/user";
 import jwt from "jsonwebtoken";
 
@@ -58,7 +58,7 @@ describe("PopularRecipe API", () => {
       instructions: "Test instructions",
       ingredients: [],
       favorites: [],
-    });
+    }) as IRecipe;
     recipeId = recipe._id.toString();
   });
 

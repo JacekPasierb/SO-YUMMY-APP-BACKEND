@@ -6,6 +6,7 @@ interface IIngredient {
 }
 
 interface IRecipe extends Document {
+  _id: Types.ObjectId;
   title: string;
   category: string;
   area?: string;
@@ -55,8 +56,7 @@ const recipeSchema = new Schema<IRecipe>(
       default: "",
     },
     favorites: {
-      type: Array,
-      of: String,
+      type: [String],
       default: [],
     },
     youtube: {
@@ -64,28 +64,21 @@ const recipeSchema = new Schema<IRecipe>(
       default: "",
     },
     tags: {
-      type: Array,
-      of: String,
+      type: [String],
       default: [],
     },
     ingredients: {
-      type: Array,
-
-      of: new Schema({
+      type: [new Schema({
         id: {
           type: Schema.Types.ObjectId,
-
           ref: "ingredient",
-
           required: true,
         },
-
         measure: {
           type: String,
-
           default: "",
         },
-      }),
+      })],
       default: [],
     },
     owner: {
@@ -99,3 +92,4 @@ const recipeSchema = new Schema<IRecipe>(
 const Recipe: Model<IRecipe> = model("recipe", recipeSchema);
 
 export default Recipe;
+export type { IRecipe };

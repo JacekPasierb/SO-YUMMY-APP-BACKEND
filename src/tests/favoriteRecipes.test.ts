@@ -5,7 +5,7 @@ import app from "../app";
 import { User } from "../models/user";
 
 import jwt from "jsonwebtoken";
-import Recipe from "../models/recipe";
+import Recipe, { IRecipe } from "../models/recipe";
 
 const API_ROUTES = {
   FAVORITES: "/api/favorite",
@@ -60,7 +60,7 @@ describe("Favorite Recipes API", () => {
       instructions: "Test instructions",
       ingredients: [],
       favorites: [],
-    });
+    }) as IRecipe;
     recipeId = recipe._id.toString();
   });
 

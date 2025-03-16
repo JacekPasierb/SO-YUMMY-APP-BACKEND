@@ -4,7 +4,7 @@ import request from "supertest";
 import app from "../app";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user";
-import Ingredient from "../models/ingredient";
+import Ingredient, { IIngredient } from "../models/ingredient";
 
 const API_ROUTES = {
   INGREDIENTS: "/api/ingredients",
@@ -71,7 +71,7 @@ describe("Ingredients API", () => {
         t: "Eggs",
         desc: "Protein-rich ingredient",
       },
-    ]);
+    ]) as IIngredient[];
     ingredientId = ingredients[0]._id.toString();
   });
 

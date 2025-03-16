@@ -16,7 +16,7 @@ interface IShoppingList extends Document {
 const shoppingListSchema = new Schema<IShoppingList>(
   {
     userId: {
-      type: Types.ObjectId ,
+      type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },
