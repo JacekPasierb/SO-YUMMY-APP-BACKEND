@@ -51,8 +51,8 @@ const getRecipes = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 exports.getRecipes = getRecipes;
 const getRecipesByFourCategories = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { count = 1, lang = "pl" } = req.query;
-        const result = yield (0, recipe_1.fetchRecipesByFourCategories)(+count, lang);
+        const { count = 1 } = req.query;
+        const result = yield (0, recipe_1.fetchRecipesByFourCategories)(+count);
         res.status(200).json({
             status: "success",
             code: 200,

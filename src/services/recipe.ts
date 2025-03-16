@@ -17,7 +17,7 @@ const fetchRecipes = async (
   return {result, totalRecipes};
 };
 
-const fetchRecipesByFourCategories = async (count: number, lang: string) => {
+const fetchRecipesByFourCategories = async (count: number) => {
   const options = [
     {
       $project: {
@@ -35,19 +35,19 @@ const fetchRecipesByFourCategories = async (count: number, lang: string) => {
     {
       $facet: {
         breakfast: [
-          {$match: {category: lang === "en" ? "Breakfast" : "Śniadanie"}},
+          {$match: {category:  "Breakfast"}},
           ...options,
         ],
         miscellaneous: [
-          {$match: {category: lang === "en" ? "Miscellaneous" : "Różne"}},
+          {$match: {category: "Miscellaneous"}},
           ...options,
         ],
         chicken: [
-          {$match: {category: lang === "en" ? "Chicken" : "Kurczak"}},
+          {$match: {category:  "Chicken" }},
           ...options,
         ],
         dessert: [
-          {$match: {category: lang === "en" ? "Dessert" : "Desery"}},
+          {$match: {category:  "Dessert" }},
           ...options,
         ],
       },

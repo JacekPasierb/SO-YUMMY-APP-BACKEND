@@ -23,7 +23,7 @@ const fetchRecipes = (filters, pageNumber, limitNumber) => __awaiter(void 0, voi
     return { result, totalRecipes };
 });
 exports.fetchRecipes = fetchRecipes;
-const fetchRecipesByFourCategories = (count, lang) => __awaiter(void 0, void 0, void 0, function* () {
+const fetchRecipesByFourCategories = (count) => __awaiter(void 0, void 0, void 0, function* () {
     const options = [
         {
             $project: {
@@ -40,19 +40,19 @@ const fetchRecipesByFourCategories = (count, lang) => __awaiter(void 0, void 0, 
         {
             $facet: {
                 breakfast: [
-                    { $match: { category: lang === "en" ? "Breakfast" : "Śniadanie" } },
+                    { $match: { category: "Breakfast" } },
                     ...options,
                 ],
                 miscellaneous: [
-                    { $match: { category: lang === "en" ? "Miscellaneous" : "Różne" } },
+                    { $match: { category: "Miscellaneous" } },
                     ...options,
                 ],
                 chicken: [
-                    { $match: { category: lang === "en" ? "Chicken" : "Kurczak" } },
+                    { $match: { category: "Chicken" } },
                     ...options,
                 ],
                 dessert: [
-                    { $match: { category: lang === "en" ? "Dessert" : "Desery" } },
+                    { $match: { category: "Dessert" } },
                     ...options,
                 ],
             },
