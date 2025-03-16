@@ -57,7 +57,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.3.0",
     "vercel": "^32.5.0",
-     "z-schema": "^5.0.5"
+    "z-schema": "^5.0.5"
   },
   "devDependencies": {
     "@shelf/jest-mongodb": "^4.3.2",
