@@ -19,7 +19,7 @@ const shoppingListSchema = new Schema<IShoppingList>(
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
-    },
+    }as any,
     items: [
       {
         ingredientId: { type: Schema.Types.ObjectId, ref: "ingredient" },

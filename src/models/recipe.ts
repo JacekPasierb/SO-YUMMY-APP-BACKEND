@@ -58,7 +58,7 @@ const recipeSchema = new Schema<IRecipe>(
     favorites: {
       type: [String],
       default: [],
-    },
+    }as any,
     youtube: {
       type: String,
       default: "",
@@ -66,7 +66,7 @@ const recipeSchema = new Schema<IRecipe>(
     tags: {
       type: [String],
       default: [],
-    },
+    }as any,
     ingredients: {
       type: [new Schema({
         id: {
@@ -80,7 +80,7 @@ const recipeSchema = new Schema<IRecipe>(
         },
       })],
       default: [],
-    },
+    }as any,
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",

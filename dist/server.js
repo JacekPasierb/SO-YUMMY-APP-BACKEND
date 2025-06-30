@@ -8,7 +8,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const app_1 = __importDefault(require("./app"));
 dotenv_1.default.config();
 const connectionString = process.env.SO_YUMMY;
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 4000;
 const connection = mongoose_1.default.connect(connectionString, {
     dbName: "so_yummy",
 });

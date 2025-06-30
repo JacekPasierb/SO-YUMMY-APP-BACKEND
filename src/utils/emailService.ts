@@ -30,10 +30,10 @@ const sendVerificationEmail = async ({
     to,
     subject: "SO YUMMY APP email verification",
     html: `
-      <div style="text-align: center;">
-      <h1>SO YUMMY APP</h1>
-      <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend-9mvu.vercel.app/api/users/verify/${verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
-      </div>
+    <div style="text-align: center;">
+    <h1>SO YUMMY APP</h1>
+    <p style="font-size:16px;">Verify your e-mail address by clicking on this link - <a href="https://so-yummy-app-backend-9mvu.vercel.app/api/users/verify/${verificationToken}" target="_blank" rel="noopener noreferrer nofollow"><strong>Verification Link</strong></a></p>
+    </div>
     `,
   };
 
@@ -72,4 +72,4 @@ const sendSubscriptionEmail = async ({
   }
 };
 
-export { sendVerificationEmail, sendSubscriptionEmail };
+export {sendVerificationEmail, sendSubscriptionEmail};

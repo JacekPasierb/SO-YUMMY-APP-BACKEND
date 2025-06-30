@@ -42,11 +42,24 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
         if (!newUser.verificationToken) {
             throw (0, handleErrors_1.default)(500, "Verification token generation failed");
         }
-        const emailToSend = {
-            to: newUser.email,
-            verificationToken: newUser.verificationToken,
-        };
-        (0, emailService_1.sendVerificationEmail)(emailToSend);
+        // Verify manual
+        const verificationToken = newUser.verificationToken;
+        const userDemo = yield (0, user_1.findUser)({ verificationToken });
+        if (!userDemo) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        const update = yield (0, user_1.updateUser)(userDemo._id, {
+            verify: true,
+            verificationToken: null,
+        });
+        // -----------------
+        // Hide function sendMail
+        // const emailToSend = {
+        //   to: newUser.email,
+        //   verificationToken: newUser.verificationToken,
+        // };
+        // sendVerificationEmail(emailToSend);
         res.status(201).json({
             status: "Created",
             code: 201,
@@ -159,9 +172,10 @@ const signin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
         if (!passwordMatch) {
             throw (0, handleErrors_1.default)(401, "Invalid Email or Password");
         }
-        if (!user.verify) {
-            throw (0, handleErrors_1.default)(403, "email is not verifed");
-        }
+        // OFF function verify email - sendGrid is to pay
+        // if (!user.verify) {
+        //   throw handleError(403, "email is not verifed");
+        // }
         const payload = {
             id: user._id,
             email: user.email,

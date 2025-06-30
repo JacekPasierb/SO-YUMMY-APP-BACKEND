@@ -13,7 +13,7 @@ const subscribeSchema = new Schema<ISubscribe>(
       type: Schema.Types.ObjectId,
       ref: "user",
       required: true,
-    },
+    }as any,
     email: {
       type: String,
       match: emailRegexp,
