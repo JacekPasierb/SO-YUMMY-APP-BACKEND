@@ -4,6 +4,11 @@ import handleError from "../utils/handleErrors";
 import { IUser } from "../models/user";
 
 const auth = (req: Request, res: Response, next: NextFunction) => {
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+    return;
+  }
+
   const authorization = req.headers.authorization;
   passport.authenticate(
     "jwt",
