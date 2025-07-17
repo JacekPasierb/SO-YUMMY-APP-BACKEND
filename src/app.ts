@@ -56,6 +56,17 @@ app.use(
     ],
   })
 );
+
+app.options("*", cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 // 🔍 Logowanie żądań CORS do debugowania
 app.use((req, res, next) => {
   console.log(`CORS request from: ${req.headers.origin}`);
