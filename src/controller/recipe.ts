@@ -62,10 +62,10 @@ const getRecipesByFourCategories = async (
 ): Promise<void> => {
   try {
     const {count = 1, lang="pl" } = req.query;
-console.log("BACKEND check count: ",count);
+
 
     const result = await fetchRecipesByFourCategories(Number(count), lang as string);
-console.log("Wyniki",result[0]);
+
 
     res.status(200).json({
       status: "success",

@@ -19,10 +19,9 @@ const getShoppingList = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
     try {
         const userId = req.user._id;
         const shoppingList = yield (0, shoppingList_1.getShoppingListByUserId)(userId);
-        if (!shoppingList) {
-            return next((0, handleErrors_1.default)(404, "Shopping list not found"));
-        }
-        res.status(200).json(shoppingList);
+        !shoppingList
+            ? res.status(200).json({ items: [] })
+            : res.status(200).json(shoppingList);
     }
     catch (error) {
         const err = error;

@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import {Request, Response, NextFunction} from "express";
 import handleError from "../utils/handleErrors";
-import { IUser } from "../models/user";
+import {IUser} from "../models/user";
 import {
   addIngredientToShoppingList,
   deleteIngredientFromShoppingList,
@@ -13,15 +13,13 @@ const getShoppingList = async (
   next: NextFunction
 ) => {
   try {
-
     const userId = (req.user as IUser)._id;
+
     const shoppingList = await getShoppingListByUserId(userId);
 
-    if (!shoppingList) {
-      return next(handleError(404, "Shopping list not found"));
-    }
-
-    res.status(200).json(shoppingList);
+    !shoppingList
+      ? res.status(200).json({items: []})
+      : res.status(200).json(shoppingList);
   } catch (error) {
     const err = error as Error;
     next(handleError(500, `Internal server error: ${err.message}`));
@@ -34,8 +32,7 @@ const addIngredient = async (
   next: NextFunction
 ) => {
   try {
-
-    const { ingredientId, thb, name, measure, recipeId } = req.body;
+    const {ingredientId, thb, name, measure, recipeId} = req.body;
     const userId = (req.user as IUser)._id;
     const shoppingList = await addIngredientToShoppingList(userId, {
       ingredientId,
@@ -66,11 +63,10 @@ const deleteIngredient = async (
   next: NextFunction
 ) => {
   try {
- 
-    const { ingredientId, recipeId } = req.body;
+    const {ingredientId, recipeId} = req.body;
     const userId = (req.user as IUser)._id;
 
-    await deleteIngredientFromShoppingList(userId, { ingredientId, recipeId });
+    await deleteIngredientFromShoppingList(userId, {ingredientId, recipeId});
 
     res.status(200).json({
       message: "Item removed successfully",
@@ -86,4 +82,4 @@ const deleteIngredient = async (
   }
 };
 
-export { getShoppingList, addIngredient, deleteIngredient };
+export {getShoppingList, addIngredient, deleteIngredient};

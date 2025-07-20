@@ -52,9 +52,7 @@ exports.getRecipes = getRecipes;
 const getRecipesByFourCategories = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { count = 1, lang = "pl" } = req.query;
-        console.log("BACKEND check count: ", count);
         const result = yield (0, recipe_1.fetchRecipesByFourCategories)(Number(count), lang);
-        console.log("Wyniki", result[0]);
         res.status(200).json({
             status: "success",
             code: 200,
