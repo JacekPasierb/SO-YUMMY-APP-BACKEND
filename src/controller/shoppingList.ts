@@ -34,6 +34,8 @@ const addIngredient = async (
   try {
     const {ingredientId, thb, name, measure, recipeId} = req.body;
     const userId = (req.user as IUser)._id;
+    console.log("userI", userId);
+    
     const shoppingList = await addIngredientToShoppingList(userId, {
       ingredientId,
       thb,

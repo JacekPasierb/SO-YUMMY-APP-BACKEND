@@ -21,9 +21,12 @@ const getShoppingListByUserId = (userId) => __awaiter(void 0, void 0, void 0, fu
 exports.getShoppingListByUserId = getShoppingListByUserId;
 const addIngredientToShoppingList = (userId, ingredientData) => __awaiter(void 0, void 0, void 0, function* () {
     let shoppingList = yield shoppingList_1.default.findOne({ userId });
+    console.log("shop", shoppingList);
     if (!shoppingList) {
+        console.log("bedzie tworzyc");
         shoppingList = new shoppingList_1.default({ userId, items: [] });
     }
+    yield shoppingList.save();
     yield shoppingList_1.default.updateOne({ userId }, { $push: { items: ingredientData } });
     return shoppingList;
 });

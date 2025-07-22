@@ -33,6 +33,7 @@ const addIngredient = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         const { ingredientId, thb, name, measure, recipeId } = req.body;
         const userId = req.user._id;
+        console.log("userI", userId);
         const shoppingList = yield (0, shoppingList_1.addIngredientToShoppingList)(userId, {
             ingredientId,
             thb,

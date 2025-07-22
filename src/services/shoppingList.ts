@@ -18,11 +18,14 @@ const addIngredientToShoppingList = async (
   }
 ) => {
   let shoppingList = await ShoppingList.findOne({userId});
+console.log("shop",shoppingList);
 
   if (!shoppingList) {
+    console.log("bedzie tworzyc");
+    
     shoppingList = new ShoppingList({userId, items: []});
   }
-
+  await shoppingList.save();
   await ShoppingList.updateOne({userId}, {$push: {items: ingredientData}});
 
   return shoppingList;
